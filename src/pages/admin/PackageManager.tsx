@@ -29,7 +29,7 @@ interface Pkg {
 
 const emptyPkg: Omit<Pkg, "id"> = {
   name: "", name_bn: "", speed: 0, price: 0, category: "home",
-  features: [], badges: [], featured: false, visible: true, sort_order: 0,
+  features: [], badges: [], featured: false, popular: false, visible: true, sort_order: 0,
 };
 
 const PackageManager = () => {
