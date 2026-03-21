@@ -147,13 +147,22 @@ const About = () => {
           <h2 className="text-3xl font-bold text-foreground text-center mb-10">{t("Our Team", "আমাদের দল")}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-4xl mx-auto">
             {team.map((member) => (
-              <Card key={member.name} className="border hover:border-accent/40 transition-all">
+              <Card key={member.id} className="border hover:border-accent/40 transition-all">
                 <CardContent className="p-6 text-center">
-                  <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-accent" />
-                  </div>
+                  {member.photo_url ? (
+                    <img src={member.photo_url} alt={member.name} className="h-16 w-16 rounded-full object-cover mx-auto mb-4" />
+                  ) : (
+                    <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                      <Users className="h-8 w-8 text-accent" />
+                    </div>
+                  )}
                   <h3 className="font-bold text-foreground">{t(member.name, member.name_bn || member.name)}</h3>
-                  <p className="text-sm text-accent font-medium mt-1">{t(member.role, member.role_bn || member.role)}</p>
+                  {member.designations && (
+                    <p className="text-sm text-accent font-medium mt-1">{t(member.designations.name, member.designations.name_bn || member.designations.name)}</p>
+                  )}
+                  {member.departments && (
+                    <p className="text-xs text-muted-foreground mt-1">{t(member.departments.name, member.departments.name_bn || member.departments.name)}</p>
+                  )}
                 </CardContent>
               </Card>
             ))}
