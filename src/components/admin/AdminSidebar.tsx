@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Package, MapPin, ShoppingCart, FileText,
-  Bell, Settings, Users, LogOut, Wifi, Menu, CreditCard, Home, Image
+  Bell, Settings, Users, LogOut, Wifi, Menu, CreditCard, Home, Image, ExternalLink
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
