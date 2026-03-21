@@ -33,7 +33,12 @@ interface TeamMember {
   designations: { name: string; name_bn: string | null } | null;
 }
 
-// safeParse and About component moved above
+function safeParse<T>(json: string | undefined, fallback: T): T {
+  if (!json) return fallback;
+  try { return JSON.parse(json); } catch { return fallback; }
+}
+
+const About = () => {
   const { t } = useLanguage();
   const [heroEn, setHeroEn] = useState("Connecting Bangladesh with fast, reliable internet since 2015.");
   const [heroBn, setHeroBn] = useState("২০১৫ সাল থেকে দ্রুত ও নির্ভরযোগ্য ইন্টারনেটে সংযুক্ত করছি।");
