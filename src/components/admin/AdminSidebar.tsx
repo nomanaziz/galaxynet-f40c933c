@@ -52,14 +52,9 @@ export function AdminSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-primary">
-            <Wifi className="h-4 w-4 text-sidebar-primary-foreground" />
-          </div>
+          <img src={logo} alt="Galaxy Net" className="h-8 w-auto brightness-0 invert shrink-0" />
           {!collapsed && (
-            <div>
-              <p className="text-sm font-bold text-sidebar-foreground">Galaxy Net</p>
-              <p className="text-xs text-sidebar-foreground/70">Admin Panel</p>
-            </div>
+            <p className="text-xs text-sidebar-foreground/70">Admin Panel</p>
           )}
         </div>
         <a href="/" target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center gap-1.5 text-xs text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors">

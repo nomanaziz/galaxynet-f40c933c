@@ -197,10 +197,7 @@ const Navbar = () => {
             <SheetContent side="right" className="w-72 p-0 bg-background">
               <div className="flex items-center justify-between p-4 border-b border-border">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
-                    <Wifi className="h-4 w-4 text-accent-foreground" />
-                  </div>
-                  <span className="font-bold text-foreground">Galaxy Net</span>
+                  <img src={logo} alt="Galaxy Net" className="h-8 w-auto" />
                 </div>
                 <SheetClose asChild>
                   <Button variant="ghost" size="icon">

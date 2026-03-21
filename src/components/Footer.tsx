@@ -48,10 +48,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent">
-                <Wifi className="h-5 w-5 text-accent-foreground" />
-              </div>
-              <span className="text-lg font-bold">{siteName}</span>
+              <img src={logo} alt={siteName} className="h-10 w-auto brightness-0 invert" />
             </div>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-4">
               {tagline}
