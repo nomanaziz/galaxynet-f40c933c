@@ -50,7 +50,7 @@ const OffersManager = () => {
   const handleDelete = async (id: string) => {
     await supabase.from("offers").delete().eq("id", id);
     toast({ title: "Offer deleted" });
-    fetch();
+    fetchOffers();
   };
 
   const toggleActive = async (o: any) => {
