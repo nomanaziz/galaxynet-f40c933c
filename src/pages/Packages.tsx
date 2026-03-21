@@ -110,13 +110,6 @@ const Packages = () => {
                 </TabsList>
               </div>
 
-              <div className="max-w-sm mx-auto mb-10 p-4 rounded-xl bg-secondary border">
-                <p className="text-sm font-medium text-foreground mb-2 text-center">
-                  {t("Filter by Speed", "গতি অনুযায়ী")}: {speedFilter[0] === 0 ? t("All", "সব") : `${speedFilter[0]}+ Mbps`}
-                </p>
-                <Slider value={speedFilter} onValueChange={setSpeedFilter} max={200} step={10} className="w-full" />
-              </div>
-
               {["home", "corporate", "dedicated"].map(cat => (
                 <TabsContent key={cat} value={cat}>
                   <div className={`grid grid-cols-1 ${cat === "dedicated" ? "sm:grid-cols-1 lg:grid-cols-1 max-w-lg mx-auto" : "sm:grid-cols-2 lg:grid-cols-4"} gap-5`}>
