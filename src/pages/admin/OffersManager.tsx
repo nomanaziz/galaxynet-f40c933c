@@ -23,13 +23,13 @@ const OffersManager = () => {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  const fetch = async () => {
+  const fetchOffers = async () => {
     const { data } = await supabase.from("offers").select("*").order("created_at", { ascending: false });
     setOffers(data ?? []);
     setLoading(false);
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { fetchOffers(); }, []);
 
   const openAdd = () => { setEditing(null); setForm(defaultForm); setDialogOpen(true); };
   const openEdit = (o: any) => { setEditing(o); setForm({ title: o.title, title_bn: o.title_bn || "", description: o.description || "", description_bn: o.description_bn || "", image_url: o.image_url || "", expiry_date: o.expiry_date || "", active: o.active, type: o.type }); setDialogOpen(true); };
