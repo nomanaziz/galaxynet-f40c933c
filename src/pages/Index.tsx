@@ -288,7 +288,7 @@ const Index = () => {
       {partners.length > 0 && (
         <section className="py-14 bg-secondary/50">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-foreground text-center mb-8">
+            <h2 className="text-2xl font-bold text-primary text-center mb-8">
               {t(settings.partner_section_title_en || "Our Partners", settings.partner_section_title_bn || "আমাদের পার্টনার")}
             </h2>
             <div className="flex flex-wrap justify-center gap-8 items-center">
