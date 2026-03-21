@@ -7,7 +7,9 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/s
 const navLinks = [
   { href: "/", label: "Home", labelBn: "হোম" },
   { href: "/packages", label: "Packages", labelBn: "প্যাকেজ" },
+  { href: "/services", label: "Services", labelBn: "সেবা" },
   { href: "/coverage", label: "Coverage", labelBn: "কভারেজ" },
+  { href: "/about", label: "About", labelBn: "আমাদের সম্পর্কে" },
   { href: "/contact", label: "Contact", labelBn: "যোগাযোগ" },
 ];
 
@@ -21,7 +23,6 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 w-full shadow-md" style={{ background: "hsl(var(--galaxy-blue-dark))" }}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-galaxy-orange">
             <Wifi className="h-5 w-5 text-white" />
@@ -32,13 +33,12 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
-              className={`flex flex-col items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex flex-col items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 isActive(link.href)
                   ? "bg-galaxy-orange text-white"
                   : "text-blue-100 hover:bg-white/10 hover:text-white"
@@ -50,18 +50,16 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* CTA Button (Desktop) */}
-        <div className="hidden md:flex items-center gap-3">
-          <Link to="/contact">
+        <div className="hidden lg:flex items-center gap-3">
+          <Link to="/order">
             <Button className="bg-galaxy-orange hover:bg-galaxy-orange-dark text-white font-semibold px-5 animate-pulse-orange">
-              Get Connected · সংযুক্ত হন
+              Order Now · অর্ডার করুন
             </Button>
           </Link>
         </div>
 
-        {/* Mobile Menu */}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild className="md:hidden">
+          <SheetTrigger asChild className="lg:hidden">
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
               <Menu className="h-6 w-6" />
             </Button>
@@ -98,9 +96,9 @@ const Navbar = () => {
               ))}
               <div className="pt-4 border-t border-white/10 mt-2">
                 <SheetClose asChild>
-                  <Link to="/contact">
+                  <Link to="/order">
                     <Button className="w-full bg-galaxy-orange hover:bg-galaxy-orange-dark text-white font-semibold">
-                      Get Connected · সংযুক্ত হন
+                      Order Now · অর্ডার করুন
                     </Button>
                   </Link>
                 </SheetClose>
