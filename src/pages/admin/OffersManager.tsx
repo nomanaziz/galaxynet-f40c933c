@@ -55,7 +55,7 @@ const OffersManager = () => {
 
   const toggleActive = async (o: any) => {
     await supabase.from("offers").update({ active: !o.active }).eq("id", o.id);
-    fetch();
+    fetchOffers();
   };
 
   if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin" /></div>;

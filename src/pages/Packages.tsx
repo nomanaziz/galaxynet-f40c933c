@@ -59,7 +59,7 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
           ))}
         </ul>
         <Link to="/contact">
-          <Button variant={plan.featured ? "default" : "outline"} className={`w-full font-semibold ${plan.featured ? "bg-accent hover:bg-accent/90 text-accent-foreground" : ""}`}>
+          <Button variant={plan.popular ? "default" : "outline"} className={`w-full font-semibold ${plan.popular ? "bg-accent hover:bg-accent/90 text-accent-foreground" : ""}`}>
             {t("Contact Us", "যোগাযোগ করুন")}
           </Button>
         </Link>

@@ -200,10 +200,14 @@ const PackageManager = () => {
               <Label>Badges (comma-separated)</Label>
               <Input value={badgesStr} onChange={e => setBadgesStr(e.target.value)} placeholder="BDIX, FTP, Gaming" />
             </div>
-            <div className="flex gap-6">
+            <div className="flex gap-6 flex-wrap">
               <div className="flex items-center gap-2">
                 <Switch checked={form.featured} onCheckedChange={v => setForm(f => ({ ...f, featured: v }))} />
                 <Label>Show on Homepage</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={form.popular} onCheckedChange={v => setForm(f => ({ ...f, popular: v }))} />
+                <Label>Popular</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Switch checked={form.visible} onCheckedChange={v => setForm(f => ({ ...f, visible: v }))} />
