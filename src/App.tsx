@@ -16,6 +16,18 @@ import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import StickyOrderBar from "./components/StickyOrderBar";
 
+// Admin
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminLayout from "./pages/admin/AdminLayout";
+import Dashboard from "./pages/admin/Dashboard";
+import PackageManager from "./pages/admin/PackageManager";
+import CoverageManager from "./pages/admin/CoverageManager";
+import OrderManager from "./pages/admin/OrderManager";
+import PageManager from "./pages/admin/PageManager";
+import NoticeManager from "./pages/admin/NoticeManager";
+import SettingsPage from "./pages/admin/SettingsPage";
+import UserManager from "./pages/admin/UserManager";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -34,7 +46,20 @@ const App = () => (
           <Route path="/order" element={<Order />} />
           <Route path="/speed-test" element={<SpeedTest />} />
           <Route path="/notices" element={<Notices />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="packages" element={<PackageManager />} />
+            <Route path="coverage" element={<CoverageManager />} />
+            <Route path="orders" element={<OrderManager />} />
+            <Route path="pages" element={<PageManager />} />
+            <Route path="notices" element={<NoticeManager />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="users" element={<UserManager />} />
+          </Route>
+
           <Route path="*" element={<NotFound />} />
         </Routes>
         <FloatingWhatsApp />
