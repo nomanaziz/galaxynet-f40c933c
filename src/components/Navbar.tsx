@@ -1,15 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Wifi, ChevronDown, Globe } from "lucide-react";
+import { Menu, X, Wifi, ChevronDown, Globe, User, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+  }, []);
 
   const navLinks = [
     { href: "/", label: t("Home", "হোম") },
@@ -84,11 +95,28 @@ const Navbar = () => {
             <Globe className="h-4 w-4" />
             {language === "bn" ? "EN" : "বাং"}
           </button>
-          <Link to="/contact">
-            <Button size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-5">
-              {t("Contact Us", "যোগাযোগ")}
-            </Button>
-          </Link>
+          {user ? (
+            <Link to="/admin/login">
+              <Button size="sm" variant="outline" className="font-medium">
+                <User className="h-4 w-4 mr-1.5" />
+                {t("My Account", "আমার অ্যাকাউন্ট")}
+              </Button>
+            </Link>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link to="/login">
+                <Button size="sm" variant="ghost" className="font-medium">
+                  <LogIn className="h-4 w-4 mr-1.5" />
+                  {t("Login", "লগইন")}
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-5">
+                  {t("Sign Up", "সাইন আপ")}
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Mobile */}

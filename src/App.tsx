@@ -15,6 +15,8 @@ import SpeedTest from "./pages/SpeedTest";
 import Notices from "./pages/Notices";
 import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 // Admin
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -51,6 +53,8 @@ const App = () => (
             <Route path="/order" element={<Order />} />
             <Route path="/speed-test" element={<SpeedTest />} />
             <Route path="/notices" element={<Notices />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />

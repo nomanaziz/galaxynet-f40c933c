@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Package, MapPin, ShoppingCart, FileText,
-  Bell, Settings, Users, LogOut, Wifi, Menu, CreditCard, Home, Image
+  Bell, Settings, Users, LogOut, Wifi, Menu, CreditCard, Home, Image, ExternalLink
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -49,6 +49,10 @@ export function AdminSidebar() {
             </div>
           )}
         </div>
+        <a href="/" target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center gap-1.5 text-xs text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors">
+          <ExternalLink className="h-3 w-3" />
+          {!collapsed && <span>Visit Site</span>}
+        </a>
       </SidebarHeader>
 
       <SidebarContent>
