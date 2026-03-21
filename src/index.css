@@ -126,6 +126,15 @@
     border-color: hsl(var(--galaxy-orange));
   }
 
+  @keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .animate-marquee {
+    animation: marquee 20s linear infinite;
+  }
+
   .page-hero {
     @apply py-16 md:py-20 text-center relative overflow-hidden;
     background: linear-gradient(160deg, hsl(220 20% 97%) 0%, hsl(215 30% 94%) 50%, hsl(25 30% 96%) 100%);
