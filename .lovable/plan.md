@@ -1,126 +1,166 @@
 
 
-## Galaxy Net Admin Panel — Implementation Plan (Steps 1–6)
+## Galaxy Net — Complete UI/UX Redesign + Language System + Admin CMS Enhancements
 
-This is a large build. We will implement it in the first batch: database schema, auth, admin layout, dashboard, package CRUD, and coverage area CRUD.
-
----
-
-### Step 1: Database Schema + RLS
-
-Create a single migration with all tables, the `app_role` enum, the `has_role()` security definer function, and RLS policies.
-
-**Tables:**
-- `packages` — id, name, name_bn, speed, price, category (home/corporate), features (jsonb), badges (jsonb), featured, sort_order, visible, created_at
-- `coverage_areas` — id, name, name_bn, zone, district, available, created_at
-- `connection_orders` — id, name, phone, email, address, area, package_id (FK), preferred_date, notes, status (enum: pending/contacted/completed), assigned_to, created_at
-- `pages` — id, slug, title, content, meta_title, meta_description, published, created_at
-- `notices` — id, title, title_bn, category (enum: maintenance/offer/alert), content, published, created_at
-- `site_settings` — id, key (unique), value, created_at
-- `payment_methods` — id, name, account_number, logo_url, instructions, sort_order, visible, created_at
-- `user_roles` — id, user_id (FK auth.users, unique), role (enum: super_admin/admin/staff)
-
-**Security:**
-- `app_role` enum: super_admin, admin, staff
-- `has_role(uuid, app_role)` — security definer function
-- Public SELECT on: packages, coverage_areas, pages, notices, site_settings, payment_methods (where visible/published)
-- Public INSERT on: connection_orders (for visitors submitting orders — no auth required)
-- Admin INSERT/UPDATE/DELETE on all tables via `has_role()`
-- user_roles: SELECT/INSERT/UPDATE/DELETE only for super_admin
-
-**Seed data:** Insert existing hardcoded packages and coverage areas into the new tables so the site works immediately.
+This plan covers a full frontend redesign with a modern, clean, premium look — plus a Bangla/English language system and admin CMS improvements.
 
 ---
 
-### Step 2: Admin Authentication
+### 1. Language System (Foundation — Build First)
 
-- Create `/admin/login` page with email/password Supabase Auth login
-- Create `useAdminAuth` hook that checks `user_roles` table for the logged-in user
-- Redirect non-admin users away from `/admin/*` routes
+Create a lightweight i18n context that all components consume.
 
----
-
-### Step 3: Admin Layout
-
-- Create `AdminLayout.tsx` with shadcn/ui Sidebar (collapsible)
-- Sidebar sections: Dashboard, Packages, Coverage, Orders, Pages, Notices, Settings, Users
-- Role-based visibility (Users + Settings only for super_admin)
-- `SidebarTrigger` always visible in header
-- Nested routes via React Router `<Outlet />`
+- **New file:** `src/contexts/LanguageContext.tsx` — React context with `language` (bn/en), `setLanguage`, and a `t()` helper
+- **New file:** `src/i18n/translations.ts` — all UI strings in `{ en: "...", bn: "..." }` format
+- Default language: **Bangla**
+- Persist selection in `localStorage`
+- Language switcher component: simple toggle button (বাং / EN) placed in the Navbar
 
 ---
 
-### Step 4: Dashboard
+### 2. Navbar — Full Redesign
 
-- Stats cards: Total Orders, Active Packages, Coverage Areas, Pending Orders (fetched from Supabase with `.select('*', { count: 'exact', head: true })`)
-- Recent orders table (last 10)
-- Simple bar chart with Recharts for orders by status
+Replace the current navbar with a clean, modern sticky header:
 
----
-
-### Step 5: Package Management
-
-- Data table listing all packages with columns: Name, Speed, Price, Category, Featured, Visible, Actions
-- Add/Edit dialog with form (react-hook-form + shadcn/ui)
-- Delete with AlertDialog confirmation
-- Inline toggle for visible/featured via Switch
+- **Left:** Logo (icon + "Galaxy Net")
+- **Center:** Nav links — Home, Packages, Services, Coverage, About, Contact
+- **Right:** Language switcher toggle + "Contact Us" CTA button (replaces "Order Now")
+- **Dropdown support:** Services menu item gets a dropdown (Broadband, Corporate, CCTV, Networking)
+- **Mobile:** Clean hamburger menu with slide-in sheet, smooth animation
+- **Remove:** "Order Now" button from navbar entirely
+- Cleaner spacing, no dual-language labels in nav links (use selected language only)
+- Subtle bottom border/shadow instead of heavy color block
 
 ---
 
-### Step 6: Coverage Area Management
+### 3. Hero Section — Full Redesign (Homepage)
 
-- Data table: Area Name (EN/BN), Zone, District, Available
-- Add/Edit/Delete dialogs
-- Toggle available/unavailable inline
+Replace the current hero with a modern split layout:
 
----
-
-### File Structure
-
-```text
-src/
-├── pages/admin/
-│   ├── AdminLogin.tsx
-│   ├── AdminLayout.tsx
-│   ├── Dashboard.tsx
-│   ├── PackageManager.tsx
-│   ├── CoverageManager.tsx
-│   ├── OrderManager.tsx        (placeholder)
-│   ├── PageManager.tsx         (placeholder)
-│   ├── NoticeManager.tsx       (placeholder)
-│   ├── SettingsPage.tsx        (placeholder)
-│   └── UserManager.tsx         (placeholder)
-├── components/admin/
-│   ├── AdminSidebar.tsx
-│   └── StatsCard.tsx
-├── hooks/
-│   └── useAdminAuth.ts
-└── App.tsx                     (add /admin/* routes)
-```
-
-### Routing Changes (App.tsx)
-
-Add protected admin routes:
-- `/admin/login` — AdminLogin
-- `/admin` — AdminLayout wrapper with nested routes:
-  - index → Dashboard
-  - `packages` → PackageManager
-  - `coverage` → CoverageManager
-  - `orders` → OrderManager (placeholder)
-  - `pages` → PageManager (placeholder)
-  - `notices` → NoticeManager (placeholder)
-  - `settings` → SettingsPage (placeholder)
-  - `users` → UserManager (placeholder)
+- **Left side:**
+  - Strong headline in selected language (e.g., "আপনার এলাকায় সেরা ফাইবার ইন্টারনেট" / "Best Fiber Internet in Your Area")
+  - Short description paragraph
+  - Two CTA buttons: "Check Coverage" (primary) + "Contact Us" (outline)
+  - Remove: "Order Now", "Get Connection" buttons
+  - Remove: BDIX/FTP badge row from hero
+- **Right side:**
+  - Abstract ISP illustration using CSS/SVG (fiber optic network visual, gradient circles, connecting dots pattern)
+- **Background:** Subtle gradient with soft pattern overlay, not the heavy blue block
+- **Animation:** Fade-up on load for text, slide-in for illustration
 
 ---
 
-### Migration SQL Summary
+### 4. Homepage Sections Redesign
 
-One migration creates: 2 enums, 8 tables, 1 security definer function, ~20 RLS policies, and seed data for packages + coverage areas.
+Rebuild each section with cleaner design:
 
-### Important Notes
+- **Trust Stats Bar:** Softer background, larger numbers, subtle card style
+- **Why Choose Us:** Cleaner cards with more whitespace, subtle hover lift effect
+- **Services Preview:** Horizontal scroll on mobile, clean icon cards
+- **Popular Packages:** Remove "Order Now" buttons, replace with "View Details" linking to `/packages` and "Contact" linking to `/contact`
+- **Coverage CTA:** Cleaner design with illustration
+- **Testimonials:** Cleaner quote cards with avatar initials
+- **Bottom CTA:** Replace "Order Now" with "Contact Us" / "Check Coverage"
 
-- connection_orders allows anonymous INSERT (no auth needed — visitors submit orders)
-- site_settings and payment_methods have public read for visible items
-- After implementation, you will need to create an admin user via Supabase Auth dashboard and assign them a role in `user_roles`
+---
+
+### 5. Packages Page Redesign
+
+- Clean card-based layout, more whitespace
+- Replace all "Order Now" buttons with "View Details" or "Contact Us"
+- Cleaner speed filter UI
+- Better typography hierarchy (speed prominently displayed, price secondary)
+
+---
+
+### 6. Coverage Page Redesign
+
+- Cleaner search/dropdown UI
+- When available: show "Contact Us" button (not "Order Now")
+- When not available: show "Request Connection" linking to contact
+
+---
+
+### 7. Other Pages (About, Contact, Services)
+
+- Apply consistent design system across all pages
+- Cleaner page heroes (lighter, less heavy gradient)
+- Better card spacing and typography
+- Remove any remaining "Order Now" references
+
+---
+
+### 8. Footer Redesign
+
+- Clean 4-column layout
+- Better typography and spacing
+- Quick links use selected language only
+- Social icons row
+
+---
+
+### 9. Remove "Order Now" Elements
+
+- Remove `StickyOrderBar.tsx` component (fixed bottom bar)
+- Remove "Order Now" from floating elements
+- Keep the `/order` page accessible but don't prominently push it
+- Replace all "Order Now" CTAs with "Contact Us" or "View Details"
+
+---
+
+### 10. Admin Panel CMS Enhancements
+
+**New admin modules (database tables already exist):**
+
+- **Menu Management** (`/admin/menu`) — Add/edit/reorder menu items, link to pages
+- **Payment Method Management** (`/admin/payments`) — CRUD for bKash, Nagad, Bank payment methods
+- **Homepage Section Editor** (`/admin/homepage`) — Edit hero text, CTA text, feature highlights from admin (store in `site_settings` with section-specific keys)
+- **Media Manager** (`/admin/media`) — Create a Supabase storage bucket, upload/browse images
+
+**Database changes needed:**
+- New `menu_items` table (already in schema plan but not created yet): `id`, `label`, `label_bn`, `url`, `parent_id`, `sort_order`, `visible`
+- Storage bucket for media uploads
+
+---
+
+### File Changes Summary
+
+| Action | File |
+|--------|------|
+| Create | `src/contexts/LanguageContext.tsx` |
+| Create | `src/i18n/translations.ts` |
+| Rewrite | `src/components/Navbar.tsx` |
+| Rewrite | `src/components/Footer.tsx` |
+| Rewrite | `src/pages/Index.tsx` |
+| Rewrite | `src/pages/Packages.tsx` |
+| Rewrite | `src/pages/Coverage.tsx` |
+| Rewrite | `src/pages/About.tsx` |
+| Rewrite | `src/pages/Contact.tsx` |
+| Rewrite | `src/pages/Services.tsx` |
+| Edit | `src/pages/Order.tsx` — update CTAs, cleaner design |
+| Delete | `src/components/StickyOrderBar.tsx` |
+| Edit | `src/App.tsx` — remove StickyOrderBar, wrap with LanguageProvider |
+| Edit | `src/index.css` — updated design tokens, softer gradients |
+| Edit | `tailwind.config.ts` — new animations (fade-up, slide-in) |
+| Create | `src/pages/admin/MenuManager.tsx` |
+| Create | `src/pages/admin/PaymentManager.tsx` |
+| Create | `src/pages/admin/HomepageEditor.tsx` |
+| Create | `src/pages/admin/MediaManager.tsx` |
+| Edit | `src/components/admin/AdminSidebar.tsx` — add new menu items |
+| Edit | `src/App.tsx` — add new admin routes |
+| Migration | Create `menu_items` table + storage bucket |
+
+---
+
+### Implementation Order
+
+1. Language system (context + translations)
+2. Navbar redesign
+3. Hero section redesign
+4. Homepage sections redesign
+5. Packages, Coverage, About, Contact, Services page redesigns
+6. Footer redesign
+7. Remove StickyOrderBar + "Order Now" references
+8. Admin CMS enhancements (menu, payments, homepage editor, media)
+9. Database migration for menu_items + storage bucket
 
