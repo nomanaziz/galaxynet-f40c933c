@@ -34,6 +34,7 @@ const Index = () => {
     });
     supabase.from("homepage_features").select("*").order("sort_order").then(({ data }) => setFeatures(data ?? []));
     supabase.from("packages").select("*").eq("visible", true).eq("featured", true).order("sort_order").then(({ data }) => setPackages(data ?? []));
+    supabase.from("services").select("*").eq("visible", true).order("sort_order").limit(5).then(({ data }) => setServices(data ?? []));
     supabase.from("testimonials").select("*").eq("visible", true).order("sort_order").then(({ data }) => setTestimonials(data ?? []));
     supabase.from("partners").select("*").eq("visible", true).order("sort_order").then(({ data }) => setPartners(data ?? []));
   }, []);
