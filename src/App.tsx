@@ -27,6 +27,10 @@ import PageManager from "./pages/admin/PageManager";
 import NoticeManager from "./pages/admin/NoticeManager";
 import SettingsPage from "./pages/admin/SettingsPage";
 import UserManager from "./pages/admin/UserManager";
+import MenuManager from "./pages/admin/MenuManager";
+import PaymentManager from "./pages/admin/PaymentManager";
+import HomepageEditor from "./pages/admin/HomepageEditor";
+import MediaManager from "./pages/admin/MediaManager";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +63,10 @@ const App = () => (
               <Route path="notices" element={<NoticeManager />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="users" element={<UserManager />} />
+              <Route path="menu" element={<MenuManager />} />
+              <Route path="payments" element={<PaymentManager />} />
+              <Route path="homepage" element={<HomepageEditor />} />
+              <Route path="media" element={<MediaManager />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
