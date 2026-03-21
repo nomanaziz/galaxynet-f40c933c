@@ -1,29 +1,18 @@
 
 
-## Insert New Packages + Add Dedicated Category
+## Rename "Featured" to "Show on Homepage" Toggle
 
-### 1. Database Migration
-Add `dedicated` value to `package_category` enum:
-```sql
-ALTER TYPE package_category ADD VALUE 'dedicated';
-```
+The system already works correctly — the homepage queries `featured=true` packages, and the admin has a `Featured` toggle. The only change needed is **renaming the label** from "Featured" to "Show on Homepage" so the admin understands it controls homepage visibility.
 
-### 2. Data Operations (via insert tool)
-- Delete all existing 7 packages
-- Insert 10 Home packages (Starter+ through Titan+)
-- Insert 5 Corporate packages (Startup+ through Premium+)
-- Insert 1 Dedicated package with price 0 and a "Call for Price" indicator
+### Changes
 
-### 3. Update `Packages.tsx`
-- Add a third tab: "Dedicated" (ডেডিকেটেড)
-- For dedicated packages, show "Call for Price" instead of a price number
-- Keep existing card layout and speed filter
+**`src/pages/admin/PackageManager.tsx`**
+- Table header: "Featured" → "Homepage"
+- Table row toggle: keep same `featured` field, just relabel
+- Dialog: "Featured" label → "Show on Homepage"
 
-### Files
-| Action | File |
-|--------|------|
-| Migration | Add `dedicated` to `package_category` enum |
-| Data | Delete old packages, insert 16 new ones |
-| Edit | `src/pages/Packages.tsx` — add Dedicated tab, handle "Call for Price" |
-| Edit | `src/pages/admin/PackageManager.tsx` — add `dedicated` to category dropdown |
+**`src/pages/Index.tsx`**
+- Remove the `limit(4)` on the featured packages query so ALL packages marked "Show on Homepage" appear (admin has full control)
+
+No database changes needed — the `featured` boolean column already serves this purpose.
 
