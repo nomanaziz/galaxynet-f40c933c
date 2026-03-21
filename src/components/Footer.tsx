@@ -73,6 +73,11 @@ const Footer = () => {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link to="/admin/login" className="text-sm text-primary-foreground/50 hover:text-accent transition-colors">
+                  {t("Admin Panel", "অ্যাডমিন প্যানেল")}
+                </Link>
+              </li>
             </ul>
           </div>
 
