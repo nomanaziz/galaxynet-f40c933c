@@ -63,6 +63,10 @@ const App = () => (
               <Route path="notices" element={<NoticeManager />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="users" element={<UserManager />} />
+              <Route path="menu" element={<MenuManager />} />
+              <Route path="payments" element={<PaymentManager />} />
+              <Route path="homepage" element={<HomepageEditor />} />
+              <Route path="media" element={<MediaManager />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
