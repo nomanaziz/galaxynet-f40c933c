@@ -113,6 +113,7 @@ const Packages = () => {
                 <TabsList className="h-11 p-1">
                   <TabsTrigger value="home" className="px-5 text-sm font-medium">{t("Home Plans", "হোম প্ল্যান")}</TabsTrigger>
                   <TabsTrigger value="corporate" className="px-5 text-sm font-medium">{t("Corporate Plans", "কর্পোরেট প্ল্যান")}</TabsTrigger>
+                  <TabsTrigger value="dedicated" className="px-5 text-sm font-medium">{t("Dedicated", "ডেডিকেটেড")}</TabsTrigger>
                 </TabsList>
               </div>
 
