@@ -41,6 +41,9 @@ import OffersManager from "./pages/admin/OffersManager";
 import TestimonialsManager from "./pages/admin/TestimonialsManager";
 import PartnersManager from "./pages/admin/PartnersManager";
 import FeaturesManager from "./pages/admin/FeaturesManager";
+import DepartmentManager from "./pages/admin/DepartmentManager";
+import DesignationManager from "./pages/admin/DesignationManager";
+import EmployeeManager from "./pages/admin/EmployeeManager";
 
 const queryClient = new QueryClient();
 
