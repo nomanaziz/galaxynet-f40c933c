@@ -74,7 +74,7 @@ const OffersManager = () => {
               <div><Label>Description (EN)</Label><Textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} /></div>
               <div><Label>Description (BN)</Label><Textarea value={form.description_bn} onChange={e => setForm({...form, description_bn: e.target.value})} /></div>
               <div><Label>Type</Label>
-                <Select value={form.type} onValueChange={v => setForm({...form, type: v})}>
+                <Select value={form.type} onValueChange={v => setForm({...form, type: v as "offer" | "referral" | "coupon"})}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="offer">Offer</SelectItem>
