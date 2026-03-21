@@ -19,6 +19,10 @@ const mainItems = [
   { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
   { title: "Pages", url: "/admin/pages", icon: FileText },
   { title: "Notices", url: "/admin/notices", icon: Bell },
+  { title: "Menu", url: "/admin/menu", icon: Menu },
+  { title: "Payments", url: "/admin/payments", icon: CreditCard },
+  { title: "Homepage", url: "/admin/homepage", icon: Home },
+  { title: "Media", url: "/admin/media", icon: Image },
 ];
 
 const systemItems = [
