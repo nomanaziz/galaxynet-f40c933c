@@ -120,6 +120,7 @@ const PackageManager = () => {
             <TableHead>Price (৳)</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Homepage</TableHead>
+            <TableHead>Popular</TableHead>
             <TableHead>Visible</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
