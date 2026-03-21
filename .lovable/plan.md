@@ -1,110 +1,141 @@
 
 
-## Galaxy Net ISP Website — Full PRD Implementation Plan
+## Galaxy Net Admin Panel — Implementation Plan
 
-### What Already Exists
-- Home page (hero, features, packages teaser, about, testimonials, CTA)
-- Packages page (home/business tabs, plan cards)
-- Coverage page (area search, zone filters)
-- Contact page (form, contact details)
-- Navbar + Footer, Orange + Blue design system, bilingual support
+### Current State
+The website is fully static — all data (packages, coverage areas, orders) is hardcoded in React components. An admin panel requires a **database backend** to store and manage content dynamically.
 
-### What Needs to Be Built / Enhanced
+### Prerequisites
+- **Supabase** connection is required for: authentication (admin login), database (packages, areas, orders, pages, settings), and storage (media/images)
+- All visitor-facing pages will be refactored to fetch data from Supabase instead of hardcoded arrays
 
 ---
 
-#### Phase 1: New Pages
+### Phase 1: Database Foundation
 
-**1. About Us Page (`/about`)**
-- Company history section with timeline
-- Team section with member cards (photo placeholder, name, role)
-- "Why Choose Us" section with stats (clients, uptime, coverage %)
-- Trust badges: BDIX, Fiber Optic, 99.9% Uptime
+**Tables to create:**
+- `packages` — name, speed, price, category (home/corporate), features (jsonb), badges (jsonb), featured, sort_order, visible
+- `coverage_areas` — name, name_bn, zone, district, available (boolean)
+- `connection_orders` — name, phone, email, address, area, package_id, preferred_date, notes, status (pending/contacted/completed), assigned_to, created_at
+- `pages` — slug, title, content (rich text), meta_title, meta_description, published
+- `notices` — title, category (maintenance/offer/alert), content, published, created_at
+- `site_settings` — key/value store for website name, logo URL, phone, email, address, social links, maintenance mode
+- `payment_methods` — name, account_number, logo_url, instructions, sort_order, visible
+- `contact_info` — phone, email, address, map_embed, social_links (jsonb)
+- `user_roles` — user_id, role (super_admin/admin/staff) — separate table per security requirements
+- `menu_items` — label, url, parent_id, sort_order, visible
 
-**2. Services Page (`/services`)**
-- Service cards for: Broadband Internet, Corporate Internet, Dedicated Bandwidth, CCTV Solution, Network Setup
-- Each card: icon, title (EN+BN), short description, CTA button
-
-**3. New Connection / Order Page (`/order`)**
-- Multi-step form: Name, Mobile, Address, Package selection (dropdown from existing plans), preferred installation date (date picker)
-- Form validation with clear error states
-- Success confirmation screen after submission
-
-**4. Speed Test Page (`/speed-test`)**
-- Embedded Ookla speed test widget (iframe from fast.com or speedtest.net embed)
-- Tips section for improving speed
-
-**5. Blog / Notices Page (`/notices`)**
-- Static notice cards: maintenance alerts, fiber cut notices, offers/promotions
-- Each card: date, title, category badge, description
+**RLS policies:** Admin-only write access via `has_role()` security definer function. Public read for packages, areas, pages, notices, settings.
 
 ---
 
-#### Phase 2: Homepage Enhancements
+### Phase 2: Admin Authentication & Layout
 
-- Add **Services preview** section (Broadband, Corporate, CCTV, Networking icons)
-- Add **Coverage CTA** block ("Check if we're in your area" with inline search)
-- Add **Trust stats bar** (99% uptime, 10K+ clients, 50+ areas, BDIX enabled)
-- Add **BDIX / FTP / Gaming latency** highlight badges in hero or features
-- Reorder sections: Hero → Stats Bar → Why Choose Us → Services → Packages → Coverage CTA → Testimonials → CTA
-
----
-
-#### Phase 3: Conversion & UX Features
-
-- **Sticky "Order Now" button** — fixed bottom bar on mobile with CTA
-- **Floating WhatsApp button** — fixed bottom-right corner, links to WhatsApp
-- **One-click call button** — in sticky bar and footer
-- **Package cards** — add BDIX, FTP, YouTube/Facebook cache as feature badges
+- Admin login page at `/admin/login` with Supabase Auth (email/password)
+- Protected `/admin/*` routes checking user role
+- Sidebar layout using **shadcn/ui Sidebar** component with sections: Dashboard, Packages, Coverage, Orders, Pages, Notices, Settings, Media
+- Role-based menu visibility (super_admin sees User Management + Settings)
 
 ---
 
-#### Phase 4: Navbar & Footer Updates
+### Phase 3: Admin Modules (shadcn/ui throughout)
 
-- **Navbar**: Add links for About, Services, Order Now. Reorganize: Home | Packages | Services | Coverage | About | Contact + "Order Now" CTA
-- **Footer**: Add links to new pages (About, Services, Notices, Speed Test)
+**3.1 Dashboard** (`/admin`)
+- Stats cards: Total Orders, Active Packages, Coverage Areas, Pending Orders
+- Recent orders table (last 10)
+- Charts using Recharts (daily orders, package popularity)
+
+**3.2 Package Management** (`/admin/packages`)
+- Data table with columns: Name, Speed, Price, Category, Featured, Visible, Actions
+- Add/Edit dialog with form fields matching the `packages` table
+- Delete with confirmation dialog
+- Toggle visibility and featured status inline
+
+**3.3 Coverage Area Management** (`/admin/coverage`)
+- Data table: Area Name, Zone, District, Available status
+- Add/Edit/Delete areas
+- Bulk toggle available/unavailable
+
+**3.4 Connection Orders** (`/admin/orders`)
+- Full data table with filters (status, date range)
+- Status dropdown to update: Pending → Contacted → Completed
+- Click-to-call and WhatsApp links
+- CSV export button
+
+**3.5 CMS Pages** (`/admin/pages`)
+- List of pages with edit/delete
+- Rich text editor (using a simple textarea/markdown initially, upgradeable)
+- SEO fields: meta title, description
+
+**3.6 Notices** (`/admin/notices`)
+- CRUD for maintenance alerts, offers, fiber cut notices
+- Category badge, publish/draft toggle
+
+**3.7 Site Settings** (`/admin/settings`)
+- Website name, logo URL, contact info
+- Payment methods management
+- Social links
+- Maintenance mode toggle
+
+**3.8 User Management** (`/admin/users`) — Super Admin only
+- View admins/staff
+- Invite new admin (Supabase auth invite)
+- Role assignment
 
 ---
 
-#### Phase 5: Packages Page Enhancement
+### Phase 4: Refactor Visitor Pages
 
-- Add **speed range filter** (slider or buttons: 20Mbps, 50Mbps, 100Mbps+)
-- Add **BDIX, FTP, Cache** badges on each plan card
-- Rename "Subscribe Now" to "Order Now" linking to `/order`
-
----
-
-#### Phase 6: Coverage Page Enhancement
-
-- Add **District → Area dropdown** selectors alongside the existing search
-- Show "Order Now" button when area is available, "Request Connection" when not
+Update all public pages to fetch from Supabase instead of hardcoded data:
+- `Index.tsx` — fetch packages, settings, testimonials
+- `Packages.tsx` — fetch from `packages` table with filters
+- `Coverage.tsx` — fetch from `coverage_areas` table
+- `Order.tsx` — submit to `connection_orders` table, fetch packages for dropdown
+- `Notices.tsx` — fetch from `notices` table
+- `Contact.tsx` — fetch contact info from `site_settings`
 
 ---
 
-### Technical Approach
+### File Structure
 
-- All pages use existing shadcn/ui components (Card, Button, Input, Tabs, Badge, Select, Calendar/DatePicker, Sheet)
-- Bilingual (EN + BN) throughout
-- Mobile-first responsive design
-- No backend needed — all static/client-side for now
-- New routes added to `App.tsx`: `/about`, `/services`, `/order`, `/speed-test`, `/notices`
-- Floating WhatsApp + sticky CTA as shared components
+```text
+src/
+├── pages/
+│   └── admin/
+│       ├── AdminLogin.tsx
+│       ├── AdminLayout.tsx      (sidebar + outlet)
+│       ├── Dashboard.tsx
+│       ├── PackageManager.tsx
+│       ├── CoverageManager.tsx
+│       ├── OrderManager.tsx
+│       ├── PageManager.tsx
+│       ├── NoticeManager.tsx
+│       ├── SettingsPage.tsx
+│       └── UserManager.tsx
+├── components/
+│   └── admin/
+│       ├── AdminSidebar.tsx
+│       ├── StatsCard.tsx
+│       └── DataTable.tsx
+└── hooks/
+    └── useAdminAuth.ts
+```
 
-### File Changes Summary
+---
 
-| Action | File |
-|--------|------|
-| Create | `src/pages/About.tsx` |
-| Create | `src/pages/Services.tsx` |
-| Create | `src/pages/Order.tsx` |
-| Create | `src/pages/SpeedTest.tsx` |
-| Create | `src/pages/Notices.tsx` |
-| Create | `src/components/FloatingWhatsApp.tsx` |
-| Create | `src/components/StickyOrderBar.tsx` |
-| Edit | `src/pages/Index.tsx` — add services, coverage CTA, trust stats, BDIX badges |
-| Edit | `src/pages/Packages.tsx` — add filters, BDIX/FTP badges, link to /order |
-| Edit | `src/pages/Coverage.tsx` — add dropdowns, Order/Request buttons |
-| Edit | `src/components/Navbar.tsx` — add new page links |
-| Edit | `src/components/Footer.tsx` — add new page links |
-| Edit | `src/App.tsx` — add new routes |
+### Implementation Order
+
+1. Connect Supabase + create all database tables + RLS
+2. Admin auth + login page + protected routes
+3. Admin sidebar layout
+4. Dashboard with stats
+5. Package CRUD
+6. Coverage area CRUD
+7. Orders management
+8. CMS pages + Notices
+9. Settings + Payment methods
+10. Refactor visitor pages to use live data
+11. User management (super admin)
+
+This is a large build. I recommend implementing it in batches — starting with **Steps 1–6** (database + auth + core CRUD modules), then **Steps 7–11** in a follow-up.
 
