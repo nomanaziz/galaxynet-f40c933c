@@ -156,12 +156,15 @@ const Index = () => {
             <h2 className="text-3xl font-bold text-foreground mb-2">{t("Our Services", "আমাদের সেবাসমূহ")}</h2>
           </div>
           <div className="flex flex-wrap justify-center gap-4 mb-8">
-            {servicesPreview.map((s) => (
-              <div key={s.title} className="flex flex-col items-center p-5 rounded-xl bg-background border hover:border-accent/40 transition-all min-w-[110px] hover:shadow-sm">
-                <s.icon className="h-7 w-7 text-accent mb-2" />
-                <p className="font-medium text-foreground text-sm">{s.title}</p>
-              </div>
-            ))}
+            {services.map((s) => {
+              const Icon = iconMap[s.icon_name] || Wifi;
+              return (
+                <div key={s.id} className="flex flex-col items-center p-5 rounded-xl bg-background border hover:border-accent/40 transition-all min-w-[110px] hover:shadow-sm">
+                  <Icon className="h-7 w-7 text-accent mb-2" />
+                  <p className="font-medium text-foreground text-sm">{t(s.title, s.title_bn || s.title)}</p>
+                </div>
+              );
+            })}
           </div>
           <div className="text-center">
             <Link to="/services">
