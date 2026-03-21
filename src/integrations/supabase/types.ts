@@ -14,16 +14,288 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      connection_orders: {
+        Row: {
+          address: string
+          area: string | null
+          assigned_to: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          package_id: string | null
+          phone: string
+          preferred_date: string | null
+          status: Database["public"]["Enums"]["order_status"]
+        }
+        Insert: {
+          address: string
+          area?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          package_id?: string | null
+          phone: string
+          preferred_date?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+        }
+        Update: {
+          address?: string
+          area?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          package_id?: string | null
+          phone?: string
+          preferred_date?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connection_orders_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coverage_areas: {
+        Row: {
+          available: boolean
+          created_at: string
+          district: string | null
+          id: string
+          name: string
+          name_bn: string | null
+          zone: string | null
+        }
+        Insert: {
+          available?: boolean
+          created_at?: string
+          district?: string | null
+          id?: string
+          name: string
+          name_bn?: string | null
+          zone?: string | null
+        }
+        Update: {
+          available?: boolean
+          created_at?: string
+          district?: string | null
+          id?: string
+          name?: string
+          name_bn?: string | null
+          zone?: string | null
+        }
+        Relationships: []
+      }
+      notices: {
+        Row: {
+          category: Database["public"]["Enums"]["notice_category"]
+          content: string | null
+          created_at: string
+          id: string
+          published: boolean
+          title: string
+          title_bn: string | null
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["notice_category"]
+          content?: string | null
+          created_at?: string
+          id?: string
+          published?: boolean
+          title: string
+          title_bn?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["notice_category"]
+          content?: string | null
+          created_at?: string
+          id?: string
+          published?: boolean
+          title?: string
+          title_bn?: string | null
+        }
+        Relationships: []
+      }
+      packages: {
+        Row: {
+          badges: Json | null
+          category: Database["public"]["Enums"]["package_category"]
+          created_at: string
+          featured: boolean
+          features: Json | null
+          id: string
+          name: string
+          name_bn: string | null
+          price: number
+          sort_order: number
+          speed: number
+          visible: boolean
+        }
+        Insert: {
+          badges?: Json | null
+          category?: Database["public"]["Enums"]["package_category"]
+          created_at?: string
+          featured?: boolean
+          features?: Json | null
+          id?: string
+          name: string
+          name_bn?: string | null
+          price: number
+          sort_order?: number
+          speed: number
+          visible?: boolean
+        }
+        Update: {
+          badges?: Json | null
+          category?: Database["public"]["Enums"]["package_category"]
+          created_at?: string
+          featured?: boolean
+          features?: Json | null
+          id?: string
+          name?: string
+          name_bn?: string | null
+          price?: number
+          sort_order?: number
+          speed?: number
+          visible?: boolean
+        }
+        Relationships: []
+      }
+      pages: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          published: boolean
+          slug: string
+          title: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean
+          slug: string
+          title: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published?: boolean
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      payment_methods: {
+        Row: {
+          account_number: string | null
+          created_at: string
+          id: string
+          instructions: string | null
+          logo_url: string | null
+          name: string
+          sort_order: number
+          visible: boolean
+        }
+        Insert: {
+          account_number?: string | null
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          logo_url?: string | null
+          name: string
+          sort_order?: number
+          visible?: boolean
+        }
+        Update: {
+          account_number?: string | null
+          created_at?: string
+          id?: string
+          instructions?: string | null
+          logo_url?: string | null
+          name?: string
+          sort_order?: number
+          visible?: boolean
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "admin" | "staff"
+      notice_category: "maintenance" | "offer" | "alert"
+      order_status: "pending" | "contacted" | "completed"
+      package_category: "home" | "corporate"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +422,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "admin", "staff"],
+      notice_category: ["maintenance", "offer", "alert"],
+      order_status: ["pending", "contacted", "completed"],
+      package_category: ["home", "corporate"],
+    },
   },
 } as const
