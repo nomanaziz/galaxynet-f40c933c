@@ -32,7 +32,7 @@ const Index = () => {
       setSettings(map);
     });
     supabase.from("homepage_features").select("*").order("sort_order").then(({ data }) => setFeatures(data ?? []));
-    supabase.from("packages").select("*").eq("visible", true).eq("featured", true).order("sort_order").limit(4).then(({ data }) => setPackages(data ?? []));
+    supabase.from("packages").select("*").eq("visible", true).eq("featured", true).order("sort_order").then(({ data }) => setPackages(data ?? []));
     supabase.from("testimonials").select("*").eq("visible", true).order("sort_order").then(({ data }) => setTestimonials(data ?? []));
     supabase.from("partners").select("*").eq("visible", true).order("sort_order").then(({ data }) => setPartners(data ?? []));
   }, []);
