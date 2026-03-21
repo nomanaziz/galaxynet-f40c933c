@@ -1,23 +1,40 @@
 
 
-## Fix: Offers Not Displaying After Creation
+## Redesign Payment Page + Enhanced Admin Management
 
-### Root Cause
+### Reference Image Analysis
+The reference shows payment methods as large cards with: colored logo area, Bengali name, description text, and a colored "বিস্তারিত জানুন →" button. Each card has a distinct brand color.
 
-The OffersManager has two problems:
+### Database Migration
 
-1. **No error handling** — Both `insert` and `select` calls ignore errors. The toast shows "Offer created" even if the insert fails due to RLS or data issues. The fetch silently returns `[]` if there's an error.
+Add new columns to `payment_methods`:
 
-2. **Empty strings sent for nullable fields** — Fields like `expiry_date` (date type) and `image_url` receive `""` instead of `null`. An empty string is invalid for a PostgreSQL `date` column, causing silent insert failures. Similarly, the fetch may fail if the RLS check encounters issues.
+| Column | Type | Purpose |
+|--------|------|---------|
+| `name_bn` | text | Bengali name (e.g. বিকাশ) |
+| `instructions_bn` | text | Bengali instructions |
+| `button_text` | text | Button label (default: "বিস্তারিত জানুন") |
+| `button_text_bn` | text | Bengali button label |
+| `button_url` | text | Link URL for the button |
+| `bg_color` | text | Brand color for the card accent (e.g. #E2136E for bKash) |
+| `screenshot_url` | text | Screenshot/detail image URL |
 
-Data exists in the DB (1 offer found), so the SELECT query is likely being blocked on the client. This points to the Supabase client's auth session not being properly recognized during the fetch, or the query erroring silently.
+### Files to Change
 
-### Fix in `src/pages/admin/OffersManager.tsx`
+| File | Change |
+|------|--------|
+| `src/pages/Payment.tsx` | Redesign to match reference: large card grid (4 cols), big logo with colored background, Bengali name, description, colored CTA button |
+| `src/pages/admin/PaymentManager.tsx` | Add all new fields to the form dialog: name_bn, instructions_bn, button text/url, bg_color (color picker input), screenshot URL. Add image upload for logo and screenshot using the `media` bucket |
 
-1. **Add error handling** to `handleSave` — check `error` from insert/update, show error toast if it fails, only show success if it succeeds
-2. **Add error handling** to `fetchOffers` — log/check errors from select
-3. **Sanitize form data before save** — convert empty strings to `null` for nullable fields (`image_url`, `expiry_date`, `description`, `description_bn`, `title_bn`)
-4. **Add `DialogDescription`** to fix the console warning about missing description
+### Payment Page Design (Public)
+- 4-column responsive grid (1 col mobile, 2 tablet, 4 desktop)
+- Each card: rounded with subtle shadow, large logo area with `bg_color` background, name (Bengali), description text, colored CTA button with arrow
+- Clicking button links to `button_url` or opens a modal showing the screenshot with payment instructions and account number details
 
-Single file change: `src/pages/admin/OffersManager.tsx`
+### Admin PaymentManager Enhancements
+- Add Name (BN), Instructions (BN) fields
+- Add Button Text, Button Text (BN), Button URL fields
+- Add Background Color field (text input with color preview)
+- Add Screenshot URL field
+- Show logo preview in the table
 
