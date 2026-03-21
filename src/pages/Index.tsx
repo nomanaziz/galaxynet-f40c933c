@@ -153,7 +153,7 @@ const Index = () => {
       <section className="py-14 bg-secondary/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-foreground mb-2">{t("Our Services", "আমাদের সেবাসমূহ")}</h2>
+            <h2 className="text-3xl font-bold text-primary mb-2">{t("Our Services", "আমাদের সেবাসমূহ")}</h2>
           </div>
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             {services.map((s) => {
