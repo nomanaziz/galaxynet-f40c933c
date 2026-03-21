@@ -58,7 +58,7 @@ const Index = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-up">
               <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-3">Galaxy Net</p>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-[1.1] mb-4">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-[1.1] mb-4">
                 {t(settings.hero_title_en || "Best Fiber Internet in Your Area", settings.hero_title_bn || "আপনার এলাকায় সেরা ফাইবার ইন্টারনেট")}
               </h1>
               <p className="text-muted-foreground text-lg mb-8 max-w-lg">
