@@ -531,7 +531,7 @@ export type Database = {
       notice_category: "maintenance" | "offer" | "alert"
       offer_type: "offer" | "referral" | "coupon"
       order_status: "pending" | "contacted" | "completed"
-      package_category: "home" | "corporate"
+      package_category: "home" | "corporate" | "dedicated"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -664,7 +664,7 @@ export const Constants = {
       notice_category: ["maintenance", "offer", "alert"],
       offer_type: ["offer", "referral", "coupon"],
       order_status: ["pending", "contacted", "completed"],
-      package_category: ["home", "corporate"],
+      package_category: ["home", "corporate", "dedicated"],
     },
   },
 } as const

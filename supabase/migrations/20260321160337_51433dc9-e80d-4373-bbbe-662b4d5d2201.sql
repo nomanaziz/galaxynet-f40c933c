@@ -1,0 +1,1 @@
+ALTER TYPE package_category ADD VALUE 'dedicated';
