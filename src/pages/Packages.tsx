@@ -69,7 +69,6 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
 };
 
 const Packages = () => {
-  const [speedFilter, setSpeedFilter] = useState([0]);
   const [packages, setPackages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
@@ -81,12 +80,7 @@ const Packages = () => {
     });
   }, []);
 
-  const filterPlans = (category: string) => {
-    const plans = packages.filter(p => p.category === category);
-    const min = speedFilter[0];
-    if (min === 0) return plans;
-    return plans.filter(p => p.speed >= min);
-  };
+  const filterPlans = (category: string) => packages.filter(p => p.category === category);
 
   return (
     <div className="min-h-screen flex flex-col">
