@@ -236,7 +236,7 @@ const Index = () => {
           <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <MapPin className="h-6 w-6 text-accent" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">{t("Check If We're In Your Area", "আপনার এলাকায় আমরা আছি কিনা দেখুন")}</h2>
+          <h2 className="text-2xl font-bold text-primary mb-2">{t("Check If We're In Your Area", "আপনার এলাকায় আমরা আছি কিনা দেখুন")}</h2>
           <div className="flex gap-3 mt-6">
             <Input placeholder={t("Enter your area...", "এলাকার নাম...")} value={coverageCheck} onChange={(e) => setCoverageCheck(e.target.value)} />
             <Link to={`/coverage?q=${encodeURIComponent(coverageCheck)}`}>
