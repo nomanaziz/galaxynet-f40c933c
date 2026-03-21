@@ -98,11 +98,8 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent">
-            <Wifi className="h-5 w-5 text-accent-foreground" />
-          </div>
-          <span className="text-lg font-bold text-foreground">Galaxy Net</span>
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="Galaxy Net" className="h-10 w-auto" />
         </Link>
 
         {/* Desktop Nav */}
