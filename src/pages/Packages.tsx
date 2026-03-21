@@ -1,75 +1,30 @@
 import { useState } from "react";
-import { CheckCircle, Zap } from "lucide-react";
+import { CheckCircle, Zap, Server, Globe, MonitorPlay } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 
 const homePlans = [
-  {
-    name: "Home Basic",
-    nameBn: "হোম বেসিক",
-    speed: "10 Mbps",
-    price: "500",
-    tag: "",
-    features: ["Unlimited Data · আনলিমিটেড ডেটা", "Email Support · ইমেইল সাপোর্ট", "1 Device · ১টি ডিভাইস", "Standard Router"],
-  },
-  {
-    name: "Home Standard",
-    nameBn: "হোম স্ট্যান্ডার্ড",
-    speed: "50 Mbps",
-    price: "900",
-    tag: "Most Popular · সবচেয়ে জনপ্রিয়",
-    features: ["Unlimited Data · আনলিমিটেড ডেটা", "24/7 Support · ২৪/৭ সাপোর্ট", "5 Devices · ৫টি ডিভাইস", "Free Router · বিনামূল্যে রাউটার", "Free Installation · বিনামূল্যে ইনস্টলেশন"],
-  },
-  {
-    name: "Home Premium",
-    nameBn: "হোম প্রিমিয়াম",
-    speed: "100 Mbps",
-    price: "1500",
-    tag: "",
-    features: ["Unlimited Data · আনলিমিটেড ডেটা", "Priority 24/7 Support", "Unlimited Devices", "Free Router + Setup", "Static IP Available"],
-  },
-  {
-    name: "Home Ultra",
-    nameBn: "হোম আলট্রা",
-    speed: "200 Mbps",
-    price: "2500",
-    tag: "Best Value",
-    features: ["Unlimited Data · আনলিমিটেড ডেটা", "VIP Support · ভিআইপি সাপোর্ট", "Unlimited Devices", "Premium Router + Setup", "Static IP · স্ট্যাটিক আইপি", "1 Month Free"],
-  },
+  { name: "Home Basic", nameBn: "হোম বেসিক", speed: 10, price: "500", tag: "", features: ["Unlimited Data", "Email Support", "1 Device", "Standard Router"], badges: ["BDIX"] },
+  { name: "Home Standard", nameBn: "হোম স্ট্যান্ডার্ড", speed: 50, price: "900", tag: "Most Popular · সবচেয়ে জনপ্রিয়", features: ["Unlimited Data", "24/7 Support", "5 Devices", "Free Router", "Free Installation"], badges: ["BDIX", "FTP"] },
+  { name: "Home Premium", nameBn: "হোম প্রিমিয়াম", speed: 100, price: "1500", tag: "", features: ["Unlimited Data", "Priority 24/7 Support", "Unlimited Devices", "Free Router + Setup", "Static IP Available"], badges: ["BDIX", "FTP", "Cache"] },
+  { name: "Home Ultra", nameBn: "হোম আলট্রা", speed: 200, price: "2500", tag: "Best Value", features: ["Unlimited Data", "VIP Support", "Unlimited Devices", "Premium Router + Setup", "Static IP", "1 Month Free"], badges: ["BDIX", "FTP", "Cache"] },
 ];
 
 const businessPlans = [
-  {
-    name: "Business Starter",
-    nameBn: "বিজনেস স্টার্টার",
-    speed: "100 Mbps",
-    price: "3000",
-    tag: "",
-    features: ["Unlimited Data", "Business Support 9–9", "5 Users", "Free Router", "SLA 99.5%"],
-  },
-  {
-    name: "Business Pro",
-    nameBn: "বিজনেস প্রো",
-    speed: "300 Mbps",
-    price: "6000",
-    tag: "Recommended · প্রস্তাবিত",
-    features: ["Unlimited Data", "24/7 Priority Support", "20 Users", "Enterprise Router", "SLA 99.9%", "Static IP"],
-  },
-  {
-    name: "Business Enterprise",
-    nameBn: "বিজনেস এন্টারপ্রাইজ",
-    speed: "1 Gbps",
-    price: "12000",
-    tag: "",
-    features: ["Unlimited Data", "Dedicated Account Manager", "Unlimited Users", "Enterprise-grade Router", "SLA 99.99%", "Multiple Static IPs", "Dedicated Line"],
-  },
+  { name: "Business Starter", nameBn: "বিজনেস স্টার্টার", speed: 100, price: "3000", tag: "", features: ["Unlimited Data", "Business Support 9–9", "5 Users", "Free Router", "SLA 99.5%"], badges: ["BDIX", "FTP"] },
+  { name: "Business Pro", nameBn: "বিজনেস প্রো", speed: 300, price: "6000", tag: "Recommended · প্রস্তাবিত", features: ["Unlimited Data", "24/7 Priority Support", "20 Users", "Enterprise Router", "SLA 99.9%", "Static IP"], badges: ["BDIX", "FTP", "Cache"] },
+  { name: "Business Enterprise", nameBn: "বিজনেস এন্টারপ্রাইজ", speed: 1000, price: "12000", tag: "", features: ["Unlimited Data", "Dedicated Account Manager", "Unlimited Users", "Enterprise-grade Router", "SLA 99.99%", "Multiple Static IPs", "Dedicated Line"], badges: ["BDIX", "FTP", "Cache", "Dedicated"] },
 ];
 
-const PlanCard = ({ plan, index }: { plan: typeof homePlans[0]; index: number }) => {
+const badgeIcons: Record<string, typeof Server> = { BDIX: Server, FTP: Globe, Cache: MonitorPlay, Dedicated: Zap };
+
+const PlanCard = ({ plan }: { plan: typeof homePlans[0] }) => {
   const isPopular = !!plan.tag;
   return (
     <Card className={`relative overflow-hidden border-2 transition-all hover:shadow-xl ${isPopular ? "border-galaxy-orange shadow-lg" : "border-border hover:border-galaxy-orange"}`}>
@@ -85,11 +40,22 @@ const PlanCard = ({ plan, index }: { plan: typeof homePlans[0]; index: number })
         </div>
         <div className="flex items-end gap-1 mb-2">
           <Zap className="h-5 w-5 text-galaxy-orange mb-1" />
-          <span className="text-3xl font-bold text-galaxy-blue">{plan.speed}</span>
+          <span className="text-3xl font-bold text-galaxy-blue">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
         </div>
-        <div className="mb-5 p-3 rounded-lg bg-galaxy-orange/10">
+        <div className="mb-3 p-3 rounded-lg bg-galaxy-orange/10">
           <span className="text-3xl font-bold text-galaxy-orange">৳{plan.price}</span>
           <span className="text-muted-foreground text-sm">/month · /মাস</span>
+        </div>
+        {/* Badges */}
+        <div className="flex flex-wrap gap-1 mb-4">
+          {plan.badges.map((b) => {
+            const Icon = badgeIcons[b] || Server;
+            return (
+              <Badge key={b} variant="secondary" className="text-xs flex items-center gap-1">
+                <Icon className="h-3 w-3" /> {b}
+              </Badge>
+            );
+          })}
         </div>
         <ul className="space-y-2 mb-6">
           {plan.features.map((f) => (
@@ -99,9 +65,9 @@ const PlanCard = ({ plan, index }: { plan: typeof homePlans[0]; index: number })
             </li>
           ))}
         </ul>
-        <Link to="/contact">
+        <Link to="/order">
           <Button className={`w-full font-semibold ${isPopular ? "bg-galaxy-orange hover:bg-galaxy-orange-dark text-white" : "bg-galaxy-blue hover:bg-galaxy-blue-dark text-white"}`}>
-            Subscribe Now · সাবস্ক্রাইব করুন
+            Order Now · অর্ডার করুন
           </Button>
         </Link>
       </CardContent>
@@ -110,6 +76,14 @@ const PlanCard = ({ plan, index }: { plan: typeof homePlans[0]; index: number })
 };
 
 const Packages = () => {
+  const [speedFilter, setSpeedFilter] = useState([0]);
+
+  const filterPlans = (plans: typeof homePlans) => {
+    const min = speedFilter[0];
+    if (min === 0) return plans;
+    return plans.filter((p) => p.speed >= min);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -117,7 +91,7 @@ const Packages = () => {
       {/* Hero */}
       <section className="hero-gradient text-white py-16 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-white blur-3xl"></div>
+          <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-white blur-3xl" />
         </div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">Internet Packages</h1>
@@ -140,7 +114,7 @@ const Packages = () => {
       <section className="py-16 md:py-20 bg-background flex-1">
         <div className="container mx-auto px-4">
           <Tabs defaultValue="home" className="w-full">
-            <div className="flex justify-center mb-10">
+            <div className="flex justify-center mb-6">
               <TabsList className="h-12 p-1 bg-secondary border-2 border-galaxy-blue/20">
                 <TabsTrigger value="home" className="px-6 py-2 text-sm font-semibold data-[state=active]:bg-galaxy-blue data-[state=active]:text-white">
                   🏠 Home Plans · হোম প্ল্যান
@@ -151,20 +125,40 @@ const Packages = () => {
               </TabsList>
             </div>
 
+            {/* Speed Filter */}
+            <div className="max-w-md mx-auto mb-10 p-4 rounded-xl bg-secondary border-2 border-border">
+              <p className="text-sm font-semibold text-galaxy-blue mb-2 text-center">
+                Filter by Speed · গতি অনুযায়ী ফিল্টার: {speedFilter[0] === 0 ? "All" : `${speedFilter[0]}+ Mbps`}
+              </p>
+              <Slider value={speedFilter} onValueChange={setSpeedFilter} max={200} step={10} className="w-full" />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>All</span>
+                <span>50 Mbps</span>
+                <span>100 Mbps</span>
+                <span>200+ Mbps</span>
+              </div>
+            </div>
+
             <TabsContent value="home">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {homePlans.map((plan, i) => (
-                  <PlanCard key={plan.name} plan={plan} index={i} />
+                {filterPlans(homePlans).map((plan) => (
+                  <PlanCard key={plan.name} plan={plan} />
                 ))}
               </div>
+              {filterPlans(homePlans).length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No plans match this speed range. · এই গতির কোনো প্ল্যান নেই।</p>
+              )}
             </TabsContent>
 
             <TabsContent value="business">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                {businessPlans.map((plan, i) => (
-                  <PlanCard key={plan.name} plan={plan} index={i} />
+                {filterPlans(businessPlans).map((plan) => (
+                  <PlanCard key={plan.name} plan={plan} />
                 ))}
               </div>
+              {filterPlans(businessPlans).length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No plans match this speed range. · এই গতির কোনো প্ল্যান নেই।</p>
+              )}
             </TabsContent>
           </Tabs>
 

@@ -1,103 +1,61 @@
 import { Link } from "react-router-dom";
-import { Zap, Shield, HeadphonesIcon, DollarSign, Star, CheckCircle, ArrowRight, Wifi } from "lucide-react";
+import { Zap, Shield, HeadphonesIcon, DollarSign, Star, CheckCircle, ArrowRight, Wifi, Server, Globe, Gamepad2, Building2, Camera, Network, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useState } from "react";
+
+const trustStats = [
+  { num: "99.9%", label: "Uptime", labelBn: "আপটাইম", icon: Shield },
+  { num: "10K+", label: "Clients", labelBn: "গ্রাহক", icon: Wifi },
+  { num: "50+", label: "Areas", labelBn: "এলাকা", icon: MapPin },
+  { num: "BDIX", label: "Connected", labelBn: "সংযুক্ত", icon: Server },
+];
 
 const features = [
-  {
-    icon: Zap,
-    title: "High Speed",
-    titleBn: "উচ্চ গতি",
-    desc: "Blazing fast internet up to 1 Gbps",
-    descBn: "১ Gbps পর্যন্ত দ্রুত ইন্টারনেট",
-  },
-  {
-    icon: Shield,
-    title: "Unlimited Data",
-    titleBn: "আনলিমিটেড ডেটা",
-    desc: "No data caps, browse freely",
-    descBn: "কোনো ডেটা সীমা নেই, মুক্তভাবে ব্রাউজ করুন",
-  },
-  {
-    icon: HeadphonesIcon,
-    title: "24/7 Support",
-    titleBn: "২৪/৭ সাপোর্ট",
-    desc: "Expert help whenever you need it",
-    descBn: "যখনই দরকার, বিশেষজ্ঞ সহায়তা",
-  },
-  {
-    icon: DollarSign,
-    title: "Affordable",
-    titleBn: "সাশ্রয়ী মূল্য",
-    desc: "Best plans that fit any budget",
-    descBn: "যেকোনো বাজেটের জন্য সেরা প্ল্যান",
-  },
+  { icon: Zap, title: "High Speed Fiber", titleBn: "উচ্চ গতির ফাইবার", desc: "Up to 1 Gbps fiber optic broadband", descBn: "১ Gbps পর্যন্ত ফাইবার অপটিক" },
+  { icon: Shield, title: "Unlimited Data", titleBn: "আনলিমিটেড ডেটা", desc: "No data caps on any plan", descBn: "কোনো ডেটা সীমা নেই" },
+  { icon: HeadphonesIcon, title: "24/7 Support", titleBn: "২৪/৭ সাপোর্ট", desc: "Expert help whenever you need", descBn: "যেকোনো সময় বিশেষজ্ঞ সহায়তা" },
+  { icon: DollarSign, title: "Affordable Plans", titleBn: "সাশ্রয়ী প্ল্যান", desc: "Best value for your budget", descBn: "আপনার বাজেটের জন্য সেরা" },
+  { icon: Globe, title: "BDIX + FTP", titleBn: "BDIX + FTP", desc: "Local content at maximum speed", descBn: "স্থানীয় কন্টেন্ট সর্বোচ্চ গতিতে" },
+  { icon: Gamepad2, title: "Low Latency", titleBn: "কম লেটেন্সি", desc: "Optimized for gaming & streaming", descBn: "গেমিং ও স্ট্রিমিংয়ের জন্য অপ্টিমাইজড" },
+];
+
+const servicesPreview = [
+  { icon: Wifi, title: "Broadband", titleBn: "ব্রডব্যান্ড" },
+  { icon: Building2, title: "Corporate", titleBn: "কর্পোরেট" },
+  { icon: Camera, title: "CCTV", titleBn: "সিসিটিভি" },
+  { icon: Network, title: "Networking", titleBn: "নেটওয়ার্কিং" },
+  { icon: Server, title: "Dedicated", titleBn: "ডেডিকেটেড" },
 ];
 
 const packages = [
-  {
-    name: "Basic",
-    nameBn: "বেসিক",
-    speed: "10 Mbps",
-    price: "500",
-    features: ["Unlimited Data", "Email Support", "1 Device"],
-  },
-  {
-    name: "Standard",
-    nameBn: "স্ট্যান্ডার্ড",
-    speed: "50 Mbps",
-    price: "900",
-    popular: true,
-    features: ["Unlimited Data", "24/7 Support", "5 Devices", "Free Router"],
-  },
-  {
-    name: "Premium",
-    nameBn: "প্রিমিয়াম",
-    speed: "100 Mbps",
-    price: "1500",
-    features: ["Unlimited Data", "Priority Support", "Unlimited Devices", "Free Router + Installation"],
-  },
+  { name: "Basic", nameBn: "বেসিক", speed: "10 Mbps", price: "500", features: ["Unlimited Data", "BDIX", "Email Support"], badges: [] },
+  { name: "Standard", nameBn: "স্ট্যান্ডার্ড", speed: "50 Mbps", price: "900", popular: true, features: ["Unlimited Data", "BDIX + FTP", "24/7 Support", "Free Router"], badges: ["BDIX", "FTP"] },
+  { name: "Premium", nameBn: "প্রিমিয়াম", speed: "100 Mbps", price: "1500", features: ["Unlimited Data", "BDIX + FTP", "Priority Support", "Free Router + Setup"], badges: ["BDIX", "FTP", "Cache"] },
 ];
 
 const testimonials = [
-  {
-    name: "Rahim Uddin",
-    nameBn: "রহিম উদ্দিন",
-    location: "Dhaka",
-    rating: 5,
-    text: "Galaxy Net has transformed my home internet. Super fast and never drops!",
-    textBn: "গ্যালাক্সি নেট আমার হোম ইন্টারনেট বদলে দিয়েছে। অনেক দ্রুত এবং কখনো বিচ্ছিন্ন হয় না!",
-  },
-  {
-    name: "Fatema Khanam",
-    nameBn: "ফাতেমা খানম",
-    location: "Chittagong",
-    rating: 5,
-    text: "Affordable pricing with excellent customer service. Highly recommended!",
-    textBn: "সাশ্রয়ী মূল্যে চমৎকার গ্রাহক সেবা। সবাইকে সুপারিশ করছি!",
-  },
-  {
-    name: "Karim Ahmed",
-    nameBn: "করিম আহমেদ",
-    location: "Sylhet",
-    rating: 5,
-    text: "Best ISP in our area. 24/7 support team is always ready to help.",
-    textBn: "আমাদের এলাকার সেরা ISP। ২৪/৭ সাপোর্ট টিম সবসময় সাহায্য করতে প্রস্তুত।",
-  },
+  { name: "Rahim Uddin", nameBn: "রহিম উদ্দিন", location: "Dhaka", rating: 5, text: "Galaxy Net has transformed my home internet. Super fast and never drops!", textBn: "গ্যালাক্সি নেট আমার হোম ইন্টারনেট বদলে দিয়েছে।" },
+  { name: "Fatema Khanam", nameBn: "ফাতেমা খানম", location: "Chittagong", rating: 5, text: "Affordable pricing with excellent customer service. Highly recommended!", textBn: "সাশ্রয়ী মূল্যে চমৎকার গ্রাহক সেবা।" },
+  { name: "Karim Ahmed", nameBn: "করিম আহমেদ", location: "Sylhet", rating: 5, text: "Best ISP in our area. 24/7 support team is always ready to help.", textBn: "আমাদের এলাকার সেরা ISP।" },
 ];
 
 const Index = () => {
+  const [coverageCheck, setCoverageCheck] = useState("");
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="hero-gradient text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-white blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 h-80 w-80 rounded-full bg-galaxy-orange blur-3xl"></div>
+          <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-white blur-3xl" />
+          <div className="absolute bottom-10 right-10 h-80 w-80 rounded-full bg-galaxy-orange blur-3xl" />
         </div>
         <div className="container mx-auto px-4 py-20 md:py-32 relative z-10">
           <div className="max-w-3xl">
@@ -108,34 +66,34 @@ const Index = () => {
               <span className="text-orange-300 font-semibold text-sm uppercase tracking-widest">Galaxy Net · গ্যালাক্সি নেট</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4">
-              Fast. Reliable.{" "}
-              <span className="text-galaxy-orange">Affordable.</span>
+              Best Internet in{" "}
+              <span className="text-galaxy-orange">Your Area</span>
             </h1>
-            <p className="text-2xl md:text-3xl font-semibold text-blue-100 mb-2">
-              দ্রুত। নির্ভরযোগ্য। সাশ্রয়ী।
+            <p className="text-2xl md:text-3xl font-semibold text-blue-100 mb-2">আপনার এলাকায় সেরা ইন্টারনেট</p>
+            <p className="text-blue-200 text-lg mt-4 mb-4 max-w-xl">
+              Bangladesh's trusted ISP — connecting families and businesses with lightning-fast fiber broadband.
             </p>
-            <p className="text-blue-200 text-lg mt-4 mb-8 max-w-xl">
-              Bangladesh's most trusted internet service provider — connecting families and businesses with lightning-fast broadband.
-            </p>
-            <p className="text-blue-300 text-base mb-8">
-              বাংলাদেশের সবচেয়ে বিশ্বস্ত ইন্টারনেট সেবা প্রদানকারী।
-            </p>
+            {/* BDIX/FTP/Gaming badges */}
+            <div className="flex flex-wrap gap-2 mb-8">
+              {["⚡ BDIX Connected", "📁 FTP Server", "🎮 Low Latency", "📺 YouTube/FB Cache"].map((b) => (
+                <Badge key={b} className="bg-white/15 text-white border-white/30 text-xs">{b}</Badge>
+              ))}
+            </div>
             <div className="flex flex-wrap gap-4">
-              <Link to="/contact">
+              <Link to="/coverage">
                 <Button size="lg" className="bg-galaxy-orange hover:bg-galaxy-orange-dark text-white font-bold px-8 py-6 text-lg shadow-lg">
-                  Get Connected · সংযুক্ত হন
+                  Check Coverage · কভারেজ চেক
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link to="/packages">
+              <Link to="/order">
                 <Button size="lg" variant="outline" className="border-2 border-white text-white bg-white/10 hover:bg-white/20 font-bold px-8 py-6 text-lg">
-                  See Plans · প্ল্যান দেখুন
+                  Get Connection · সংযোগ নিন
                 </Button>
               </Link>
             </div>
           </div>
         </div>
-        {/* Wave */}
         <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
           <svg viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg" className="fill-background w-full h-12 md:h-16">
             <path d="M0,40 C300,80 900,0 1200,40 L1200,80 L0,80 Z" />
@@ -143,16 +101,31 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Trust Stats Bar */}
+      <section className="py-8 bg-secondary border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {trustStats.map((s) => (
+              <div key={s.label} className="flex items-center justify-center gap-3 p-3">
+                <s.icon className="h-7 w-7 text-galaxy-orange shrink-0" />
+                <div>
+                  <div className="text-xl font-bold text-galaxy-blue">{s.num}</div>
+                  <div className="text-xs text-muted-foreground">{s.label} · {s.labelBn}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Why Choose Us */}
       <section className="py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-galaxy-blue mb-2">
-              Why Choose Galaxy Net?
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-galaxy-blue mb-2">Why Choose Galaxy Net?</h2>
             <p className="text-xl font-semibold text-galaxy-orange">কেন গ্যালাক্সি নেট বেছে নেবেন?</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f) => (
               <Card key={f.title} className="border-2 hover:border-galaxy-orange transition-all hover:shadow-lg group">
                 <CardContent className="p-6 text-center">
@@ -172,8 +145,34 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Popular Packages Teaser */}
-      <section className="py-16 md:py-20 bg-secondary">
+      {/* Services Preview */}
+      <section className="py-12 bg-secondary">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-galaxy-blue mb-2">Our Services</h2>
+            <p className="text-xl font-semibold text-galaxy-orange">আমাদের সেবাসমূহ</p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-4 mb-6">
+            {servicesPreview.map((s) => (
+              <div key={s.title} className="flex flex-col items-center p-5 rounded-xl bg-background border-2 border-border hover:border-galaxy-orange transition-all min-w-[120px]">
+                <s.icon className="h-8 w-8 text-galaxy-orange mb-2" />
+                <p className="font-semibold text-galaxy-blue text-sm">{s.title}</p>
+                <p className="text-xs text-muted-foreground">{s.titleBn}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link to="/services">
+              <Button variant="outline" className="border-2 border-galaxy-blue text-galaxy-blue hover:bg-galaxy-blue hover:text-white font-semibold">
+                All Services · সব সেবা <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Packages */}
+      <section className="py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-galaxy-blue mb-2">Popular Packages</h2>
@@ -188,17 +187,20 @@ const Index = () => {
                   </div>
                 )}
                 <CardContent className="p-6">
-                  <div className="mb-4">
-                    <h3 className="text-2xl font-bold text-galaxy-blue">{pkg.name}</h3>
-                    <p className="text-galaxy-orange font-medium">{pkg.nameBn}</p>
-                  </div>
-                  <div className="mb-4">
-                    <span className="text-4xl font-bold text-galaxy-blue">{pkg.speed}</span>
-                  </div>
+                  <h3 className="text-2xl font-bold text-galaxy-blue">{pkg.name}</h3>
+                  <p className="text-galaxy-orange font-medium">{pkg.nameBn}</p>
+                  <div className="my-4"><span className="text-4xl font-bold text-galaxy-blue">{pkg.speed}</span></div>
                   <div className="mb-4 p-3 rounded-lg bg-galaxy-orange/10">
                     <span className="text-3xl font-bold text-galaxy-orange">৳{pkg.price}</span>
                     <span className="text-muted-foreground text-sm">/month · মাস</span>
                   </div>
+                  {pkg.badges.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {pkg.badges.map((b) => (
+                        <Badge key={b} className="bg-galaxy-blue/10 text-galaxy-blue border-0 text-xs">{b}</Badge>
+                      ))}
+                    </div>
+                  )}
                   <ul className="space-y-2 mb-6">
                     {pkg.features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-sm">
@@ -207,9 +209,9 @@ const Index = () => {
                       </li>
                     ))}
                   </ul>
-                  <Link to="/contact">
+                  <Link to="/order">
                     <Button className={`w-full font-semibold ${pkg.popular ? "bg-galaxy-orange hover:bg-galaxy-orange-dark text-white" : "bg-galaxy-blue hover:bg-galaxy-blue-dark text-white"}`}>
-                      Subscribe Now · সাবস্ক্রাইব করুন
+                      Order Now · অর্ডার করুন
                     </Button>
                   </Link>
                 </CardContent>
@@ -219,70 +221,32 @@ const Index = () => {
           <div className="text-center mt-8">
             <Link to="/packages">
               <Button size="lg" variant="outline" className="border-2 border-galaxy-blue text-galaxy-blue hover:bg-galaxy-blue hover:text-white font-semibold">
-                See All Plans · সব প্ল্যান দেখুন
-                <ArrowRight className="ml-2 h-4 w-4" />
+                See All Plans · সব প্ল্যান দেখুন <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* About Snippet */}
-      <section className="py-16 md:py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-galaxy-blue mb-2">About Galaxy Net</h2>
-              <p className="text-xl font-semibold text-galaxy-orange mb-6">গ্যালাক্সি নেট সম্পর্কে</p>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-4">
-                Galaxy Net is a leading internet service provider dedicated to delivering fast, reliable, and affordable broadband across Bangladesh. Since our founding, we've been committed to connecting communities and empowering people through technology.
-              </p>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                গ্যালাক্সি নেট বাংলাদেশের একটি শীর্ষস্থানীয় ইন্টারনেট সেবা প্রদানকারী। আমরা দ্রুত, নির্ভরযোগ্য এবং সাশ্রয়ী ব্রডব্যান্ড সংযোগ দেওয়ার প্রতিশ্রুতি নিয়ে কাজ করি।
-              </p>
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                {[
-                  { num: "10K+", label: "Customers · গ্রাহক" },
-                  { num: "50+", label: "Areas · এলাকা" },
-                  { num: "99.9%", label: "Uptime" },
-                ].map((stat) => (
-                  <div key={stat.num} className="text-center p-4 rounded-lg bg-secondary">
-                    <div className="text-2xl font-bold text-galaxy-orange">{stat.num}</div>
-                    <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-              <Link to="/coverage">
-                <Button className="bg-galaxy-blue hover:bg-galaxy-blue-dark text-white font-semibold">
-                  Learn More · আরও জানুন
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-            <div className="relative">
-              <div className="hero-gradient rounded-2xl p-8 text-white">
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { icon: Zap, label: "Fiber Optic", labelBn: "ফাইবার অপটিক" },
-                    { icon: Shield, label: "Secure Network", labelBn: "নিরাপদ নেটওয়ার্ক" },
-                    { icon: HeadphonesIcon, label: "Expert Team", labelBn: "বিশেষজ্ঞ দল" },
-                    { icon: Wifi, label: "Wide Coverage", labelBn: "বিস্তৃত কভারেজ" },
-                  ].map((item) => (
-                    <div key={item.label} className="flex flex-col items-center text-center p-4 rounded-xl bg-white/10">
-                      <item.icon className="h-8 w-8 text-galaxy-orange mb-2" />
-                      <p className="font-semibold text-sm">{item.label}</p>
-                      <p className="text-xs text-blue-200">{item.labelBn}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+      {/* Coverage CTA */}
+      <section className="py-12 bg-secondary">
+        <div className="container mx-auto px-4 max-w-xl text-center">
+          <MapPin className="h-10 w-10 text-galaxy-orange mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-galaxy-blue mb-1">Check If We're In Your Area</h2>
+          <p className="text-galaxy-orange font-medium mb-6">আপনার এলাকায় আমরা আছি কিনা দেখুন</p>
+          <div className="flex gap-3">
+            <Input placeholder="Enter your area... · এলাকার নাম..." value={coverageCheck} onChange={(e) => setCoverageCheck(e.target.value)} className="border-2 border-galaxy-blue/20" />
+            <Link to={`/coverage?q=${encodeURIComponent(coverageCheck)}`}>
+              <Button className="bg-galaxy-orange hover:bg-galaxy-orange-dark text-white font-semibold shrink-0">
+                <Search className="h-4 w-4 mr-1" /> Check
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 md:py-20 bg-secondary">
+      <section className="py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-galaxy-blue mb-2">Customer Reviews</h2>
@@ -321,10 +285,9 @@ const Index = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Connected?</h2>
           <p className="text-2xl font-semibold text-orange-300 mb-4">সংযুক্ত হতে প্রস্তুত?</p>
           <p className="text-blue-200 text-lg mb-8">Join thousands of happy customers today!</p>
-          <Link to="/contact">
+          <Link to="/order">
             <Button size="lg" className="bg-galaxy-orange hover:bg-galaxy-orange-dark text-white font-bold px-10 py-6 text-lg shadow-xl">
-              Contact Us Now · এখনই যোগাযোগ করুন
-              <ArrowRight className="ml-2 h-5 w-5" />
+              Order Now · এখনই অর্ডার করুন <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
         </div>
