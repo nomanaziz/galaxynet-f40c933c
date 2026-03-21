@@ -58,7 +58,7 @@ const Index = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-up">
               <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-3">Galaxy Net</p>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-[1.1] mb-4">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-[1.1] mb-4">
                 {t(settings.hero_title_en || "Best Fiber Internet in Your Area", settings.hero_title_bn || "আপনার এলাকায় সেরা ফাইবার ইন্টারনেট")}
               </h1>
               <p className="text-muted-foreground text-lg mb-8 max-w-lg">
@@ -122,7 +122,7 @@ const Index = () => {
         <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-14">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
                 {t("Why Choose Galaxy Net?", "কেন গ্যালাক্সি নেট?")}
               </h2>
               <p className="text-muted-foreground max-w-lg mx-auto">
@@ -153,7 +153,7 @@ const Index = () => {
       <section className="py-14 bg-secondary/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-foreground mb-2">{t("Our Services", "আমাদের সেবাসমূহ")}</h2>
+            <h2 className="text-3xl font-bold text-primary mb-2">{t("Our Services", "আমাদের সেবাসমূহ")}</h2>
           </div>
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             {services.map((s) => {
@@ -180,7 +180,7 @@ const Index = () => {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{t("Popular Packages", "জনপ্রিয় প্যাকেজ")}</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("Popular Packages", "জনপ্রিয় প্যাকেজ")}</h2>
             <p className="text-muted-foreground">{t("Choose the perfect plan for you", "আপনার জন্য সেরা প্ল্যান বেছে নিন")}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
@@ -236,7 +236,7 @@ const Index = () => {
           <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <MapPin className="h-6 w-6 text-accent" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">{t("Check If We're In Your Area", "আপনার এলাকায় আমরা আছি কিনা দেখুন")}</h2>
+          <h2 className="text-2xl font-bold text-primary mb-2">{t("Check If We're In Your Area", "আপনার এলাকায় আমরা আছি কিনা দেখুন")}</h2>
           <div className="flex gap-3 mt-6">
             <Input placeholder={t("Enter your area...", "এলাকার নাম...")} value={coverageCheck} onChange={(e) => setCoverageCheck(e.target.value)} />
             <Link to={`/coverage?q=${encodeURIComponent(coverageCheck)}`}>
@@ -253,7 +253,7 @@ const Index = () => {
         <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-14">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{t("Customer Reviews", "গ্রাহকদের মতামত")}</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("Customer Reviews", "গ্রাহকদের মতামত")}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {testimonials.map((item) => (
@@ -288,7 +288,7 @@ const Index = () => {
       {partners.length > 0 && (
         <section className="py-14 bg-secondary/50">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-foreground text-center mb-8">
+            <h2 className="text-2xl font-bold text-primary text-center mb-8">
               {t(settings.partner_section_title_en || "Our Partners", settings.partner_section_title_bn || "আমাদের পার্টনার")}
             </h2>
             <div className="flex flex-wrap justify-center gap-8 items-center">
@@ -318,7 +318,7 @@ const Index = () => {
               </Button>
             </Link>
             <Link to="/contact">
-              <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 font-semibold px-8">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10 font-semibold px-8">
                 {t("Contact Us", "যোগাযোগ করুন")}
               </Button>
             </Link>
