@@ -198,7 +198,7 @@ const PackageManager = () => {
             <div className="flex gap-6">
               <div className="flex items-center gap-2">
                 <Switch checked={form.featured} onCheckedChange={v => setForm(f => ({ ...f, featured: v }))} />
-                <Label>Featured</Label>
+                <Label>Show on Homepage</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Switch checked={form.visible} onCheckedChange={v => setForm(f => ({ ...f, visible: v }))} />
