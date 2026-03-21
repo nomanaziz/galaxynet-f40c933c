@@ -18,7 +18,7 @@ interface Pkg {
   name_bn: string | null;
   speed: number;
   price: number;
-  category: "home" | "corporate";
+  category: "home" | "corporate" | "dedicated";
   features: string[];
   badges: string[];
   featured: boolean;
