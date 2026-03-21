@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 const iconMap: Record<string, any> = {
   zap: Zap, headphones: HeadphonesIcon, gauge: Gauge, shield: Shield, wifi: Wifi,
   banknote: Banknote, dollar: DollarSign, globe: Globe, gamepad: Gamepad2,
-  server: Server, star: Star,
+  server: Server, star: Star, "building-2": Building2, camera: Camera, network: Network,
 };
 
 const Index = () => {
