@@ -18,7 +18,7 @@ interface Pkg {
   name_bn: string | null;
   speed: number;
   price: number;
-  category: "home" | "corporate";
+  category: "home" | "corporate" | "dedicated";
   features: string[];
   badges: string[];
   featured: boolean;
@@ -183,6 +183,7 @@ const PackageManager = () => {
                 <SelectContent>
                   <SelectItem value="home">Home</SelectItem>
                   <SelectItem value="corporate">Corporate</SelectItem>
+                  <SelectItem value="dedicated">Dedicated</SelectItem>
                 </SelectContent>
               </Select>
             </div>

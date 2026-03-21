@@ -26,12 +26,20 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
       )}
       <CardContent className="p-6">
         <h3 className="text-xl font-bold text-foreground">{t(plan.name, plan.name_bn || plan.name)}</h3>
-        <div className="flex items-end gap-1 my-3">
-          <span className="text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
-        </div>
+        {plan.category !== "dedicated" && (
+          <div className="flex items-end gap-1 my-3">
+            <span className="text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
+          </div>
+        )}
         <div className="mb-3 p-3 rounded-lg bg-accent/8">
-          <span className="text-2xl font-bold text-accent">৳{plan.price}</span>
-          <span className="text-muted-foreground text-sm">/{t("month", "মাস")}</span>
+          {plan.category === "dedicated" ? (
+            <span className="text-2xl font-bold text-accent">{t("Call for Price", "মূল্যের জন্য কল করুন")}</span>
+          ) : (
+            <>
+              <span className="text-2xl font-bold text-accent">৳{plan.price}</span>
+              <span className="text-muted-foreground text-sm">/{t("month", "মাস")}</span>
+            </>
+          )}
         </div>
         <div className="flex flex-wrap gap-1 mb-4">
           {badgeList.map((b: string) => {
@@ -105,6 +113,7 @@ const Packages = () => {
                 <TabsList className="h-11 p-1">
                   <TabsTrigger value="home" className="px-5 text-sm font-medium">{t("Home Plans", "হোম প্ল্যান")}</TabsTrigger>
                   <TabsTrigger value="corporate" className="px-5 text-sm font-medium">{t("Corporate Plans", "কর্পোরেট প্ল্যান")}</TabsTrigger>
+                  <TabsTrigger value="dedicated" className="px-5 text-sm font-medium">{t("Dedicated", "ডেডিকেটেড")}</TabsTrigger>
                 </TabsList>
               </div>
 
@@ -115,9 +124,9 @@ const Packages = () => {
                 <Slider value={speedFilter} onValueChange={setSpeedFilter} max={200} step={10} className="w-full" />
               </div>
 
-              {["home", "corporate"].map(cat => (
+              {["home", "corporate", "dedicated"].map(cat => (
                 <TabsContent key={cat} value={cat}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                  <div className={`grid grid-cols-1 ${cat === "dedicated" ? "sm:grid-cols-1 lg:grid-cols-1 max-w-lg mx-auto" : "sm:grid-cols-2 lg:grid-cols-4"} gap-5`}>
                     {filterPlans(cat).map(plan => <PlanCard key={plan.id} plan={plan} t={t} />)}
                   </div>
                   {filterPlans(cat).length === 0 && (
