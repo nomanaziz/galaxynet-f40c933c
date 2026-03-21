@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Search, MapPin, CheckCircle, XCircle, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
@@ -10,30 +11,91 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
+interface Location {
+  id: string;
+  name: string;
+  name_bn: string | null;
+  type: "district" | "thana" | "zone";
+  parent_id: string | null;
+}
+
 const Coverage = () => {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
-  const [selectedZone, setSelectedZone] = useState("All");
   const [checkResult, setCheckResult] = useState<null | boolean>(null);
   const [checkInput, setCheckInput] = useState(searchParams.get("q") || "");
   const [areas, setAreas] = useState<any[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
 
+  // Cascading filter state
+  const [filterDistrict, setFilterDistrict] = useState("");
+  const [filterThana, setFilterThana] = useState("");
+  const [filterZone, setFilterZone] = useState("");
+
   useEffect(() => {
-    supabase.from("coverage_areas").select("*").order("name").then(({ data }) => {
-      setAreas(data ?? []);
+    Promise.all([
+      supabase.from("coverage_areas").select("*").order("name"),
+      supabase.from("coverage_locations").select("*").order("sort_order"),
+    ]).then(([areasRes, locsRes]) => {
+      setAreas(areasRes.data ?? []);
+      setLocations((locsRes.data ?? []) as Location[]);
       setLoading(false);
     });
   }, []);
 
-  const zones = ["All", ...Array.from(new Set(areas.map(a => a.zone).filter(Boolean)))];
+  const districts = useMemo(() => locations.filter(l => l.type === "district"), [locations]);
+  const thanas = useMemo(() => {
+    if (!filterDistrict) return [];
+    return locations.filter(l => l.type === "thana" && l.parent_id === filterDistrict);
+  }, [locations, filterDistrict]);
+  const zones = useMemo(() => {
+    if (!filterThana) return [];
+    return locations.filter(l => l.type === "zone" && l.parent_id === filterThana);
+  }, [locations, filterThana]);
 
-  const filtered = areas.filter((area) => {
-    const matchesZone = selectedZone === "All" || area.zone === selectedZone;
-    const matchesSearch = search === "" || area.name.toLowerCase().includes(search.toLowerCase()) || (area.name_bn || "").includes(search);
-    return matchesZone && matchesSearch;
-  });
+  const locationMap = useMemo(() => {
+    const m = new Map<string, Location>();
+    locations.forEach(l => m.set(l.id, l));
+    return m;
+  }, [locations]);
+
+  const getBreadcrumb = (locationId: string | null): string => {
+    if (!locationId) return "";
+    const parts: string[] = [];
+    let current = locationMap.get(locationId);
+    while (current) {
+      parts.unshift(t(current.name, current.name_bn || current.name));
+      current = current.parent_id ? locationMap.get(current.parent_id) : undefined;
+    }
+    return parts.join(" > ");
+  };
+
+  // Get all zone IDs under a thana, or all zone IDs under a district
+  const getZoneIdsForDistrict = (distId: string) => {
+    const thanaIds = locations.filter(l => l.type === "thana" && l.parent_id === distId).map(l => l.id);
+    return locations.filter(l => l.type === "zone" && thanaIds.includes(l.parent_id!)).map(l => l.id);
+  };
+
+  const filtered = useMemo(() => {
+    return areas.filter((area) => {
+      const matchesSearch = search === "" || area.name.toLowerCase().includes(search.toLowerCase()) || (area.name_bn || "").includes(search);
+
+      let matchesLocation = true;
+      if (filterZone) {
+        matchesLocation = area.location_id === filterZone;
+      } else if (filterThana) {
+        const zoneIds = locations.filter(l => l.type === "zone" && l.parent_id === filterThana).map(l => l.id);
+        matchesLocation = zoneIds.includes(area.location_id);
+      } else if (filterDistrict) {
+        const zoneIds = getZoneIdsForDistrict(filterDistrict);
+        matchesLocation = zoneIds.includes(area.location_id);
+      }
+
+      return matchesSearch && matchesLocation;
+    });
+  }, [areas, search, filterDistrict, filterThana, filterZone, locations]);
 
   const handleCheck = () => {
     if (!checkInput.trim()) return;
@@ -57,6 +119,7 @@ const Coverage = () => {
         </div>
       </section>
 
+      {/* Check area section */}
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4 max-w-xl">
           <div className="p-6 rounded-2xl border bg-card">
@@ -105,6 +168,7 @@ const Coverage = () => {
         </div>
       </section>
 
+      {/* Areas listing */}
       <section className="py-12 bg-secondary/50 flex-1">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
@@ -115,23 +179,44 @@ const Coverage = () => {
             <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
           ) : (
             <>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-                <div className="flex flex-wrap gap-2">
-                  {zones.map((zone) => (
-                    <button
-                      key={zone}
-                      onClick={() => setSelectedZone(zone)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
-                        selectedZone === zone ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border hover:border-primary/40"
-                      }`}
-                    >
-                      {zone === "All" ? t("All", "সব") : zone}
-                    </button>
-                  ))}
+              {/* Cascading filters */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-end mb-8 max-w-3xl mx-auto">
+                <div className="w-full sm:w-auto">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("District", "জেলা")}</label>
+                  <Select value={filterDistrict} onValueChange={(v) => { setFilterDistrict(v === "all" ? "" : v); setFilterThana(""); setFilterZone(""); }}>
+                    <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder={t("All Districts", "সকল জেলা")} /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("All Districts", "সকল জেলা")}</SelectItem>
+                      {districts.map(d => <SelectItem key={d.id} value={d.id}>{t(d.name, d.name_bn || d.name)}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder={t("Search...", "খুঁজুন...")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 w-48" />
+                <div className="w-full sm:w-auto">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("Thana", "থানা")}</label>
+                  <Select value={filterThana} onValueChange={(v) => { setFilterThana(v === "all" ? "" : v); setFilterZone(""); }} disabled={!filterDistrict}>
+                    <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder={t("All Thanas", "সকল থানা")} /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("All Thanas", "সকল থানা")}</SelectItem>
+                      {thanas.map(t2 => <SelectItem key={t2.id} value={t2.id}>{t(t2.name, t2.name_bn || t2.name)}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="w-full sm:w-auto">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("Zone", "জোন")}</label>
+                  <Select value={filterZone} onValueChange={(v) => setFilterZone(v === "all" ? "" : v)} disabled={!filterThana}>
+                    <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder={t("All Zones", "সকল জোন")} /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("All Zones", "সকল জোন")}</SelectItem>
+                      {zones.map(z => <SelectItem key={z.id} value={z.id}>{t(z.name, z.name_bn || z.name)}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="relative w-full sm:w-auto">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("Search", "খুঁজুন")}</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder={t("Search...", "খুঁজুন...")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 w-full sm:w-48" />
+                  </div>
                 </div>
               </div>
 
@@ -140,7 +225,12 @@ const Coverage = () => {
                   <div key={area.id} className={`flex flex-col items-center text-center p-4 rounded-xl bg-background border hover:border-accent/40 hover:shadow-sm transition-all ${!area.available ? "opacity-50" : ""}`}>
                     <MapPin className="h-5 w-5 text-accent mb-2" />
                     <p className="font-medium text-foreground text-sm">{t(area.name, area.name_bn || area.name)}</p>
-                    <Badge variant="secondary" className="mt-2 text-xs">{area.zone || area.district}</Badge>
+                    {area.location_id && (
+                      <p className="text-xs text-muted-foreground mt-1">{getBreadcrumb(area.location_id)}</p>
+                    )}
+                    {!area.location_id && (area.zone || area.district) && (
+                      <Badge variant="secondary" className="mt-2 text-xs">{area.zone || area.district}</Badge>
+                    )}
                     {!area.available && <span className="text-xs text-destructive mt-1">{t("Coming Soon", "শীঘ্রই আসছে")}</span>}
                   </div>
                 ))}
