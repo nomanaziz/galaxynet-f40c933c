@@ -27,6 +27,10 @@ import PageManager from "./pages/admin/PageManager";
 import NoticeManager from "./pages/admin/NoticeManager";
 import SettingsPage from "./pages/admin/SettingsPage";
 import UserManager from "./pages/admin/UserManager";
+import MenuManager from "./pages/admin/MenuManager";
+import PaymentManager from "./pages/admin/PaymentManager";
+import HomepageEditor from "./pages/admin/HomepageEditor";
+import MediaManager from "./pages/admin/MediaManager";
 
 const queryClient = new QueryClient();
 
