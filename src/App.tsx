@@ -13,6 +13,10 @@ import Services from "./pages/Services";
 import Order from "./pages/Order";
 import SpeedTest from "./pages/SpeedTest";
 import Notices from "./pages/Notices";
+import Offers from "./pages/Offers";
+import Payment from "./pages/Payment";
+import Selfcare from "./pages/Selfcare";
+import GetConnected from "./pages/GetConnected";
 import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import Login from "./pages/Login";
@@ -33,6 +37,10 @@ import MenuManager from "./pages/admin/MenuManager";
 import PaymentManager from "./pages/admin/PaymentManager";
 import HomepageEditor from "./pages/admin/HomepageEditor";
 import MediaManager from "./pages/admin/MediaManager";
+import OffersManager from "./pages/admin/OffersManager";
+import TestimonialsManager from "./pages/admin/TestimonialsManager";
+import PartnersManager from "./pages/admin/PartnersManager";
+import FeaturesManager from "./pages/admin/FeaturesManager";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +61,10 @@ const App = () => (
             <Route path="/order" element={<Order />} />
             <Route path="/speed-test" element={<SpeedTest />} />
             <Route path="/notices" element={<Notices />} />
+            <Route path="/offers" element={<Offers />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/selfcare" element={<Selfcare />} />
+            <Route path="/get-connected" element={<GetConnected />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
@@ -71,6 +83,10 @@ const App = () => (
               <Route path="payments" element={<PaymentManager />} />
               <Route path="homepage" element={<HomepageEditor />} />
               <Route path="media" element={<MediaManager />} />
+              <Route path="offers" element={<OffersManager />} />
+              <Route path="testimonials" element={<TestimonialsManager />} />
+              <Route path="partners" element={<PartnersManager />} />
+              <Route path="features" element={<FeaturesManager />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

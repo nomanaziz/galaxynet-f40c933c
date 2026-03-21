@@ -14,8 +14,32 @@ const settingsKeys = [
   { key: "email", label: "Email" },
   { key: "address", label: "Address" },
   { key: "facebook", label: "Facebook URL" },
+  { key: "hotline", label: "Hotline Number" },
   { key: "maintenance_mode", label: "Maintenance Mode (true/false)" },
 ];
+
+const topbarKeys = [
+  { key: "topbar_notice_en", label: "Top Bar Notice (EN)" },
+  { key: "topbar_notice_bn", label: "Top Bar Notice (BN)" },
+];
+
+const heroKeys = [
+  { key: "hero_banner_url", label: "Hero Banner Image URL" },
+  { key: "hero_title_en", label: "Hero Title (EN)" },
+  { key: "hero_title_bn", label: "Hero Title (BN)" },
+  { key: "hero_subtitle_en", label: "Hero Subtitle (EN)" },
+  { key: "hero_subtitle_bn", label: "Hero Subtitle (BN)" },
+  { key: "hero_cta_text_en", label: "Hero CTA Text (EN)" },
+  { key: "hero_cta_text_bn", label: "Hero CTA Text (BN)" },
+  { key: "hero_cta_url", label: "Hero CTA URL" },
+];
+
+const selfcareKeys = [
+  { key: "selfcare_url", label: "Selfcare Portal URL" },
+  { key: "selfcare_enabled", label: "Selfcare Enabled (true/false)" },
+];
+
+const allKeys = [...settingsKeys, ...topbarKeys, ...heroKeys, ...selfcareKeys];
 
 const SettingsPage = () => {
   const [settings, setSettings] = useState<Record<string, string>>({});
@@ -36,7 +60,7 @@ const SettingsPage = () => {
 
   const handleSave = async () => {
     setSaving(true);
-    for (const { key } of settingsKeys) {
+    for (const { key } of allKeys) {
       const val = settings[key] ?? "";
       await supabase.from("site_settings").upsert({ key, value: val }, { onConflict: "key" });
     }
@@ -46,24 +70,31 @@ const SettingsPage = () => {
 
   if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin" /></div>;
 
+  const renderSection = (title: string, keys: typeof settingsKeys) => (
+    <Card>
+      <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+      <CardContent className="space-y-4">
+        {keys.map(({ key, label }) => (
+          <div key={key} className="space-y-1">
+            <Label>{label}</Label>
+            <Input value={settings[key] ?? ""} onChange={e => setSettings(s => ({ ...s, [key]: e.target.value }))} />
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Site Settings</h2>
-      <Card>
-        <CardHeader><CardTitle>General</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          {settingsKeys.map(({ key, label }) => (
-            <div key={key} className="space-y-1">
-              <Label>{label}</Label>
-              <Input value={settings[key] ?? ""} onChange={e => setSettings(s => ({ ...s, [key]: e.target.value }))} />
-            </div>
-          ))}
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            Save Settings
-          </Button>
-        </CardContent>
-      </Card>
+      {renderSection("General", settingsKeys)}
+      {renderSection("Top Bar", topbarKeys)}
+      {renderSection("Hero Section", heroKeys)}
+      {renderSection("Selfcare Portal", selfcareKeys)}
+      <Button onClick={handleSave} disabled={saving} size="lg">
+        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+        Save All Settings
+      </Button>
     </div>
   );
 };

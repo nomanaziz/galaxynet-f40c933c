@@ -1,6 +1,7 @@
 import {
   LayoutDashboard, Package, MapPin, ShoppingCart, FileText,
-  Bell, Settings, Users, LogOut, Wifi, Menu, CreditCard, Home, Image, ExternalLink
+  Bell, Settings, Users, LogOut, Wifi, Menu, CreditCard, Home, Image, ExternalLink,
+  Gift, Star, Handshake, Sparkles
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -19,6 +20,10 @@ const mainItems = [
   { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
   { title: "Pages", url: "/admin/pages", icon: FileText },
   { title: "Notices", url: "/admin/notices", icon: Bell },
+  { title: "Offers", url: "/admin/offers", icon: Gift },
+  { title: "Testimonials", url: "/admin/testimonials", icon: Star },
+  { title: "Partners", url: "/admin/partners", icon: Handshake },
+  { title: "Features", url: "/admin/features", icon: Sparkles },
   { title: "Menu", url: "/admin/menu", icon: Menu },
   { title: "Payments", url: "/admin/payments", icon: CreditCard },
   { title: "Homepage", url: "/admin/homepage", icon: Home },
@@ -63,12 +68,7 @@ export function AdminSidebar() {
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={item.end}
-                      className="hover:bg-sidebar-accent/50"
-                      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    >
+                    <NavLink to={item.url} end={item.end} className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
                       <item.icon className="mr-2 h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
@@ -87,11 +87,7 @@ export function AdminSidebar() {
                 {systemItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <NavLink
-                        to={item.url}
-                        className="hover:bg-sidebar-accent/50"
-                        activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                      >
+                      <NavLink to={item.url} className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
                         <item.icon className="mr-2 h-4 w-4" />
                         {!collapsed && <span>{item.title}</span>}
                       </NavLink>
@@ -108,12 +104,7 @@ export function AdminSidebar() {
         {!collapsed && user && (
           <p className="mb-2 truncate text-xs text-sidebar-foreground/70">{user.email}</p>
         )}
-        <Button
-          variant="ghost"
-          size={collapsed ? "icon" : "default"}
-          className="w-full text-sidebar-foreground hover:bg-sidebar-accent/50"
-          onClick={signOut}
-        >
+        <Button variant="ghost" size={collapsed ? "icon" : "default"} className="w-full text-sidebar-foreground hover:bg-sidebar-accent/50" onClick={signOut}>
           <LogOut className="h-4 w-4" />
           {!collapsed && <span className="ml-2">Sign Out</span>}
         </Button>

@@ -12,7 +12,7 @@ import { Loader2, Plus, Pencil, Trash2, Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 
-const defaultForm = { title: "", title_bn: "", description: "", description_bn: "", image_url: "", expiry_date: "", active: true, type: "offer" as string };
+const defaultForm = { title: "", title_bn: "", description: "", description_bn: "", image_url: "", expiry_date: "", active: true, type: "offer" as "offer" | "referral" | "coupon" };
 
 const OffersManager = () => {
   const [offers, setOffers] = useState<any[]>([]);
