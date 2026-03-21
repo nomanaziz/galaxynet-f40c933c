@@ -46,13 +46,6 @@ const Index = () => {
     { num: "BDIX", label: t("Connected", "সংযুক্ত"), icon: Server },
   ];
 
-  const servicesPreview = [
-    { icon: Wifi, title: t("Broadband", "ব্রডব্যান্ড") },
-    { icon: Building2, title: t("Corporate", "কর্পোরেট") },
-    { icon: Camera, title: t("CCTV", "সিসিটিভি") },
-    { icon: Network, title: t("Networking", "নেটওয়ার্কিং") },
-    { icon: Server, title: t("Dedicated", "ডেডিকেটেড") },
-  ];
 
   return (
     <div className="min-h-screen flex flex-col">
