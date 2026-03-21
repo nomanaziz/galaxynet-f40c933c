@@ -1,98 +1,77 @@
 
 
-## Galaxy Net Admin Panel — Implementation Plan
+## Galaxy Net Admin Panel — Implementation Plan (Steps 1–6)
 
-### Current State
-The website is fully static — all data (packages, coverage areas, orders) is hardcoded in React components. An admin panel requires a **database backend** to store and manage content dynamically.
-
-### Prerequisites
-- **Supabase** connection is required for: authentication (admin login), database (packages, areas, orders, pages, settings), and storage (media/images)
-- All visitor-facing pages will be refactored to fetch data from Supabase instead of hardcoded arrays
+This is a large build. We will implement it in the first batch: database schema, auth, admin layout, dashboard, package CRUD, and coverage area CRUD.
 
 ---
 
-### Phase 1: Database Foundation
+### Step 1: Database Schema + RLS
 
-**Tables to create:**
-- `packages` — name, speed, price, category (home/corporate), features (jsonb), badges (jsonb), featured, sort_order, visible
-- `coverage_areas` — name, name_bn, zone, district, available (boolean)
-- `connection_orders` — name, phone, email, address, area, package_id, preferred_date, notes, status (pending/contacted/completed), assigned_to, created_at
-- `pages` — slug, title, content (rich text), meta_title, meta_description, published
-- `notices` — title, category (maintenance/offer/alert), content, published, created_at
-- `site_settings` — key/value store for website name, logo URL, phone, email, address, social links, maintenance mode
-- `payment_methods` — name, account_number, logo_url, instructions, sort_order, visible
-- `contact_info` — phone, email, address, map_embed, social_links (jsonb)
-- `user_roles` — user_id, role (super_admin/admin/staff) — separate table per security requirements
-- `menu_items` — label, url, parent_id, sort_order, visible
+Create a single migration with all tables, the `app_role` enum, the `has_role()` security definer function, and RLS policies.
 
-**RLS policies:** Admin-only write access via `has_role()` security definer function. Public read for packages, areas, pages, notices, settings.
+**Tables:**
+- `packages` — id, name, name_bn, speed, price, category (home/corporate), features (jsonb), badges (jsonb), featured, sort_order, visible, created_at
+- `coverage_areas` — id, name, name_bn, zone, district, available, created_at
+- `connection_orders` — id, name, phone, email, address, area, package_id (FK), preferred_date, notes, status (enum: pending/contacted/completed), assigned_to, created_at
+- `pages` — id, slug, title, content, meta_title, meta_description, published, created_at
+- `notices` — id, title, title_bn, category (enum: maintenance/offer/alert), content, published, created_at
+- `site_settings` — id, key (unique), value, created_at
+- `payment_methods` — id, name, account_number, logo_url, instructions, sort_order, visible, created_at
+- `user_roles` — id, user_id (FK auth.users, unique), role (enum: super_admin/admin/staff)
+
+**Security:**
+- `app_role` enum: super_admin, admin, staff
+- `has_role(uuid, app_role)` — security definer function
+- Public SELECT on: packages, coverage_areas, pages, notices, site_settings, payment_methods (where visible/published)
+- Public INSERT on: connection_orders (for visitors submitting orders — no auth required)
+- Admin INSERT/UPDATE/DELETE on all tables via `has_role()`
+- user_roles: SELECT/INSERT/UPDATE/DELETE only for super_admin
+
+**Seed data:** Insert existing hardcoded packages and coverage areas into the new tables so the site works immediately.
 
 ---
 
-### Phase 2: Admin Authentication & Layout
+### Step 2: Admin Authentication
 
-- Admin login page at `/admin/login` with Supabase Auth (email/password)
-- Protected `/admin/*` routes checking user role
-- Sidebar layout using **shadcn/ui Sidebar** component with sections: Dashboard, Packages, Coverage, Orders, Pages, Notices, Settings, Media
-- Role-based menu visibility (super_admin sees User Management + Settings)
+- Create `/admin/login` page with email/password Supabase Auth login
+- Create `useAdminAuth` hook that checks `user_roles` table for the logged-in user
+- Redirect non-admin users away from `/admin/*` routes
 
 ---
 
-### Phase 3: Admin Modules (shadcn/ui throughout)
+### Step 3: Admin Layout
 
-**3.1 Dashboard** (`/admin`)
-- Stats cards: Total Orders, Active Packages, Coverage Areas, Pending Orders
+- Create `AdminLayout.tsx` with shadcn/ui Sidebar (collapsible)
+- Sidebar sections: Dashboard, Packages, Coverage, Orders, Pages, Notices, Settings, Users
+- Role-based visibility (Users + Settings only for super_admin)
+- `SidebarTrigger` always visible in header
+- Nested routes via React Router `<Outlet />`
+
+---
+
+### Step 4: Dashboard
+
+- Stats cards: Total Orders, Active Packages, Coverage Areas, Pending Orders (fetched from Supabase with `.select('*', { count: 'exact', head: true })`)
 - Recent orders table (last 10)
-- Charts using Recharts (daily orders, package popularity)
-
-**3.2 Package Management** (`/admin/packages`)
-- Data table with columns: Name, Speed, Price, Category, Featured, Visible, Actions
-- Add/Edit dialog with form fields matching the `packages` table
-- Delete with confirmation dialog
-- Toggle visibility and featured status inline
-
-**3.3 Coverage Area Management** (`/admin/coverage`)
-- Data table: Area Name, Zone, District, Available status
-- Add/Edit/Delete areas
-- Bulk toggle available/unavailable
-
-**3.4 Connection Orders** (`/admin/orders`)
-- Full data table with filters (status, date range)
-- Status dropdown to update: Pending → Contacted → Completed
-- Click-to-call and WhatsApp links
-- CSV export button
-
-**3.5 CMS Pages** (`/admin/pages`)
-- List of pages with edit/delete
-- Rich text editor (using a simple textarea/markdown initially, upgradeable)
-- SEO fields: meta title, description
-
-**3.6 Notices** (`/admin/notices`)
-- CRUD for maintenance alerts, offers, fiber cut notices
-- Category badge, publish/draft toggle
-
-**3.7 Site Settings** (`/admin/settings`)
-- Website name, logo URL, contact info
-- Payment methods management
-- Social links
-- Maintenance mode toggle
-
-**3.8 User Management** (`/admin/users`) — Super Admin only
-- View admins/staff
-- Invite new admin (Supabase auth invite)
-- Role assignment
+- Simple bar chart with Recharts for orders by status
 
 ---
 
-### Phase 4: Refactor Visitor Pages
+### Step 5: Package Management
 
-Update all public pages to fetch from Supabase instead of hardcoded data:
-- `Index.tsx` — fetch packages, settings, testimonials
-- `Packages.tsx` — fetch from `packages` table with filters
-- `Coverage.tsx` — fetch from `coverage_areas` table
-- `Order.tsx` — submit to `connection_orders` table, fetch packages for dropdown
-- `Notices.tsx` — fetch from `notices` table
-- `Contact.tsx` — fetch contact info from `site_settings`
+- Data table listing all packages with columns: Name, Speed, Price, Category, Featured, Visible, Actions
+- Add/Edit dialog with form (react-hook-form + shadcn/ui)
+- Delete with AlertDialog confirmation
+- Inline toggle for visible/featured via Switch
+
+---
+
+### Step 6: Coverage Area Management
+
+- Data table: Area Name (EN/BN), Zone, District, Available
+- Add/Edit/Delete dialogs
+- Toggle available/unavailable inline
 
 ---
 
@@ -100,42 +79,48 @@ Update all public pages to fetch from Supabase instead of hardcoded data:
 
 ```text
 src/
-├── pages/
-│   └── admin/
-│       ├── AdminLogin.tsx
-│       ├── AdminLayout.tsx      (sidebar + outlet)
-│       ├── Dashboard.tsx
-│       ├── PackageManager.tsx
-│       ├── CoverageManager.tsx
-│       ├── OrderManager.tsx
-│       ├── PageManager.tsx
-│       ├── NoticeManager.tsx
-│       ├── SettingsPage.tsx
-│       └── UserManager.tsx
-├── components/
-│   └── admin/
-│       ├── AdminSidebar.tsx
-│       ├── StatsCard.tsx
-│       └── DataTable.tsx
-└── hooks/
-    └── useAdminAuth.ts
+├── pages/admin/
+│   ├── AdminLogin.tsx
+│   ├── AdminLayout.tsx
+│   ├── Dashboard.tsx
+│   ├── PackageManager.tsx
+│   ├── CoverageManager.tsx
+│   ├── OrderManager.tsx        (placeholder)
+│   ├── PageManager.tsx         (placeholder)
+│   ├── NoticeManager.tsx       (placeholder)
+│   ├── SettingsPage.tsx        (placeholder)
+│   └── UserManager.tsx         (placeholder)
+├── components/admin/
+│   ├── AdminSidebar.tsx
+│   └── StatsCard.tsx
+├── hooks/
+│   └── useAdminAuth.ts
+└── App.tsx                     (add /admin/* routes)
 ```
+
+### Routing Changes (App.tsx)
+
+Add protected admin routes:
+- `/admin/login` — AdminLogin
+- `/admin` — AdminLayout wrapper with nested routes:
+  - index → Dashboard
+  - `packages` → PackageManager
+  - `coverage` → CoverageManager
+  - `orders` → OrderManager (placeholder)
+  - `pages` → PageManager (placeholder)
+  - `notices` → NoticeManager (placeholder)
+  - `settings` → SettingsPage (placeholder)
+  - `users` → UserManager (placeholder)
 
 ---
 
-### Implementation Order
+### Migration SQL Summary
 
-1. Connect Supabase + create all database tables + RLS
-2. Admin auth + login page + protected routes
-3. Admin sidebar layout
-4. Dashboard with stats
-5. Package CRUD
-6. Coverage area CRUD
-7. Orders management
-8. CMS pages + Notices
-9. Settings + Payment methods
-10. Refactor visitor pages to use live data
-11. User management (super admin)
+One migration creates: 2 enums, 8 tables, 1 security definer function, ~20 RLS policies, and seed data for packages + coverage areas.
 
-This is a large build. I recommend implementing it in batches — starting with **Steps 1–6** (database + auth + core CRUD modules), then **Steps 7–11** in a follow-up.
+### Important Notes
+
+- connection_orders allows anonymous INSERT (no auth needed — visitors submit orders)
+- site_settings and payment_methods have public read for visible items
+- After implementation, you will need to create an admin user via Supabase Auth dashboard and assign them a role in `user_roles`
 
