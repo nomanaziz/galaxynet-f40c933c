@@ -1,44 +1,46 @@
 
 
-## Add Services CRUD to Admin Panel
+## Fix 3 Issues: Popular Badge, Order Management, Offers Page
 
-### Problem
-The Services page has 5 hardcoded services. The user wants to manage them from the admin panel.
+### Issue 1: Separate "Popular" Badge from "Show on Homepage"
 
-### Database Migration
+Currently, the homepage shows a "POPULAR" badge on every package that has `featured=true`. The `featured` field controls both homepage visibility AND the popular badge — they should be independent.
 
-Create a `services` table:
-- `id` uuid PK default gen_random_uuid()
-- `title` text NOT NULL
-- `title_bn` text
-- `description` text
-- `description_bn` text
-- `icon_name` text NOT NULL default 'wifi' (lucide icon name)
-- `badge` text (e.g. "Most Popular")
-- `badge_bn` text
-- `link` text default '/contact'
-- `features` jsonb default '[]' (array of {en, bn} objects)
-- `visible` boolean default true
-- `sort_order` integer default 0
-- `created_at` timestamptz default now()
+**Database migration:** Add `popular` boolean column (default false) to `packages` table.
 
-RLS: public SELECT (visible=true), admin CRUD — same pattern as other tables.
+**Files to change:**
+- `src/pages/Index.tsx` — Show "POPULAR" badge only when `pkg.popular` is true (not `pkg.featured`)
+- `src/pages/admin/PackageManager.tsx` — Add "Popular" toggle in table and dialog form (separate from "Show on Homepage")
+- `src/pages/Packages.tsx` — Show "POPULAR" badge based on `pkg.popular` instead of `pkg.featured`
 
-Seed with the 5 existing services so nothing changes visually.
+### Issue 2: Order Manager — Add Delete + Bulk Actions
 
-### New File: `src/pages/admin/ServicesManager.tsx`
-CRUD page following the same pattern as FeaturesManager/OffersManager:
-- Table listing services with icon, title, badge, visibility toggle
-- Dialog form for add/edit with: title (en/bn), description (en/bn), icon_name dropdown, badge (en/bn), link, features JSON, visible toggle, sort_order
+**No database changes needed** — delete RLS policy already exists.
 
-### Updated Files
+**Rewrite `src/pages/admin/OrderManager.tsx`:**
+- Add checkbox column for row selection (select all / individual)
+- Add bulk action bar: bulk status change dropdown + bulk delete button
+- Add individual delete button per row
+- Add delete confirmation dialog
+- Add notes/assigned_to display
+
+### Issue 3: Offers Page Not Working
+
+The `OffersManager.tsx` has a function named `fetch` that shadows the global `fetch` API — this can cause subtle issues.
+
+**Fix `src/pages/admin/OffersManager.tsx`:**
+- Rename the `fetch` function to `fetchOffers` (same pattern as other managers)
+
+**Verify `src/pages/Offers.tsx`:** Code is correct, no changes needed. If offers exist with `active=true`, they will display.
+
+### Summary of Changes
 
 | File | Change |
 |------|--------|
-| `src/App.tsx` | Add route `/admin/services` → ServicesManager |
-| `src/components/admin/AdminSidebar.tsx` | Add "Services" item to main nav group |
-| `src/pages/Services.tsx` | Fetch from `services` table instead of hardcoded array, map `icon_name` string to lucide icon component |
-
-### Icon Mapping
-Create a simple map of icon_name strings to lucide components (Wifi, Building2, Server, Camera, Network, etc.) for rendering on the public Services page.
+| Migration | Add `popular` boolean to `packages` |
+| `src/pages/Index.tsx` | Badge uses `pkg.popular` not `pkg.featured` |
+| `src/pages/Packages.tsx` | Badge uses `pkg.popular` not `pkg.featured` |
+| `src/pages/admin/PackageManager.tsx` | Add "Popular" toggle column + dialog field |
+| `src/pages/admin/OrderManager.tsx` | Rewrite with checkboxes, bulk actions, delete |
+| `src/pages/admin/OffersManager.tsx` | Rename `fetch` → `fetchOffers` |
 
