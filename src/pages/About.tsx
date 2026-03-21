@@ -1,34 +1,60 @@
+import { useEffect, useState } from "react";
 import { Users, Award, Wifi, Shield, Zap, HeadphonesIcon, Clock, Server } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+
+const iconMap: Record<string, any> = { Users, Award, Wifi, Shield, Zap, HeadphonesIcon, Clock, Server };
+
+const defaultStats = [
+  { num: "10,000+", label: "Happy Customers", label_bn: "সন্তুষ্ট গ্রাহক", icon: "Users" },
+  { num: "99.9%", label: "Uptime", label_bn: "আপটাইম", icon: "Shield" },
+  { num: "50+", label: "Coverage Areas", label_bn: "কভারেজ এলাকা", icon: "Wifi" },
+  { num: "24/7", label: "Support", label_bn: "সাপোর্ট", icon: "HeadphonesIcon" },
+];
+
+const defaultTimeline = [
+  { year: "2015", title: "Founded", title_bn: "প্রতিষ্ঠিত", desc: "Galaxy Net started with a vision to connect Bangladesh.", desc_bn: "গ্যালাক্সি নেট বাংলাদেশকে সংযুক্ত করার লক্ষ্যে যাত্রা শুরু করে।" },
+  { year: "2017", title: "1000 Customers", title_bn: "১০০০ গ্রাহক", desc: "Reached our first milestone.", desc_bn: "প্রথম মাইলফলকে পৌঁছেছি।" },
+  { year: "2019", title: "Fiber Optic Upgrade", title_bn: "ফাইবার অপটিক আপগ্রেড", desc: "Migrated entire network to fiber optic.", desc_bn: "সম্পূর্ণ নেটওয়ার্ক ফাইবার অপটিকে স্থানান্তর।" },
+  { year: "2021", title: "Citywide Expansion", title_bn: "শহরব্যাপী সম্প্রসারণ", desc: "Expanded to 50+ areas.", desc_bn: "৫০+ এলাকায় সম্প্রসারণ।" },
+  { year: "2024", title: "10K+ Customers", title_bn: "১০,০০০+ গ্রাহক", desc: "Serving over 10,000 homes and businesses.", desc_bn: "১০,০০০+ ঘর ও ব্যবসায় সেবা প্রদান।" },
+];
+
+const defaultTeam = [
+  { name: "Md. Rafiq Hasan", name_bn: "মো. রফিক হাসান", role: "CEO & Founder", role_bn: "প্রতিষ্ঠাতা ও সিইও" },
+  { name: "Nusrat Jahan", name_bn: "নুসরাত জাহান", role: "Operations Manager", role_bn: "অপারেশন ম্যানেজার" },
+  { name: "Tanvir Ahmed", name_bn: "তানভীর আহমেদ", role: "Network Engineer", role_bn: "নেটওয়ার্ক ইঞ্জিনিয়ার" },
+  { name: "Sabrina Akter", name_bn: "সাবরিনা আক্তার", role: "Customer Support Lead", role_bn: "গ্রাহক সেবা প্রধান" },
+];
+
+function safeParse<T>(json: string | undefined, fallback: T): T {
+  if (!json) return fallback;
+  try { return JSON.parse(json); } catch { return fallback; }
+}
 
 const About = () => {
   const { t } = useLanguage();
+  const [heroEn, setHeroEn] = useState("Connecting Bangladesh with fast, reliable internet since 2015.");
+  const [heroBn, setHeroBn] = useState("২০১৫ সাল থেকে দ্রুত ও নির্ভরযোগ্য ইন্টারনেটে সংযুক্ত করছি।");
+  const [stats, setStats] = useState(defaultStats);
+  const [timeline, setTimeline] = useState(defaultTimeline);
+  const [team, setTeam] = useState(defaultTeam);
 
-  const timeline = [
-    { year: "2015", title: t("Founded", "প্রতিষ্ঠিত"), desc: t("Galaxy Net started with a vision to connect Bangladesh.", "গ্যালাক্সি নেট বাংলাদেশকে সংযুক্ত করার লক্ষ্যে যাত্রা শুরু করে।") },
-    { year: "2017", title: t("1000 Customers", "১০০০ গ্রাহক"), desc: t("Reached our first milestone.", "প্রথম মাইলফলকে পৌঁছেছি।") },
-    { year: "2019", title: t("Fiber Optic Upgrade", "ফাইবার অপটিক আপগ্রেড"), desc: t("Migrated entire network to fiber optic.", "সম্পূর্ণ নেটওয়ার্ক ফাইবার অপটিকে স্থানান্তর।") },
-    { year: "2021", title: t("Citywide Expansion", "শহরব্যাপী সম্প্রসারণ"), desc: t("Expanded to 50+ areas.", "৫০+ এলাকায় সম্প্রসারণ।") },
-    { year: "2024", title: t("10K+ Customers", "১০,০০০+ গ্রাহক"), desc: t("Serving over 10,000 homes and businesses.", "১০,০০০+ ঘর ও ব্যবসায় সেবা প্রদান।") },
-  ];
-
-  const team = [
-    { name: t("Md. Rafiq Hasan", "মো. রফিক হাসান"), role: t("CEO & Founder", "প্রতিষ্ঠাতা ও সিইও") },
-    { name: t("Nusrat Jahan", "নুসরাত জাহান"), role: t("Operations Manager", "অপারেশন ম্যানেজার") },
-    { name: t("Tanvir Ahmed", "তানভীর আহমেদ"), role: t("Network Engineer", "নেটওয়ার্ক ইঞ্জিনিয়ার") },
-    { name: t("Sabrina Akter", "সাবরিনা আক্তার"), role: t("Customer Support Lead", "গ্রাহক সেবা প্রধান") },
-  ];
-
-  const stats = [
-    { num: "10,000+", label: t("Happy Customers", "সন্তুষ্ট গ্রাহক"), icon: Users },
-    { num: "99.9%", label: t("Uptime", "আপটাইম"), icon: Shield },
-    { num: "50+", label: t("Coverage Areas", "কভারেজ এলাকা"), icon: Wifi },
-    { num: "24/7", label: t("Support", "সাপোর্ট"), icon: HeadphonesIcon },
-  ];
+  useEffect(() => {
+    supabase.from("site_settings").select("key, value").then(({ data }) => {
+      const map: Record<string, string> = {};
+      (data ?? []).forEach((r: any) => { if (r.key?.startsWith("about_")) map[r.key] = r.value ?? ""; });
+      if (map.about_hero_en) setHeroEn(map.about_hero_en);
+      if (map.about_hero_bn) setHeroBn(map.about_hero_bn);
+      setStats(safeParse(map.about_stats, defaultStats));
+      setTimeline(safeParse(map.about_timeline, defaultTimeline));
+      setTeam(safeParse(map.about_team, defaultTeam));
+    });
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -37,9 +63,7 @@ const About = () => {
       <section className="page-hero">
         <div className="container mx-auto px-4 relative z-10">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("About Galaxy Net", "গ্যালাক্সি নেট সম্পর্কে")}</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            {t("Connecting Bangladesh with fast, reliable internet since 2015.", "২০১৫ সাল থেকে দ্রুত ও নির্ভরযোগ্য ইন্টারনেটে সংযুক্ত করছি।")}
-          </p>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t(heroEn, heroBn)}</p>
         </div>
       </section>
 
@@ -47,15 +71,18 @@ const About = () => {
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map((s) => (
-              <Card key={s.label} className="border hover:border-accent/40 transition-all">
-                <CardContent className="p-6 text-center">
-                  <s.icon className="h-7 w-7 text-accent mx-auto mb-3" />
-                  <div className="text-2xl font-bold text-foreground">{s.num}</div>
-                  <p className="text-sm text-muted-foreground">{s.label}</p>
-                </CardContent>
-              </Card>
-            ))}
+            {stats.map((s) => {
+              const Icon = iconMap[s.icon] || Users;
+              return (
+                <Card key={s.label} className="border hover:border-accent/40 transition-all">
+                  <CardContent className="p-6 text-center">
+                    <Icon className="h-7 w-7 text-accent mx-auto mb-3" />
+                    <div className="text-2xl font-bold text-foreground">{s.num}</div>
+                    <p className="text-sm text-muted-foreground">{t(s.label, s.label_bn || s.label)}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -95,8 +122,8 @@ const About = () => {
                   </div>
                   <div className={`ml-14 md:ml-0 md:w-1/2 ${i % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"}`}>
                     <Badge className="bg-accent text-accent-foreground border-0 mb-2">{item.year}</Badge>
-                    <h3 className="font-bold text-foreground">{item.title}</h3>
-                    <p className="text-muted-foreground text-sm mt-1">{item.desc}</p>
+                    <h3 className="font-bold text-foreground">{t(item.title, item.title_bn || item.title)}</h3>
+                    <p className="text-muted-foreground text-sm mt-1">{t(item.desc, item.desc_bn || item.desc)}</p>
                   </div>
                 </div>
               ))}
@@ -116,8 +143,8 @@ const About = () => {
                   <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
                     <Users className="h-8 w-8 text-accent" />
                   </div>
-                  <h3 className="font-bold text-foreground">{member.name}</h3>
-                  <p className="text-sm text-accent font-medium mt-1">{member.role}</p>
+                  <h3 className="font-bold text-foreground">{t(member.name, member.name_bn || member.name)}</h3>
+                  <p className="text-sm text-accent font-medium mt-1">{t(member.role, member.role_bn || member.role)}</p>
                 </CardContent>
               </Card>
             ))}

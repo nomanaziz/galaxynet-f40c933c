@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
   const { t } = useLanguage();
+  const [s, setS] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    supabase.from("site_settings").select("key, value").then(({ data }) => {
+      const map: Record<string, string> = {};
+      (data ?? []).forEach((r: any) => { if (r.key?.startsWith("contact_")) map[r.key] = r.value ?? ""; });
+      setS(map);
+    });
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,11 +32,22 @@ const Contact = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const phone1 = s.contact_phone_1 || "+880 1700-000000";
+  const phone2 = s.contact_phone_2 || "+880 1800-000000";
+  const email1 = s.contact_email_1 || "info@galaxynet.com.bd";
+  const email2 = s.contact_email_2 || "support@galaxynet.com.bd";
+  const addressEn = s.contact_address_en || "House 12, Road 5, Dhanmondi, Dhaka-1209";
+  const addressBn = s.contact_address_bn || "হাউজ ১২, রোড ৫, ধানমন্ডি, ঢাকা-১২০৯";
+  const hoursEn = s.contact_hours_en || "Sat–Thu: 9 AM – 10 PM";
+  const hoursBn = s.contact_hours_bn || "শনি–বৃহস্পতি: সকাল ৯ – রাত ১০";
+  const friHoursEn = s.contact_friday_hours_en || "Friday: 2 PM – 10 PM";
+  const friHoursBn = s.contact_friday_hours_bn || "জুমা: দুপুর ২ – রাত ১০";
+
   const contactDetails = [
-    { icon: Phone, title: t("Phone", "ফোন"), lines: ["+880 1700-000000", "+880 1800-000000"], note: t("Available 24/7", "২৪/৭ উপলব্ধ") },
-    { icon: Mail, title: t("Email", "ইমেইল"), lines: ["info@galaxynet.com.bd", "support@galaxynet.com.bd"], note: t("Reply within 24 hours", "২৪ ঘণ্টায় উত্তর") },
-    { icon: MapPin, title: t("Address", "ঠিকানা"), lines: [t("House 12, Road 5, Dhanmondi, Dhaka-1209", "হাউজ ১২, রোড ৫, ধানমন্ডি, ঢাকা-১২০৯")], note: "" },
-    { icon: Clock, title: t("Business Hours", "অফিস সময়"), lines: [t("Sat–Thu: 9 AM – 10 PM", "শনি–বৃহস্পতি: সকাল ৯ – রাত ১০"), t("Friday: 2 PM – 10 PM", "জুমা: দুপুর ২ – রাত ১০")], note: t("24/7 Tech Support", "২৪/৭ টেক সাপোর্ট") },
+    { icon: Phone, title: t("Phone", "ফোন"), lines: [phone1, phone2], note: t("Available 24/7", "২৪/৭ উপলব্ধ") },
+    { icon: Mail, title: t("Email", "ইমেইল"), lines: [email1, email2], note: t("Reply within 24 hours", "২৪ ঘণ্টায় উত্তর") },
+    { icon: MapPin, title: t("Address", "ঠিকানা"), lines: [t(addressEn, addressBn)], note: "" },
+    { icon: Clock, title: t("Business Hours", "অফিস সময়"), lines: [t(hoursEn, hoursBn), t(friHoursEn, friHoursBn)], note: t("24/7 Tech Support", "২৪/৭ টেক সাপোর্ট") },
   ];
 
   return (
@@ -45,7 +66,6 @@ const Contact = () => {
       <section className="py-16 bg-background flex-1">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Form */}
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-6">{t("Send a Message", "বার্তা পাঠান")}</h2>
               {submitted ? (
@@ -82,7 +102,6 @@ const Contact = () => {
               )}
             </div>
 
-            {/* Details */}
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-6">{t("Contact Details", "যোগাযোগের তথ্য")}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -106,9 +125,9 @@ const Contact = () => {
 
               <div className="rounded-2xl bg-primary p-6 text-primary-foreground text-center">
                 <p className="text-lg font-bold mb-1">{t("Call Us Now!", "এখনই কল করুন!")}</p>
-                <a href="tel:+8801700000000">
+                <a href={`tel:${phone1.replace(/[^+\d]/g, "")}`}>
                   <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold w-full mt-3">
-                    <Phone className="mr-2 h-5 w-5" /> +880 1700-000000
+                    <Phone className="mr-2 h-5 w-5" /> {phone1}
                   </Button>
                 </a>
               </div>
