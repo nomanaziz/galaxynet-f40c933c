@@ -4,6 +4,7 @@ import {
   Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog, Globe
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import logo from "@/assets/logo.png";
 import { useLocation } from "react-router-dom";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
