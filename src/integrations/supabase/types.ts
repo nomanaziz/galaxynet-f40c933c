@@ -73,6 +73,7 @@ export type Database = {
           created_at: string
           district: string | null
           id: string
+          location_id: string | null
           name: string
           name_bn: string | null
           zone: string | null
@@ -82,6 +83,7 @@ export type Database = {
           created_at?: string
           district?: string | null
           id?: string
+          location_id?: string | null
           name: string
           name_bn?: string | null
           zone?: string | null
@@ -91,11 +93,58 @@ export type Database = {
           created_at?: string
           district?: string | null
           id?: string
+          location_id?: string | null
           name?: string
           name_bn?: string | null
           zone?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "coverage_areas_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "coverage_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coverage_locations: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          name_bn: string | null
+          parent_id: string | null
+          sort_order: number
+          type: Database["public"]["Enums"]["coverage_location_type"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          name_bn?: string | null
+          parent_id?: string | null
+          sort_order?: number
+          type: Database["public"]["Enums"]["coverage_location_type"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          name_bn?: string | null
+          parent_id?: string | null
+          sort_order?: number
+          type?: Database["public"]["Enums"]["coverage_location_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coverage_locations_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "coverage_locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       homepage_features: {
         Row: {
@@ -478,6 +527,7 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "admin" | "staff"
+      coverage_location_type: "district" | "thana" | "zone"
       notice_category: "maintenance" | "offer" | "alert"
       offer_type: "offer" | "referral" | "coupon"
       order_status: "pending" | "contacted" | "completed"
@@ -610,6 +660,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "staff"],
+      coverage_location_type: ["district", "thana", "zone"],
       notice_category: ["maintenance", "offer", "alert"],
       offer_type: ["offer", "referral", "coupon"],
       order_status: ["pending", "contacted", "completed"],
