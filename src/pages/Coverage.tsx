@@ -1,62 +1,51 @@
-import { useState } from "react";
-import { Search, MapPin, CheckCircle, XCircle, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, MapPin, CheckCircle, XCircle, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Navbar from "@/components/Navbar";
+import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-
-const coveredAreas = [
-  { name: "Dhanmondi", nameBn: "ধানমন্ডি", zone: "Dhaka", district: "Dhaka" },
-  { name: "Gulshan", nameBn: "গুলশান", zone: "Dhaka", district: "Dhaka" },
-  { name: "Banani", nameBn: "বনানী", zone: "Dhaka", district: "Dhaka" },
-  { name: "Mirpur", nameBn: "মিরপুর", zone: "Dhaka", district: "Dhaka" },
-  { name: "Uttara", nameBn: "উত্তরা", zone: "Dhaka", district: "Dhaka" },
-  { name: "Mohammadpur", nameBn: "মোহাম্মদপুর", zone: "Dhaka", district: "Dhaka" },
-  { name: "Bashundhara", nameBn: "বসুন্ধরা", zone: "Dhaka", district: "Dhaka" },
-  { name: "Badda", nameBn: "বাড্ডা", zone: "Dhaka", district: "Dhaka" },
-  { name: "Rampura", nameBn: "রামপুরা", zone: "Dhaka", district: "Dhaka" },
-  { name: "Tejgaon", nameBn: "তেজগাঁও", zone: "Dhaka", district: "Dhaka" },
-  { name: "Motijheel", nameBn: "মতিঝিল", zone: "Dhaka", district: "Dhaka" },
-  { name: "Khilgaon", nameBn: "খিলগাঁও", zone: "Dhaka", district: "Dhaka" },
-  { name: "Agrabad", nameBn: "আগ্রাবাদ", zone: "Chittagong", district: "Chittagong" },
-  { name: "Nasirabad", nameBn: "নাসিরাবাদ", zone: "Chittagong", district: "Chittagong" },
-  { name: "Panchlaish", nameBn: "পাঁচলাইশ", zone: "Chittagong", district: "Chittagong" },
-  { name: "Halishahar", nameBn: "হালিশহর", zone: "Chittagong", district: "Chittagong" },
-  { name: "Sylhet Sadar", nameBn: "সিলেট সদর", zone: "Sylhet", district: "Sylhet" },
-  { name: "Zindabazar", nameBn: "জিন্দাবাজার", zone: "Sylhet", district: "Sylhet" },
-  { name: "Gazipur Sadar", nameBn: "গাজীপুর সদর", zone: "Gazipur", district: "Gazipur" },
-  { name: "Tongi", nameBn: "টঙ্গী", zone: "Gazipur", district: "Gazipur" },
-];
-
-const zones = ["All", "Dhaka", "Chittagong", "Sylhet", "Gazipur"];
+import { supabase } from "@/integrations/supabase/client";
 
 const Coverage = () => {
-  const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("q") || "");
   const [selectedZone, setSelectedZone] = useState("All");
   const [checkResult, setCheckResult] = useState<null | boolean>(null);
-  const [checkInput, setCheckInput] = useState("");
+  const [checkInput, setCheckInput] = useState(searchParams.get("q") || "");
+  const [areas, setAreas] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
 
-  const filtered = coveredAreas.filter((area) => {
+  useEffect(() => {
+    supabase.from("coverage_areas").select("*").order("name").then(({ data }) => {
+      setAreas(data ?? []);
+      setLoading(false);
+    });
+  }, []);
+
+  const zones = ["All", ...Array.from(new Set(areas.map(a => a.zone).filter(Boolean)))];
+
+  const filtered = areas.filter((area) => {
     const matchesZone = selectedZone === "All" || area.zone === selectedZone;
-    const matchesSearch = search === "" || area.name.toLowerCase().includes(search.toLowerCase()) || area.nameBn.includes(search);
+    const matchesSearch = search === "" || area.name.toLowerCase().includes(search.toLowerCase()) || (area.name_bn || "").includes(search);
     return matchesZone && matchesSearch;
   });
 
   const handleCheck = () => {
     if (!checkInput.trim()) return;
-    const found = coveredAreas.some(
-      (area) => area.name.toLowerCase().includes(checkInput.toLowerCase()) || area.nameBn.includes(checkInput)
+    const found = areas.some(
+      (area) => area.available && (area.name.toLowerCase().includes(checkInput.toLowerCase()) || (area.name_bn || "").includes(checkInput))
     );
     setCheckResult(found);
   };
 
   return (
     <div className="min-h-screen flex flex-col">
+      <TopBar />
       <Navbar />
 
       <section className="page-hero">
@@ -68,7 +57,6 @@ const Coverage = () => {
         </div>
       </section>
 
-      {/* Check Area */}
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4 max-w-xl">
           <div className="p-6 rounded-2xl border bg-card">
@@ -117,50 +105,54 @@ const Coverage = () => {
         </div>
       </section>
 
-      {/* Area List */}
       <section className="py-12 bg-secondary/50 flex-1">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-foreground">{t("Covered Areas", "আমাদের সেবা এলাকা")}</h2>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <div className="flex flex-wrap gap-2">
-              {zones.map((zone) => (
-                <button
-                  key={zone}
-                  onClick={() => setSelectedZone(zone)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
-                    selectedZone === zone
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background text-muted-foreground border-border hover:border-primary/40"
-                  }`}
-                >
-                  {zone === "All" ? t("All", "সব") : zone}
-                </button>
-              ))}
-            </div>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder={t("Search...", "খুঁজুন...")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 w-48" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {filtered.map((area) => (
-              <div key={area.name} className="flex flex-col items-center text-center p-4 rounded-xl bg-background border hover:border-accent/40 hover:shadow-sm transition-all">
-                <MapPin className="h-5 w-5 text-accent mb-2" />
-                <p className="font-medium text-foreground text-sm">{t(area.name, area.nameBn)}</p>
-                <Badge variant="secondary" className="mt-2 text-xs">{area.zone}</Badge>
+          {loading ? (
+            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
+          ) : (
+            <>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+                <div className="flex flex-wrap gap-2">
+                  {zones.map((zone) => (
+                    <button
+                      key={zone}
+                      onClick={() => setSelectedZone(zone)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                        selectedZone === zone ? "bg-primary text-primary-foreground border-primary" : "bg-background text-muted-foreground border-border hover:border-primary/40"
+                      }`}
+                    >
+                      {zone === "All" ? t("All", "সব") : zone}
+                    </button>
+                  ))}
+                </div>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder={t("Search...", "খুঁজুন...")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 w-48" />
+                </div>
               </div>
-            ))}
-          </div>
 
-          {filtered.length === 0 && (
-            <div className="text-center py-12">
-              <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">{t("No areas found", "কোনো এলাকা পাওয়া যায়নি")}</p>
-            </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                {filtered.map((area) => (
+                  <div key={area.id} className={`flex flex-col items-center text-center p-4 rounded-xl bg-background border hover:border-accent/40 hover:shadow-sm transition-all ${!area.available ? "opacity-50" : ""}`}>
+                    <MapPin className="h-5 w-5 text-accent mb-2" />
+                    <p className="font-medium text-foreground text-sm">{t(area.name, area.name_bn || area.name)}</p>
+                    <Badge variant="secondary" className="mt-2 text-xs">{area.zone || area.district}</Badge>
+                    {!area.available && <span className="text-xs text-destructive mt-1">{t("Coming Soon", "শীঘ্রই আসছে")}</span>}
+                  </div>
+                ))}
+              </div>
+
+              {filtered.length === 0 && (
+                <div className="text-center py-12">
+                  <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground">{t("No areas found", "কোনো এলাকা পাওয়া যায়নি")}</p>
+                </div>
+              )}
+            </>
           )}
 
           <div className="text-center mt-8">

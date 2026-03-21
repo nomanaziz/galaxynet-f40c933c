@@ -97,6 +97,42 @@ export type Database = {
         }
         Relationships: []
       }
+      homepage_features: {
+        Row: {
+          created_at: string
+          description: string | null
+          description_bn: string | null
+          icon_name: string
+          id: string
+          sort_order: number
+          title: string
+          title_bn: string | null
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          description_bn?: string | null
+          icon_name?: string
+          id?: string
+          sort_order?: number
+          title: string
+          title_bn?: string | null
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          description_bn?: string | null
+          icon_name?: string
+          id?: string
+          sort_order?: number
+          title?: string
+          title_bn?: string | null
+          visible?: boolean
+        }
+        Relationships: []
+      }
       menu_items: {
         Row: {
           created_at: string
@@ -165,6 +201,45 @@ export type Database = {
           published?: boolean
           title?: string
           title_bn?: string | null
+        }
+        Relationships: []
+      }
+      offers: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          description_bn: string | null
+          expiry_date: string | null
+          id: string
+          image_url: string | null
+          title: string
+          title_bn: string | null
+          type: Database["public"]["Enums"]["offer_type"]
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          description_bn?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          title: string
+          title_bn?: string | null
+          type?: Database["public"]["Enums"]["offer_type"]
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          description_bn?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          title?: string
+          title_bn?: string | null
+          type?: Database["public"]["Enums"]["offer_type"]
         }
         Relationships: []
       }
@@ -246,6 +321,33 @@ export type Database = {
         }
         Relationships: []
       }
+      partners: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          sort_order: number
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          sort_order?: number
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          sort_order?: number
+          visible?: boolean
+        }
+        Relationships: []
+      }
       payment_methods: {
         Row: {
           account_number: string | null
@@ -300,6 +402,48 @@ export type Database = {
         }
         Relationships: []
       }
+      testimonials: {
+        Row: {
+          created_at: string
+          id: string
+          location: string | null
+          location_bn: string | null
+          name: string
+          name_bn: string | null
+          rating: number
+          sort_order: number
+          text: string | null
+          text_bn: string | null
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          location_bn?: string | null
+          name: string
+          name_bn?: string | null
+          rating?: number
+          sort_order?: number
+          text?: string | null
+          text_bn?: string | null
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          location_bn?: string | null
+          name?: string
+          name_bn?: string | null
+          rating?: number
+          sort_order?: number
+          text?: string | null
+          text_bn?: string | null
+          visible?: boolean
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -335,6 +479,7 @@ export type Database = {
     Enums: {
       app_role: "super_admin" | "admin" | "staff"
       notice_category: "maintenance" | "offer" | "alert"
+      offer_type: "offer" | "referral" | "coupon"
       order_status: "pending" | "contacted" | "completed"
       package_category: "home" | "corporate"
     }
@@ -466,6 +611,7 @@ export const Constants = {
     Enums: {
       app_role: ["super_admin", "admin", "staff"],
       notice_category: ["maintenance", "offer", "alert"],
+      offer_type: ["offer", "referral", "coupon"],
       order_status: ["pending", "contacted", "completed"],
       package_category: ["home", "corporate"],
     },
