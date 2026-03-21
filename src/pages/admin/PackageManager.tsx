@@ -22,13 +22,14 @@ interface Pkg {
   features: string[];
   badges: string[];
   featured: boolean;
+  popular: boolean;
   visible: boolean;
   sort_order: number;
 }
 
 const emptyPkg: Omit<Pkg, "id"> = {
   name: "", name_bn: "", speed: 0, price: 0, category: "home",
-  features: [], badges: [], featured: false, visible: true, sort_order: 0,
+  features: [], badges: [], featured: false, popular: false, visible: true, sort_order: 0,
 };
 
 const PackageManager = () => {
@@ -97,7 +98,7 @@ const PackageManager = () => {
     fetchPackages();
   };
 
-  const toggleField = async (id: string, field: "visible" | "featured", val: boolean) => {
+  const toggleField = async (id: string, field: "visible" | "featured" | "popular", val: boolean) => {
     await supabase.from("packages").update({ [field]: val }).eq("id", id);
     fetchPackages();
   };
@@ -119,6 +120,7 @@ const PackageManager = () => {
             <TableHead>Price (৳)</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Homepage</TableHead>
+            <TableHead>Popular</TableHead>
             <TableHead>Visible</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -132,6 +134,9 @@ const PackageManager = () => {
               <TableCell><Badge variant="secondary">{pkg.category}</Badge></TableCell>
               <TableCell>
                 <Switch checked={pkg.featured} onCheckedChange={(v) => toggleField(pkg.id, "featured", v)} />
+              </TableCell>
+              <TableCell>
+                <Switch checked={pkg.popular} onCheckedChange={(v) => toggleField(pkg.id, "popular" as any, v)} />
               </TableCell>
               <TableCell>
                 <Switch checked={pkg.visible} onCheckedChange={(v) => toggleField(pkg.id, "visible", v)} />
@@ -195,10 +200,14 @@ const PackageManager = () => {
               <Label>Badges (comma-separated)</Label>
               <Input value={badgesStr} onChange={e => setBadgesStr(e.target.value)} placeholder="BDIX, FTP, Gaming" />
             </div>
-            <div className="flex gap-6">
+            <div className="flex gap-6 flex-wrap">
               <div className="flex items-center gap-2">
                 <Switch checked={form.featured} onCheckedChange={v => setForm(f => ({ ...f, featured: v }))} />
                 <Label>Show on Homepage</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={form.popular} onCheckedChange={v => setForm(f => ({ ...f, popular: v }))} />
+                <Label>Popular</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Switch checked={form.visible} onCheckedChange={v => setForm(f => ({ ...f, visible: v }))} />

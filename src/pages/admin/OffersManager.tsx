@@ -23,13 +23,13 @@ const OffersManager = () => {
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  const fetch = async () => {
+  const fetchOffers = async () => {
     const { data } = await supabase.from("offers").select("*").order("created_at", { ascending: false });
     setOffers(data ?? []);
     setLoading(false);
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { fetchOffers(); }, []);
 
   const openAdd = () => { setEditing(null); setForm(defaultForm); setDialogOpen(true); };
   const openEdit = (o: any) => { setEditing(o); setForm({ title: o.title, title_bn: o.title_bn || "", description: o.description || "", description_bn: o.description_bn || "", image_url: o.image_url || "", expiry_date: o.expiry_date || "", active: o.active, type: o.type }); setDialogOpen(true); };
@@ -44,18 +44,18 @@ const OffersManager = () => {
     setSaving(false);
     setDialogOpen(false);
     toast({ title: editing ? "Offer updated" : "Offer created" });
-    fetch();
+    fetchOffers();
   };
 
   const handleDelete = async (id: string) => {
     await supabase.from("offers").delete().eq("id", id);
     toast({ title: "Offer deleted" });
-    fetch();
+    fetchOffers();
   };
 
   const toggleActive = async (o: any) => {
     await supabase.from("offers").update({ active: !o.active }).eq("id", o.id);
-    fetch();
+    fetchOffers();
   };
 
   if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin" /></div>;

@@ -413,6 +413,7 @@ export type Database = {
           id: string
           name: string
           name_bn: string | null
+          popular: boolean
           price: number
           sort_order: number
           speed: number
@@ -427,6 +428,7 @@ export type Database = {
           id?: string
           name: string
           name_bn?: string | null
+          popular?: boolean
           price: number
           sort_order?: number
           speed: number
@@ -441,6 +443,7 @@ export type Database = {
           id?: string
           name?: string
           name_bn?: string | null
+          popular?: boolean
           price?: number
           sort_order?: number
           speed?: number

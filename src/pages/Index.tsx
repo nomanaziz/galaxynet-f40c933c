@@ -189,8 +189,8 @@ const Index = () => {
             {packages.map((pkg) => {
               const featureList = Array.isArray(pkg.features) ? pkg.features : [];
               return (
-                <Card key={pkg.id} className={`relative overflow-hidden transition-all hover:shadow-lg ${pkg.featured ? "border-accent shadow-md ring-1 ring-accent/20" : "border hover:border-accent/40"}`}>
-                  {pkg.featured && (
+                <Card key={pkg.id} className={`relative overflow-hidden transition-all hover:shadow-lg ${pkg.popular ? "border-accent shadow-md ring-1 ring-accent/20" : "border hover:border-accent/40"}`}>
+                  {pkg.popular && (
                     <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
                       {t("POPULAR", "জনপ্রিয়")}
                     </div>

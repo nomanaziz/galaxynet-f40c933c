@@ -17,8 +17,8 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
   const featureList = Array.isArray(plan.features) ? plan.features : [];
   const badgeList = Array.isArray(plan.badges) ? plan.badges : [];
   return (
-    <Card className={`relative overflow-hidden transition-all hover:shadow-lg ${plan.featured ? "border-accent shadow-md ring-1 ring-accent/20" : "border hover:border-accent/40"}`}>
-      {plan.featured && (
+    <Card className={`relative overflow-hidden transition-all hover:shadow-lg ${plan.popular ? "border-accent shadow-md ring-1 ring-accent/20" : "border hover:border-accent/40"}`}>
+      {plan.popular && (
         <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
           {t("POPULAR", "জনপ্রিয়")}
         </div>
@@ -59,7 +59,7 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
           ))}
         </ul>
         <Link to="/contact">
-          <Button variant={plan.featured ? "default" : "outline"} className={`w-full font-semibold ${plan.featured ? "bg-accent hover:bg-accent/90 text-accent-foreground" : ""}`}>
+          <Button variant={plan.popular ? "default" : "outline"} className={`w-full font-semibold ${plan.popular ? "bg-accent hover:bg-accent/90 text-accent-foreground" : ""}`}>
             {t("Contact Us", "যোগাযোগ করুন")}
           </Button>
         </Link>

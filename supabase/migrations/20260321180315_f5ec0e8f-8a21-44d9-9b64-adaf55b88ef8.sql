@@ -1,0 +1,1 @@
+ALTER TABLE public.packages ADD COLUMN popular boolean NOT NULL DEFAULT false;
