@@ -514,31 +514,52 @@ export type Database = {
       payment_methods: {
         Row: {
           account_number: string | null
+          bg_color: string | null
+          button_text: string | null
+          button_text_bn: string | null
+          button_url: string | null
           created_at: string
           id: string
           instructions: string | null
+          instructions_bn: string | null
           logo_url: string | null
           name: string
+          name_bn: string | null
+          screenshot_url: string | null
           sort_order: number
           visible: boolean
         }
         Insert: {
           account_number?: string | null
+          bg_color?: string | null
+          button_text?: string | null
+          button_text_bn?: string | null
+          button_url?: string | null
           created_at?: string
           id?: string
           instructions?: string | null
+          instructions_bn?: string | null
           logo_url?: string | null
           name: string
+          name_bn?: string | null
+          screenshot_url?: string | null
           sort_order?: number
           visible?: boolean
         }
         Update: {
           account_number?: string | null
+          bg_color?: string | null
+          button_text?: string | null
+          button_text_bn?: string | null
+          button_url?: string | null
           created_at?: string
           id?: string
           instructions?: string | null
+          instructions_bn?: string | null
           logo_url?: string | null
           name?: string
+          name_bn?: string | null
+          screenshot_url?: string | null
           sort_order?: number
           visible?: boolean
         }
