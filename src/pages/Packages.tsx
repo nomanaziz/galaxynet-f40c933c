@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
