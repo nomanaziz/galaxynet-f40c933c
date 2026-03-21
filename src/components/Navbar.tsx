@@ -238,7 +238,7 @@ const Navbar = () => {
                     <>
                       {isAdmin && (
                         <SheetClose asChild>
-                          <Link to="/admin/login" className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                          <Link to="/admin" className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
                             <Shield className="h-4 w-4" />
                             {t("Admin Panel", "অ্যাডমিন প্যানেল")}
                           </Link>
