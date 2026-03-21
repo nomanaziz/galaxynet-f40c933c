@@ -26,12 +26,20 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
       )}
       <CardContent className="p-6">
         <h3 className="text-xl font-bold text-foreground">{t(plan.name, plan.name_bn || plan.name)}</h3>
-        <div className="flex items-end gap-1 my-3">
-          <span className="text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
-        </div>
+        {plan.category !== "dedicated" && (
+          <div className="flex items-end gap-1 my-3">
+            <span className="text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
+          </div>
+        )}
         <div className="mb-3 p-3 rounded-lg bg-accent/8">
-          <span className="text-2xl font-bold text-accent">৳{plan.price}</span>
-          <span className="text-muted-foreground text-sm">/{t("month", "মাস")}</span>
+          {plan.category === "dedicated" ? (
+            <span className="text-2xl font-bold text-accent">{t("Call for Price", "মূল্যের জন্য কল করুন")}</span>
+          ) : (
+            <>
+              <span className="text-2xl font-bold text-accent">৳{plan.price}</span>
+              <span className="text-muted-foreground text-sm">/{t("month", "মাস")}</span>
+            </>
+          )}
         </div>
         <div className="flex flex-wrap gap-1 mb-4">
           {badgeList.map((b: string) => {
