@@ -15,6 +15,8 @@ import SpeedTest from "./pages/SpeedTest";
 import Notices from "./pages/Notices";
 import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 // Admin
 import AdminLogin from "./pages/admin/AdminLogin";
