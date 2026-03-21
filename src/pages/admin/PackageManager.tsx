@@ -118,7 +118,7 @@ const PackageManager = () => {
             <TableHead>Speed</TableHead>
             <TableHead>Price (৳)</TableHead>
             <TableHead>Category</TableHead>
-            <TableHead>Featured</TableHead>
+            <TableHead>Homepage</TableHead>
             <TableHead>Visible</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
