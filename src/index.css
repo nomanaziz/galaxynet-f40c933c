@@ -4,46 +4,42 @@
 
 @layer base {
   :root {
-    /* Galaxy Net — Orange + Deep Blue Design System */
-    --background: 0 0% 100%;
-    --foreground: 215 45% 12%;
+    --background: 0 0% 99%;
+    --foreground: 220 20% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 45% 12%;
+    --card-foreground: 220 20% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 45% 12%;
+    --popover-foreground: 220 20% 14%;
 
-    /* Deep Blue primary */
     --primary: 215 61% 27%;
     --primary-foreground: 0 0% 100%;
 
-    /* Orange accent */
     --accent: 25 100% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --secondary: 215 30% 94%;
+    --secondary: 220 20% 96%;
     --secondary-foreground: 215 61% 27%;
 
-    --muted: 215 20% 95%;
-    --muted-foreground: 215 20% 45%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 20% 88%;
-    --input: 215 20% 88%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
     --ring: 25 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
 
-    /* Custom Galaxy Net tokens */
     --galaxy-blue: 215 61% 27%;
     --galaxy-blue-dark: 215 61% 15%;
-    --galaxy-blue-light: 215 61% 40%;
+    --galaxy-blue-light: 215 50% 42%;
     --galaxy-orange: 25 100% 50%;
-    --galaxy-orange-dark: 25 100% 40%;
-    --galaxy-orange-light: 25 100% 60%;
+    --galaxy-orange-dark: 25 100% 42%;
+    --galaxy-orange-light: 25 100% 62%;
 
     --sidebar-background: 215 61% 27%;
     --sidebar-foreground: 0 0% 100%;
@@ -56,24 +52,24 @@
   }
 
   .dark {
-    --background: 215 61% 10%;
+    --background: 215 61% 8%;
     --foreground: 210 40% 98%;
-    --card: 215 61% 14%;
+    --card: 215 50% 12%;
     --card-foreground: 210 40% 98%;
-    --popover: 215 61% 14%;
+    --popover: 215 50% 12%;
     --popover-foreground: 210 40% 98%;
     --primary: 25 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 215 40% 20%;
+    --secondary: 215 40% 18%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 215 40% 20%;
+    --muted: 215 40% 18%;
     --muted-foreground: 215 20% 65%;
     --accent: 25 100% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62% 31%;
     --destructive-foreground: 210 40% 98%;
-    --border: 215 40% 20%;
-    --input: 215 40% 20%;
+    --border: 215 35% 18%;
+    --input: 215 35% 18%;
     --ring: 25 100% 50%;
   }
 }
@@ -84,12 +80,12 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold;
+    @apply font-bold tracking-tight;
   }
 }
 
@@ -99,7 +95,11 @@
   }
 
   .hero-gradient {
-    background: linear-gradient(135deg, hsl(var(--galaxy-blue-dark)) 0%, hsl(var(--galaxy-blue)) 60%, hsl(25 80% 35%) 100%);
+    background: linear-gradient(160deg, hsl(var(--galaxy-blue-dark)) 0%, hsl(var(--galaxy-blue)) 70%, hsl(215 45% 35%) 100%);
+  }
+
+  .hero-gradient-soft {
+    background: linear-gradient(160deg, hsl(220 20% 97%) 0%, hsl(215 30% 94%) 50%, hsl(25 60% 96%) 100%);
   }
 
   .orange-gradient {
@@ -124,5 +124,10 @@
 
   .border-galaxy-orange {
     border-color: hsl(var(--galaxy-orange));
+  }
+
+  .page-hero {
+    @apply py-16 md:py-20 text-center relative overflow-hidden;
+    background: linear-gradient(160deg, hsl(220 20% 97%) 0%, hsl(215 30% 94%) 50%, hsl(25 30% 96%) 100%);
   }
 }
