@@ -30,9 +30,15 @@ const AdminLayout = () => {
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-14 flex items-center border-b bg-background px-4">
-            <SidebarTrigger className="mr-4" />
-            <h1 className="text-lg font-semibold text-foreground">Galaxy Net Admin</h1>
+          <header className="h-14 flex items-center justify-between border-b bg-background px-4">
+            <div className="flex items-center">
+              <SidebarTrigger className="mr-4" />
+              <h1 className="text-lg font-semibold text-foreground">Galaxy Net Admin</h1>
+            </div>
+            <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <ExternalLink className="h-4 w-4" />
+              Visit Site
+            </a>
           </header>
           <main className="flex-1 overflow-auto bg-muted/30 p-6">
             <Outlet />
