@@ -24,7 +24,7 @@ const OrderManager = () => {
   useEffect(() => { fetchOrders(); }, []);
 
   const updateStatus = async (id: string, status: string) => {
-    await supabase.from("connection_orders").update({ status }).eq("id", id);
+    await supabase.from("connection_orders").update({ status: status as "pending" | "contacted" | "completed" }).eq("id", id);
     toast({ title: `Status updated to ${status}` });
     fetchOrders();
   };

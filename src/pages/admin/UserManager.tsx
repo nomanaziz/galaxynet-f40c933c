@@ -31,7 +31,7 @@ const UserManager = () => {
 
   const handleAdd = async () => {
     setSaving(true);
-    const { error } = await supabase.from("user_roles").insert({ user_id: userId, role });
+    const { error } = await supabase.from("user_roles").insert([{ user_id: userId, role: role as "super_admin" | "admin" | "staff" }]);
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     else toast({ title: "Role assigned" });
     setSaving(false); setDialogOpen(false); setUserId(""); fetchRoles();
