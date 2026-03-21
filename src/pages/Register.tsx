@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wifi, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
@@ -52,9 +53,7 @@ const Register = () => {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent">
-                <Wifi className="h-6 w-6 text-accent-foreground" />
-              </div>
+              <img src={logo} alt="Galaxy Net" className="h-12 w-auto" />
             </div>
             <CardTitle className="text-2xl">{t("Create Account", "অ্যাকাউন্ট তৈরি করুন")}</CardTitle>
             <CardDescription>{t("Sign up to get started with Galaxy Net", "Galaxy Net এ শুরু করতে সাইন আপ করুন")}</CardDescription>

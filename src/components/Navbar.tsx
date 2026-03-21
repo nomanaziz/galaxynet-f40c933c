@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Wifi, ChevronDown, Globe, User, LogIn, LogOut, ExternalLink, Shield, UserPlus } from "lucide-react";
+import { Menu, X, ChevronDown, Globe, User, LogIn, LogOut, ExternalLink, Shield, UserPlus } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import {
@@ -97,11 +98,8 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent">
-            <Wifi className="h-5 w-5 text-accent-foreground" />
-          </div>
-          <span className="text-lg font-bold text-foreground">Galaxy Net</span>
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="Galaxy Net" className="h-10 w-auto" />
         </Link>
 
         {/* Desktop Nav */}
@@ -199,10 +197,7 @@ const Navbar = () => {
             <SheetContent side="right" className="w-72 p-0 bg-background">
               <div className="flex items-center justify-between p-4 border-b border-border">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
-                    <Wifi className="h-4 w-4 text-accent-foreground" />
-                  </div>
-                  <span className="font-bold text-foreground">Galaxy Net</span>
+                  <img src={logo} alt="Galaxy Net" className="h-8 w-auto" />
                 </div>
                 <SheetClose asChild>
                   <Button variant="ghost" size="icon">

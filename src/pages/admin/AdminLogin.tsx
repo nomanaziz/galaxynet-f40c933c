@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wifi, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 
@@ -75,8 +76,8 @@ const AdminLogin = () => {
     <div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary">
-            <Wifi className="h-7 w-7 text-primary-foreground" />
+          <div className="mx-auto mb-4">
+            <img src={logo} alt="Galaxy Net" className="h-14 w-auto mx-auto" />
           </div>
           <CardTitle className="text-2xl">Galaxy Net Admin</CardTitle>
           <CardDescription>Sign in to access the admin panel</CardDescription>
