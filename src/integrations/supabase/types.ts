@@ -146,6 +146,117 @@ export type Database = {
           },
         ]
       }
+      departments: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          name_bn: string | null
+          sort_order: number
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          name_bn?: string | null
+          sort_order?: number
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          name_bn?: string | null
+          sort_order?: number
+          visible?: boolean
+        }
+        Relationships: []
+      }
+      designations: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          name_bn: string | null
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          name_bn?: string | null
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          name_bn?: string | null
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      employees: {
+        Row: {
+          created_at: string
+          department_id: string | null
+          designation_id: string | null
+          email: string | null
+          id: string
+          name: string
+          name_bn: string | null
+          phone: string | null
+          photo_url: string | null
+          show_on_about: boolean
+          sort_order: number
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          department_id?: string | null
+          designation_id?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          name_bn?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          show_on_about?: boolean
+          sort_order?: number
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          department_id?: string | null
+          designation_id?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          name_bn?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          show_on_about?: boolean
+          sort_order?: number
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_designation_id_fkey"
+            columns: ["designation_id"]
+            isOneToOne: false
+            referencedRelation: "designations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       homepage_features: {
         Row: {
           created_at: string
