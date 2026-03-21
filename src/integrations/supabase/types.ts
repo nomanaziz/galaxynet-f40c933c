@@ -541,6 +541,54 @@ export type Database = {
         }
         Relationships: []
       }
+      services: {
+        Row: {
+          badge: string | null
+          badge_bn: string | null
+          created_at: string
+          description: string | null
+          description_bn: string | null
+          features: Json | null
+          icon_name: string
+          id: string
+          link: string | null
+          sort_order: number
+          title: string
+          title_bn: string | null
+          visible: boolean
+        }
+        Insert: {
+          badge?: string | null
+          badge_bn?: string | null
+          created_at?: string
+          description?: string | null
+          description_bn?: string | null
+          features?: Json | null
+          icon_name?: string
+          id?: string
+          link?: string | null
+          sort_order?: number
+          title: string
+          title_bn?: string | null
+          visible?: boolean
+        }
+        Update: {
+          badge?: string | null
+          badge_bn?: string | null
+          created_at?: string
+          description?: string | null
+          description_bn?: string | null
+          features?: Json | null
+          icon_name?: string
+          id?: string
+          link?: string | null
+          sort_order?: number
+          title?: string
+          title_bn?: string | null
+          visible?: boolean
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string

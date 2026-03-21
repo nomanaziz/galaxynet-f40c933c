@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Package, MapPin, ShoppingCart, FileText,
   Bell, Settings, Users, LogOut, Wifi, Menu, CreditCard, Home, Image, ExternalLink,
-  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog
+  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog, Globe
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -28,6 +28,7 @@ const mainItems = [
   { title: "Payments", url: "/admin/payments", icon: CreditCard },
   { title: "Homepage", url: "/admin/homepage", icon: Home },
   { title: "Media", url: "/admin/media", icon: Image },
+  { title: "Services", url: "/admin/services", icon: Globe },
 ];
 
 const aboutItems = [
