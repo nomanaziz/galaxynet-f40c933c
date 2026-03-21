@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 const iconMap: Record<string, any> = {
   zap: Zap, headphones: HeadphonesIcon, gauge: Gauge, shield: Shield, wifi: Wifi,
   banknote: Banknote, dollar: DollarSign, globe: Globe, gamepad: Gamepad2,
-  server: Server, star: Star,
+  server: Server, star: Star, "building-2": Building2, camera: Camera, network: Network,
 };
 
 const Index = () => {
@@ -22,6 +22,7 @@ const Index = () => {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [features, setFeatures] = useState<any[]>([]);
   const [packages, setPackages] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
 
@@ -33,6 +34,7 @@ const Index = () => {
     });
     supabase.from("homepage_features").select("*").order("sort_order").then(({ data }) => setFeatures(data ?? []));
     supabase.from("packages").select("*").eq("visible", true).eq("featured", true).order("sort_order").then(({ data }) => setPackages(data ?? []));
+    supabase.from("services").select("*").eq("visible", true).order("sort_order").limit(5).then(({ data }) => setServices(data ?? []));
     supabase.from("testimonials").select("*").eq("visible", true).order("sort_order").then(({ data }) => setTestimonials(data ?? []));
     supabase.from("partners").select("*").eq("visible", true).order("sort_order").then(({ data }) => setPartners(data ?? []));
   }, []);
@@ -44,13 +46,6 @@ const Index = () => {
     { num: "BDIX", label: t("Connected", "সংযুক্ত"), icon: Server },
   ];
 
-  const servicesPreview = [
-    { icon: Wifi, title: t("Broadband", "ব্রডব্যান্ড") },
-    { icon: Building2, title: t("Corporate", "কর্পোরেট") },
-    { icon: Camera, title: t("CCTV", "সিসিটিভি") },
-    { icon: Network, title: t("Networking", "নেটওয়ার্কিং") },
-    { icon: Server, title: t("Dedicated", "ডেডিকেটেড") },
-  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -161,12 +156,15 @@ const Index = () => {
             <h2 className="text-3xl font-bold text-foreground mb-2">{t("Our Services", "আমাদের সেবাসমূহ")}</h2>
           </div>
           <div className="flex flex-wrap justify-center gap-4 mb-8">
-            {servicesPreview.map((s) => (
-              <div key={s.title} className="flex flex-col items-center p-5 rounded-xl bg-background border hover:border-accent/40 transition-all min-w-[110px] hover:shadow-sm">
-                <s.icon className="h-7 w-7 text-accent mb-2" />
-                <p className="font-medium text-foreground text-sm">{s.title}</p>
-              </div>
-            ))}
+            {services.map((s) => {
+              const Icon = iconMap[s.icon_name] || Wifi;
+              return (
+                <div key={s.id} className="flex flex-col items-center p-5 rounded-xl bg-background border hover:border-accent/40 transition-all min-w-[110px] hover:shadow-sm">
+                  <Icon className="h-7 w-7 text-accent mb-2" />
+                  <p className="font-medium text-foreground text-sm">{t(s.title, s.title_bn || s.title)}</p>
+                </div>
+              );
+            })}
           </div>
           <div className="text-center">
             <Link to="/services">
