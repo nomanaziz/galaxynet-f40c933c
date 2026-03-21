@@ -30,6 +30,12 @@ const mainItems = [
   { title: "Media", url: "/admin/media", icon: Image },
 ];
 
+const aboutItems = [
+  { title: "Departments", url: "/admin/departments", icon: Building2 },
+  { title: "Designations", url: "/admin/designations", icon: BadgeCheck },
+  { title: "Employees", url: "/admin/employees", icon: UserCog },
+];
+
 const systemItems = [
   { title: "Settings", url: "/admin/settings", icon: Settings },
   { title: "Users", url: "/admin/users", icon: Users },
