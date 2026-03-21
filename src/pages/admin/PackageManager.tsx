@@ -183,6 +183,7 @@ const PackageManager = () => {
                 <SelectContent>
                   <SelectItem value="home">Home</SelectItem>
                   <SelectItem value="corporate">Corporate</SelectItem>
+                  <SelectItem value="dedicated">Dedicated</SelectItem>
                 </SelectContent>
               </Select>
             </div>

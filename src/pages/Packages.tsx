@@ -124,9 +124,9 @@ const Packages = () => {
                 <Slider value={speedFilter} onValueChange={setSpeedFilter} max={200} step={10} className="w-full" />
               </div>
 
-              {["home", "corporate"].map(cat => (
+              {["home", "corporate", "dedicated"].map(cat => (
                 <TabsContent key={cat} value={cat}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                  <div className={`grid grid-cols-1 ${cat === "dedicated" ? "sm:grid-cols-1 lg:grid-cols-1 max-w-lg mx-auto" : "sm:grid-cols-2 lg:grid-cols-4"} gap-5`}>
                     {filterPlans(cat).map(plan => <PlanCard key={plan.id} plan={plan} t={t} />)}
                   </div>
                   {filterPlans(cat).length === 0 && (
