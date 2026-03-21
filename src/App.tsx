@@ -44,6 +44,7 @@ import FeaturesManager from "./pages/admin/FeaturesManager";
 import DepartmentManager from "./pages/admin/DepartmentManager";
 import DesignationManager from "./pages/admin/DesignationManager";
 import EmployeeManager from "./pages/admin/EmployeeManager";
+import ServicesManager from "./pages/admin/ServicesManager";
 
 const queryClient = new QueryClient();
 
