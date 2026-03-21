@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
@@ -70,7 +69,6 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
 };
 
 const Packages = () => {
-  const [speedFilter, setSpeedFilter] = useState([0]);
   const [packages, setPackages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
@@ -82,12 +80,7 @@ const Packages = () => {
     });
   }, []);
 
-  const filterPlans = (category: string) => {
-    const plans = packages.filter(p => p.category === category);
-    const min = speedFilter[0];
-    if (min === 0) return plans;
-    return plans.filter(p => p.speed >= min);
-  };
+  const filterPlans = (category: string) => packages.filter(p => p.category === category);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -115,13 +108,6 @@ const Packages = () => {
                   <TabsTrigger value="corporate" className="px-5 text-sm font-medium">{t("Corporate Plans", "কর্পোরেট প্ল্যান")}</TabsTrigger>
                   <TabsTrigger value="dedicated" className="px-5 text-sm font-medium">{t("Dedicated", "ডেডিকেটেড")}</TabsTrigger>
                 </TabsList>
-              </div>
-
-              <div className="max-w-sm mx-auto mb-10 p-4 rounded-xl bg-secondary border">
-                <p className="text-sm font-medium text-foreground mb-2 text-center">
-                  {t("Filter by Speed", "গতি অনুযায়ী")}: {speedFilter[0] === 0 ? t("All", "সব") : `${speedFilter[0]}+ Mbps`}
-                </p>
-                <Slider value={speedFilter} onValueChange={setSpeedFilter} max={200} step={10} className="w-full" />
               </div>
 
               {["home", "corporate", "dedicated"].map(cat => (
