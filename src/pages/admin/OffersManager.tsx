@@ -6,13 +6,24 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Loader2, Plus, Pencil, Trash2, Gift } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 
 const defaultForm = { title: "", title_bn: "", description: "", description_bn: "", image_url: "", expiry_date: "", active: true, type: "offer" as "offer" | "referral" | "coupon" };
+
+const sanitize = (form: typeof defaultForm) => ({
+  title: form.title,
+  title_bn: form.title_bn || null,
+  description: form.description || null,
+  description_bn: form.description_bn || null,
+  image_url: form.image_url || null,
+  expiry_date: form.expiry_date || null,
+  active: form.active,
+  type: form.type,
+});
 
 const OffersManager = () => {
   const [offers, setOffers] = useState<any[]>([]);
@@ -24,7 +35,11 @@ const OffersManager = () => {
   const { toast } = useToast();
 
   const fetchOffers = async () => {
-    const { data } = await supabase.from("offers").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("offers").select("*").order("created_at", { ascending: false });
+    if (error) {
+      console.error("fetchOffers error:", error);
+      toast({ title: "Failed to load offers", description: error.message, variant: "destructive" });
+    }
     setOffers(data ?? []);
     setLoading(false);
   };
@@ -36,12 +51,15 @@ const OffersManager = () => {
 
   const handleSave = async () => {
     setSaving(true);
-    if (editing) {
-      await supabase.from("offers").update(form).eq("id", editing.id);
-    } else {
-      await supabase.from("offers").insert(form);
-    }
+    const payload = sanitize(form);
+    const { error } = editing
+      ? await supabase.from("offers").update(payload).eq("id", editing.id)
+      : await supabase.from("offers").insert(payload);
     setSaving(false);
+    if (error) {
+      toast({ title: "Save failed", description: error.message, variant: "destructive" });
+      return;
+    }
     setDialogOpen(false);
     toast({ title: editing ? "Offer updated" : "Offer created" });
     fetchOffers();
@@ -67,7 +85,10 @@ const OffersManager = () => {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild><Button onClick={openAdd}><Plus className="mr-2 h-4 w-4" /> Add Offer</Button></DialogTrigger>
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-            <DialogHeader><DialogTitle>{editing ? "Edit Offer" : "Add Offer"}</DialogTitle></DialogHeader>
+            <DialogHeader>
+              <DialogTitle>{editing ? "Edit Offer" : "Add Offer"}</DialogTitle>
+              <DialogDescription>Fill in the offer details below.</DialogDescription>
+            </DialogHeader>
             <div className="space-y-4">
               <div><Label>Title (EN)</Label><Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} /></div>
               <div><Label>Title (BN)</Label><Input value={form.title_bn} onChange={e => setForm({...form, title_bn: e.target.value})} /></div>
