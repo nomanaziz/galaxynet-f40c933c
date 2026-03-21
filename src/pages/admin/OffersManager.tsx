@@ -44,7 +44,7 @@ const OffersManager = () => {
     setSaving(false);
     setDialogOpen(false);
     toast({ title: editing ? "Offer updated" : "Offer created" });
-    fetch();
+    fetchOffers();
   };
 
   const handleDelete = async (id: string) => {
