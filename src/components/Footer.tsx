@@ -1,9 +1,27 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Wifi, Phone, Mail, MapPin, Facebook, Youtube, MessageCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Footer = () => {
   const { t } = useLanguage();
+  const [settings, setSettings] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    supabase.from("site_settings").select("key, value").then(({ data }) => {
+      const map: Record<string, string> = {};
+      (data ?? []).forEach((s: any) => { map[s.key] = s.value ?? ""; });
+      setSettings(map);
+    });
+  }, []);
+
+  const phone = settings.phone || "+880 1700-000000";
+  const email = settings.email || "info@galaxynet.com.bd";
+  const address = t(settings.address || "Dhaka, Bangladesh", settings.address_bn || settings.address || "ঢাকা, বাংলাদেশ");
+  const facebookUrl = settings.facebook || "#";
+  const siteName = settings.website_name || "Galaxy Net";
+  const tagline = settings.tagline || t("Fast. Reliable. Affordable.", "দ্রুত। নির্ভরযোগ্য। সাশ্রয়ী।");
 
   const quickLinks = [
     { href: "/", label: t("Home", "হোম") },
@@ -18,6 +36,8 @@ const Footer = () => {
     { href: "/order", label: t("New Connection", "নতুন সংযোগ") },
     { href: "/speed-test", label: t("Speed Test", "স্পিড টেস্ট") },
     { href: "/notices", label: t("Notices", "নোটিশ") },
+    { href: "/payment", label: t("Pay Bill", "বিল পরিশোধ") },
+    { href: "/offers", label: t("Offers", "অফার") },
   ];
 
   return (
@@ -30,13 +50,16 @@ const Footer = () => {
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent">
                 <Wifi className="h-5 w-5 text-accent-foreground" />
               </div>
-              <span className="text-lg font-bold">Galaxy Net</span>
+              <span className="text-lg font-bold">{siteName}</span>
             </div>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-4">
-              {t("Fast. Reliable. Affordable.", "দ্রুত। নির্ভরযোগ্য। সাশ্রয়ী।")}
+              {tagline}
             </p>
             <div className="flex gap-2">
-              {[Facebook, Youtube, MessageCircle].map((Icon, i) => (
+              <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-foreground/10 hover:bg-accent transition-colors">
+                <Facebook className="h-4 w-4" />
+              </a>
+              {[Youtube, MessageCircle].map((Icon, i) => (
                 <a key={i} href="#" className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-foreground/10 hover:bg-accent transition-colors">
                   <Icon className="h-4 w-4" />
                 </a>
@@ -73,11 +96,6 @@ const Footer = () => {
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link to="/admin/login" className="text-sm text-primary-foreground/50 hover:text-accent transition-colors">
-                  {t("Admin Panel", "অ্যাডমিন প্যানেল")}
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -89,15 +107,15 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-primary-foreground/70">
               <li className="flex items-start gap-2.5">
                 <Phone className="h-4 w-4 mt-0.5 text-accent shrink-0" />
-                <span>+880 1700-000000</span>
+                <a href={`tel:${phone}`} className="hover:text-accent transition-colors">{phone}</a>
               </li>
               <li className="flex items-start gap-2.5">
                 <Mail className="h-4 w-4 mt-0.5 text-accent shrink-0" />
-                <span>info@galaxynet.com.bd</span>
+                <a href={`mailto:${email}`} className="hover:text-accent transition-colors">{email}</a>
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 mt-0.5 text-accent shrink-0" />
-                <span>{t("Dhanmondi, Dhaka-1209", "ধানমন্ডি, ঢাকা-১২০৯")}</span>
+                <span>{address}</span>
               </li>
               <li className="pt-2">
                 <span className="inline-flex items-center gap-1.5 text-xs">
@@ -112,7 +130,7 @@ const Footer = () => {
 
       <div className="border-t border-primary-foreground/10">
         <div className="container mx-auto px-4 py-4 text-center text-primary-foreground/50 text-xs">
-          © {new Date().getFullYear()} Galaxy Net. {t("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}
+          © {new Date().getFullYear()} {siteName}. {t("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}
         </div>
       </div>
     </footer>

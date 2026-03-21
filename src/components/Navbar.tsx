@@ -1,45 +1,97 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Wifi, ChevronDown, Globe, User, LogIn } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, Wifi, ChevronDown, Globe, User, LogIn, LogOut, ExternalLink, Shield, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
+interface MenuItem {
+  id: string;
+  label: string;
+  label_bn: string | null;
+  url: string;
+  parent_id: string | null;
+  sort_order: number;
+}
+
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [servicesOpen, setServicesOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
   const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [selfcareUrl, setSelfcareUrl] = useState("");
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    // Fetch menu items
+    supabase
+      .from("menu_items")
+      .select("*")
+      .eq("visible", true)
+      .is("parent_id", null)
+      .order("sort_order")
+      .then(({ data }) => setMenuItems((data as MenuItem[]) ?? []));
+
+    // Fetch selfcare URL
+    supabase
+      .from("site_settings")
+      .select("key, value")
+      .in("key", ["selfcare_url", "selfcare_enabled"])
+      .then(({ data }) => {
+        const map: Record<string, string> = {};
+        (data ?? []).forEach((s: any) => { map[s.key] = s.value ?? ""; });
+        if (map.selfcare_enabled !== "false") {
+          setSelfcareUrl(map.selfcare_url || "");
+        }
+      });
+  }, []);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        const u = session?.user ?? null;
+        setUser(u);
+        if (u) {
+          setTimeout(async () => {
+            const { data } = await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", u.id)
+              .maybeSingle();
+            setIsAdmin(data?.role === "super_admin" || data?.role === "admin");
+          }, 0);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+    );
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
+    return () => subscription.unsubscribe();
   }, []);
 
-  const navLinks = [
-    { href: "/", label: t("Home", "হোম") },
-    { href: "/packages", label: t("Packages", "প্যাকেজ") },
-    { href: "/services", label: t("Services", "সেবা"), hasDropdown: true },
-    { href: "/coverage", label: t("Coverage", "কভারেজ") },
-    { href: "/about", label: t("About", "আমাদের সম্পর্কে") },
-    { href: "/contact", label: t("Contact", "যোগাযোগ") },
-  ];
-
-  const serviceDropdown = [
-    { href: "/services", label: t("Broadband", "ব্রডব্যান্ড") },
-    { href: "/services", label: t("Corporate", "কর্পোরেট") },
-    { href: "/services", label: t("CCTV", "সিসিটিভি") },
-    { href: "/services", label: t("Networking", "নেটওয়ার্কিং") },
-  ];
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setIsAdmin(false);
+    navigate("/");
+  };
 
   const isActive = (href: string) =>
     href === "/" ? location.pathname === "/" : location.pathname.startsWith(href);
+
+  const getLabel = (item: MenuItem) => t(item.label, item.label_bn || item.label);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-lg border-b border-border">
@@ -54,35 +106,18 @@ const Navbar = () => {
 
         {/* Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <div key={link.href + link.label} className="relative group">
-              <Link
-                to={link.href}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
-                  isActive(link.href)
-                    ? "text-accent bg-accent/8"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                {link.label}
-                {link.hasDropdown && <ChevronDown className="h-3.5 w-3.5" />}
-              </Link>
-              {link.hasDropdown && (
-                <div className="absolute top-full left-0 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <div className="bg-popover border border-border rounded-lg shadow-lg py-1 min-w-[160px]">
-                    {serviceDropdown.map((item, i) => (
-                      <Link
-                        key={i}
-                        to={item.href}
-                        className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+          {menuItems.map((item) => (
+            <Link
+              key={item.id}
+              to={item.url}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isActive(item.url)
+                  ? "text-accent bg-accent/8"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
+            >
+              {getLabel(item)}
+            </Link>
           ))}
         </nav>
 
@@ -95,28 +130,55 @@ const Navbar = () => {
             <Globe className="h-4 w-4" />
             {language === "bn" ? "EN" : "বাং"}
           </button>
-          {user ? (
-            <Link to="/admin/login">
-              <Button size="sm" variant="outline" className="font-medium">
-                <User className="h-4 w-4 mr-1.5" />
-                {t("My Account", "আমার অ্যাকাউন্ট")}
+
+          {selfcareUrl && (
+            <a href={selfcareUrl} target="_blank" rel="noopener noreferrer">
+              <Button size="sm" variant="outline" className="font-medium text-accent border-accent hover:bg-accent hover:text-accent-foreground">
+                <ExternalLink className="h-4 w-4 mr-1.5" />
+                {t("Selfcare", "সেলফকেয়ার")}
               </Button>
-            </Link>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link to="/login">
-                <Button size="sm" variant="ghost" className="font-medium">
-                  <LogIn className="h-4 w-4 mr-1.5" />
-                  {t("Login", "লগইন")}
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-5">
-                  {t("Sign Up", "সাইন আপ")}
-                </Button>
-              </Link>
-            </div>
+            </a>
           )}
+
+          {/* User dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon" variant="ghost" className="rounded-full">
+                <User className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {user ? (
+                <>
+                  <DropdownMenuItem className="text-xs text-muted-foreground" disabled>
+                    {user.email}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate("/admin/login")}>
+                      <Shield className="h-4 w-4 mr-2" />
+                      {t("Admin Panel", "অ্যাডমিন প্যানেল")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    {t("Logout", "লগআউট")}
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem onClick={() => navigate("/login")}>
+                    <LogIn className="h-4 w-4 mr-2" />
+                    {t("Login", "লগইন")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/register")}>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    {t("Sign Up", "সাইন আপ")}
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Mobile */}
@@ -149,28 +211,64 @@ const Navbar = () => {
                 </SheetClose>
               </div>
               <nav className="flex flex-col p-4 gap-1">
-                {navLinks.map((link) => (
-                  <SheetClose asChild key={link.href + link.label}>
+                {menuItems.map((item) => (
+                  <SheetClose asChild key={item.id}>
                     <Link
-                      to={link.href}
+                      to={item.url}
                       className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive(link.href)
+                        isActive(item.url)
                           ? "bg-accent/10 text-accent"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >
-                      {link.label}
+                      {getLabel(item)}
                     </Link>
                   </SheetClose>
                 ))}
-                <div className="pt-4 mt-2 border-t border-border">
-                  <SheetClose asChild>
-                    <Link to="/contact">
-                      <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold">
-                        {t("Contact Us", "যোগাযোগ করুন")}
-                      </Button>
-                    </Link>
-                  </SheetClose>
+
+                {selfcareUrl && (
+                  <a href={selfcareUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-3 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    {t("Selfcare", "সেলফকেয়ার")}
+                  </a>
+                )}
+
+                <div className="pt-4 mt-2 border-t border-border space-y-1">
+                  {user ? (
+                    <>
+                      {isAdmin && (
+                        <SheetClose asChild>
+                          <Link to="/admin/login" className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                            <Shield className="h-4 w-4" />
+                            {t("Admin Panel", "অ্যাডমিন প্যানেল")}
+                          </Link>
+                        </SheetClose>
+                      )}
+                      <button onClick={handleSignOut} className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                        <LogOut className="h-4 w-4" />
+                        {t("Logout", "লগআউট")}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <SheetClose asChild>
+                        <Link to="/login">
+                          <Button className="w-full" variant="outline">
+                            <LogIn className="h-4 w-4 mr-1.5" />
+                            {t("Login", "লগইন")}
+                          </Button>
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link to="/register">
+                          <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold">
+                            <UserPlus className="h-4 w-4 mr-1.5" />
+                            {t("Sign Up", "সাইন আপ")}
+                          </Button>
+                        </Link>
+                      </SheetClose>
+                    </>
+                  )}
                 </div>
               </nav>
             </SheetContent>
