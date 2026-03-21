@@ -253,7 +253,7 @@ const Index = () => {
         <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-14">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{t("Customer Reviews", "গ্রাহকদের মতামত")}</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("Customer Reviews", "গ্রাহকদের মতামত")}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {testimonials.map((item) => (
