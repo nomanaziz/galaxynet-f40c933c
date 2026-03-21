@@ -62,7 +62,7 @@ const aboutTextKeys = [
 const aboutJsonKeys = [
   { key: "about_stats", label: "Stats (JSON)", help: '[{"num":"10,000+","label":"Happy Customers","label_bn":"সন্তুষ্ট গ্রাহক","icon":"Users"}]' },
   { key: "about_timeline", label: "Timeline (JSON)", help: '[{"year":"2015","title":"Founded","title_bn":"প্রতিষ্ঠিত","desc":"Started...","desc_bn":"শুরু..."}]' },
-  { key: "about_team", label: "Team (JSON)", help: '[{"name":"John","name_bn":"জন","role":"CEO","role_bn":"সিইও"}]' },
+  
 ];
 
 const allKeys = [

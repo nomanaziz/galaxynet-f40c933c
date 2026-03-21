@@ -24,12 +24,14 @@ const defaultTimeline = [
   { year: "2024", title: "10K+ Customers", title_bn: "১০,০০০+ গ্রাহক", desc: "Serving over 10,000 homes and businesses.", desc_bn: "১০,০০০+ ঘর ও ব্যবসায় সেবা প্রদান।" },
 ];
 
-const defaultTeam = [
-  { name: "Md. Rafiq Hasan", name_bn: "মো. রফিক হাসান", role: "CEO & Founder", role_bn: "প্রতিষ্ঠাতা ও সিইও" },
-  { name: "Nusrat Jahan", name_bn: "নুসরাত জাহান", role: "Operations Manager", role_bn: "অপারেশন ম্যানেজার" },
-  { name: "Tanvir Ahmed", name_bn: "তানভীর আহমেদ", role: "Network Engineer", role_bn: "নেটওয়ার্ক ইঞ্জিনিয়ার" },
-  { name: "Sabrina Akter", name_bn: "সাবরিনা আক্তার", role: "Customer Support Lead", role_bn: "গ্রাহক সেবা প্রধান" },
-];
+interface TeamMember {
+  id: string;
+  name: string;
+  name_bn: string | null;
+  photo_url: string | null;
+  departments: { name: string; name_bn: string | null } | null;
+  designations: { name: string; name_bn: string | null } | null;
+}
 
 function safeParse<T>(json: string | undefined, fallback: T): T {
   if (!json) return fallback;
@@ -42,9 +44,10 @@ const About = () => {
   const [heroBn, setHeroBn] = useState("২০১৫ সাল থেকে দ্রুত ও নির্ভরযোগ্য ইন্টারনেটে সংযুক্ত করছি।");
   const [stats, setStats] = useState(defaultStats);
   const [timeline, setTimeline] = useState(defaultTimeline);
-  const [team, setTeam] = useState(defaultTeam);
+  const [team, setTeam] = useState<TeamMember[]>([]);
 
   useEffect(() => {
+    // Fetch site settings
     supabase.from("site_settings").select("key, value").then(({ data }) => {
       const map: Record<string, string> = {};
       (data ?? []).forEach((r: any) => { if (r.key?.startsWith("about_")) map[r.key] = r.value ?? ""; });
@@ -52,8 +55,14 @@ const About = () => {
       if (map.about_hero_bn) setHeroBn(map.about_hero_bn);
       setStats(safeParse(map.about_stats, defaultStats));
       setTimeline(safeParse(map.about_timeline, defaultTimeline));
-      setTeam(safeParse(map.about_team, defaultTeam));
     });
+    // Fetch team from employees table
+    supabase.from("employees")
+      .select("id, name, name_bn, photo_url, departments(name, name_bn), designations(name, name_bn)")
+      .eq("show_on_about", true)
+      .eq("visible", true)
+      .order("sort_order")
+      .then(({ data }) => { setTeam((data as TeamMember[]) ?? []); });
   }, []);
 
   return (
@@ -138,13 +147,22 @@ const About = () => {
           <h2 className="text-3xl font-bold text-foreground text-center mb-10">{t("Our Team", "আমাদের দল")}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-4xl mx-auto">
             {team.map((member) => (
-              <Card key={member.name} className="border hover:border-accent/40 transition-all">
+              <Card key={member.id} className="border hover:border-accent/40 transition-all">
                 <CardContent className="p-6 text-center">
-                  <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-accent" />
-                  </div>
+                  {member.photo_url ? (
+                    <img src={member.photo_url} alt={member.name} className="h-16 w-16 rounded-full object-cover mx-auto mb-4" />
+                  ) : (
+                    <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                      <Users className="h-8 w-8 text-accent" />
+                    </div>
+                  )}
                   <h3 className="font-bold text-foreground">{t(member.name, member.name_bn || member.name)}</h3>
-                  <p className="text-sm text-accent font-medium mt-1">{t(member.role, member.role_bn || member.role)}</p>
+                  {member.designations && (
+                    <p className="text-sm text-accent font-medium mt-1">{t(member.designations.name, member.designations.name_bn || member.designations.name)}</p>
+                  )}
+                  {member.departments && (
+                    <p className="text-xs text-muted-foreground mt-1">{t(member.departments.name, member.departments.name_bn || member.departments.name)}</p>
+                  )}
                 </CardContent>
               </Card>
             ))}

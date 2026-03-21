@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Package, MapPin, ShoppingCart, FileText,
   Bell, Settings, Users, LogOut, Wifi, Menu, CreditCard, Home, Image, ExternalLink,
-  Gift, Star, Handshake, Sparkles
+  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -28,6 +28,12 @@ const mainItems = [
   { title: "Payments", url: "/admin/payments", icon: CreditCard },
   { title: "Homepage", url: "/admin/homepage", icon: Home },
   { title: "Media", url: "/admin/media", icon: Image },
+];
+
+const aboutItems = [
+  { title: "Departments", url: "/admin/departments", icon: Building2 },
+  { title: "Designations", url: "/admin/designations", icon: BadgeCheck },
+  { title: "Employees", url: "/admin/employees", icon: UserCog },
 ];
 
 const systemItems = [
@@ -69,6 +75,24 @@ export function AdminSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end={item.end} className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>About Us / Team</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {aboutItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
                       <item.icon className="mr-2 h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
