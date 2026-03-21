@@ -97,6 +97,47 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_items: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          label_bn: string | null
+          parent_id: string | null
+          sort_order: number
+          url: string
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          label_bn?: string | null
+          parent_id?: string | null
+          sort_order?: number
+          url: string
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          label_bn?: string | null
+          parent_id?: string | null
+          sort_order?: number
+          url?: string
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notices: {
         Row: {
           category: Database["public"]["Enums"]["notice_category"]
