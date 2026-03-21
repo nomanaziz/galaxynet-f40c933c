@@ -22,6 +22,7 @@ const Index = () => {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [features, setFeatures] = useState<any[]>([]);
   const [packages, setPackages] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
 
