@@ -94,6 +94,7 @@ const App = () => (
               <Route path="departments" element={<DepartmentManager />} />
               <Route path="designations" element={<DesignationManager />} />
               <Route path="employees" element={<EmployeeManager />} />
+              <Route path="services" element={<ServicesManager />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

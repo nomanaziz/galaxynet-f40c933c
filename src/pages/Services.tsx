@@ -1,47 +1,30 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Wifi, Building2, Server, Camera, Network, ArrowRight, Shield, Zap, Globe } from "lucide-react";
+import { Wifi, Building2, Server, Camera, Network, ArrowRight, Shield, Zap, Globe, LucideIcon, MonitorSmartphone, Radio, Smartphone, Cpu, HardDrive, Cloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+
+const iconMap: Record<string, LucideIcon> = {
+  wifi: Wifi, "building-2": Building2, server: Server, camera: Camera, network: Network,
+  shield: Shield, zap: Zap, globe: Globe, "monitor-smartphone": MonitorSmartphone,
+  radio: Radio, smartphone: Smartphone, cpu: Cpu, "hard-drive": HardDrive, cloud: Cloud,
+};
 
 const Services = () => {
   const { t } = useLanguage();
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const services = [
-    {
-      icon: Wifi, title: t("Broadband Internet", "ব্রডব্যান্ড ইন্টারনেট"),
-      desc: t("High-speed fiber optic broadband for homes with unlimited data and BDIX.", "বাড়ির জন্য আনলিমিটেড ডেটা ও BDIX সহ উচ্চ গতির ফাইবার অপটিক।"),
-      features: [t("Up to 200 Mbps", "২০০ Mbps পর্যন্ত"), "BDIX + FTP", t("Unlimited Data", "আনলিমিটেড ডেটা"), t("Free Router", "ফ্রি রাউটার")],
-      link: "/packages", badge: t("Most Popular", "সবচেয়ে জনপ্রিয়"),
-    },
-    {
-      icon: Building2, title: t("Corporate Internet", "কর্পোরেট ইন্টারনেট"),
-      desc: t("Dedicated bandwidth for businesses with guaranteed uptime SLA.", "ব্যবসার জন্য গ্যারান্টিড আপটাইম SLA সহ ডেডিকেটেড ব্যান্ডউইথ।"),
-      features: [t("Dedicated Line", "ডেডিকেটেড লাইন"), "99.99% SLA", t("Static IP", "স্ট্যাটিক IP"), t("24/7 Support", "২৪/৭ সাপোর্ট")],
-      link: "/packages", badge: "",
-    },
-    {
-      icon: Server, title: t("Dedicated Bandwidth", "ডেডিকেটেড ব্যান্ডউইথ"),
-      desc: t("Enterprise-grade solutions for ISPs and large organizations.", "ISP ও বড় প্রতিষ্ঠানের জন্য এন্টারপ্রাইজ-গ্রেড সমাধান।"),
-      features: [t("1:1 Bandwidth", "১:১ ব্যান্ডউইথ"), t("Redundant Links", "রিডান্ড্যান্ট লিংক"), t("Custom SLA", "কাস্টম SLA")],
-      link: "/contact", badge: t("Enterprise", "এন্টারপ্রাইজ"),
-    },
-    {
-      icon: Camera, title: t("CCTV Solution", "সিসিটিভি সমাধান"),
-      desc: t("Complete surveillance solutions with remote monitoring.", "রিমোট মনিটরিং সহ সম্পূর্ণ নজরদারি সমাধান।"),
-      features: [t("IP Cameras", "IP ক্যামেরা"), t("NVR Setup", "NVR সেটআপ"), t("Remote Access", "রিমোট অ্যাক্সেস"), t("Cloud Storage", "ক্লাউড স্টোরেজ")],
-      link: "/contact", badge: "",
-    },
-    {
-      icon: Network, title: t("Network Setup", "নেটওয়ার্ক সেটআপ"),
-      desc: t("Professional network infrastructure for offices and enterprises.", "অফিস ও এন্টারপ্রাইজের জন্য পেশাদার নেটওয়ার্ক ইনফ্রাস্ট্রাকচার।"),
-      features: [t("Structured Cabling", "স্ট্রাকচার্ড ক্যাবলিং"), t("WiFi Setup", "ওয়াইফাই সেটআপ"), t("Firewall", "ফায়ারওয়াল")],
-      link: "/contact", badge: "",
-    },
-  ];
+  useEffect(() => {
+    supabase.from("services").select("*").eq("visible", true).order("sort_order")
+      .then(({ data }) => { setServices(data ?? []); setLoading(false); });
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -77,34 +60,43 @@ const Services = () => {
       {/* Services */}
       <section className="py-16 bg-background flex-1">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((s) => (
-              <Card key={s.title} className="relative border hover:border-accent/40 transition-all hover:shadow-md group">
-                {s.badge && (
-                  <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
-                    {s.badge}
-                  </div>
-                )}
-                <CardContent className="p-6">
-                  <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent transition-colors">
-                    <s.icon className="h-6 w-6 text-accent group-hover:text-accent-foreground transition-colors" />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground">{s.title}</h3>
-                  <p className="text-muted-foreground text-sm mt-2 mb-4">{s.desc}</p>
-                  <div className="flex flex-wrap gap-1.5 mb-5">
-                    {s.features.map((f) => (
-                      <Badge key={f} variant="secondary" className="text-xs">{f}</Badge>
-                    ))}
-                  </div>
-                  <Link to={s.link}>
-                    <Button variant="outline" className="w-full font-semibold">
-                      {t("Learn More", "বিস্তারিত")} <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {services.map((s) => {
+                const Icon = iconMap[s.icon_name] || Wifi;
+                const features = (s.features || []) as Array<{ en: string; bn: string }>;
+                const badge = t(s.badge, s.badge_bn);
+                return (
+                  <Card key={s.id} className="relative border hover:border-accent/40 transition-all hover:shadow-md group">
+                    {badge && (
+                      <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
+                        {badge}
+                      </div>
+                    )}
+                    <CardContent className="p-6">
+                      <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent transition-colors">
+                        <Icon className="h-6 w-6 text-accent group-hover:text-accent-foreground transition-colors" />
+                      </div>
+                      <h3 className="text-lg font-bold text-foreground">{t(s.title, s.title_bn)}</h3>
+                      <p className="text-muted-foreground text-sm mt-2 mb-4">{t(s.description, s.description_bn)}</p>
+                      <div className="flex flex-wrap gap-1.5 mb-5">
+                        {features.map((f, i) => (
+                          <Badge key={i} variant="secondary" className="text-xs">{t(f.en, f.bn)}</Badge>
+                        ))}
+                      </div>
+                      <Link to={s.link || "/contact"}>
+                        <Button variant="outline" className="w-full font-semibold">
+                          {t("Learn More", "বিস্তারিত")} <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 

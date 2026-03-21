@@ -28,6 +28,7 @@ const mainItems = [
   { title: "Payments", url: "/admin/payments", icon: CreditCard },
   { title: "Homepage", url: "/admin/homepage", icon: Home },
   { title: "Media", url: "/admin/media", icon: Image },
+  { title: "Services", url: "/admin/services", icon: Globe },
 ];
 
 const aboutItems = [
