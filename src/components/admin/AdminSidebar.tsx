@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Package, MapPin, ShoppingCart, FileText,
   Bell, Settings, Users, LogOut, Wifi, Menu, CreditCard, Home, Image, ExternalLink,
-  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog
+  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog, Globe
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
