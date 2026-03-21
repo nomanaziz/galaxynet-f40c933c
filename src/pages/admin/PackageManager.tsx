@@ -22,6 +22,7 @@ interface Pkg {
   features: string[];
   badges: string[];
   featured: boolean;
+  popular: boolean;
   visible: boolean;
   sort_order: number;
 }
