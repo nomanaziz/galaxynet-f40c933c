@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Wifi, Phone, Mail, MapPin, Facebook, Youtube, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Youtube, MessageCircle } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
