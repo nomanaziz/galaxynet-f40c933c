@@ -136,6 +136,9 @@ const PackageManager = () => {
                 <Switch checked={pkg.featured} onCheckedChange={(v) => toggleField(pkg.id, "featured", v)} />
               </TableCell>
               <TableCell>
+                <Switch checked={pkg.popular} onCheckedChange={(v) => toggleField(pkg.id, "popular" as any, v)} />
+              </TableCell>
+              <TableCell>
                 <Switch checked={pkg.visible} onCheckedChange={(v) => toggleField(pkg.id, "visible", v)} />
               </TableCell>
               <TableCell className="flex gap-2">
