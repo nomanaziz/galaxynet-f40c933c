@@ -21,7 +21,9 @@ const Offers = () => {
 
   useEffect(() => {
     supabase.from("offers").select("*").eq("active", true).order("created_at", { ascending: false }).then(({ data }) => {
-      setOffers(data ?? []);
+      const now = new Date();
+      const active = (data ?? []).filter(o => !o.expiry_date || new Date(o.expiry_date) >= now);
+      setOffers(active);
       setLoading(false);
     });
   }, []);
@@ -54,7 +56,7 @@ const Offers = () => {
                 const cfg = typeConfig[offer.type] || typeConfig.offer;
                 const expired = offer.expiry_date && new Date(offer.expiry_date) < new Date();
                 return (
-                  <Card key={offer.id} className={`border hover:border-accent/40 transition-all ${expired ? "opacity-50" : ""}`}>
+                  <Card key={offer.id} className="border hover:border-accent/40 transition-all">
                     {offer.image_url && (
                       <img src={offer.image_url} alt={offer.title} className="w-full h-48 object-cover rounded-t-lg" />
                     )}
