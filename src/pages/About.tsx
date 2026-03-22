@@ -68,6 +68,7 @@ const About = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <TopBar />
       <Navbar />
 
       <section className="page-hero">
