@@ -1,24 +1,17 @@
 
 
-## Fix: Hide Expired Offers from Public Page
+## Add Missing TopBar to Services, Contact, and About Pages
 
 ### Problem
-Currently, expired offers (where `expiry_date` has passed) still show in the list with reduced opacity. Offers without an `expiry_date` (lifetime offers) should always show. Expired offers should be hidden entirely.
+The TopBar (showing the scrolling notice and hotline) is missing from three pages: Services, Contact, and About. All other public pages already have it.
 
-### Change in `src/pages/Offers.tsx`
+### Changes
 
-Filter out expired offers after fetching, keeping only:
-- Offers with no `expiry_date` (lifetime/permanent offers)
-- Offers where `expiry_date` is in the future
+| File | Change |
+|------|--------|
+| `src/pages/Services.tsx` | Add `import TopBar from "@/components/TopBar"` and render `<TopBar />` before `<Navbar />` |
+| `src/pages/Contact.tsx` | Add `import TopBar from "@/components/TopBar"` and render `<TopBar />` before `<Navbar />` |
+| `src/pages/About.tsx` | Add `import TopBar from "@/components/TopBar"` and render `<TopBar />` before `<Navbar />` |
 
-**Line 23-26**: After fetching data, filter before setting state:
-```typescript
-const now = new Date();
-const active = (data ?? []).filter(o => !o.expiry_date || new Date(o.expiry_date) >= now);
-setOffers(active);
-```
-
-Also remove the `opacity-50` expired styling on line 57 since expired offers will no longer appear.
-
-Single file change: `src/pages/Offers.tsx`
+Three small edits — add one import line and one JSX element to each file.
 
