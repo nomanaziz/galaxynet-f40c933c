@@ -21,7 +21,9 @@ const Offers = () => {
 
   useEffect(() => {
     supabase.from("offers").select("*").eq("active", true).order("created_at", { ascending: false }).then(({ data }) => {
-      setOffers(data ?? []);
+      const now = new Date();
+      const active = (data ?? []).filter(o => !o.expiry_date || new Date(o.expiry_date) >= now);
+      setOffers(active);
       setLoading(false);
     });
   }, []);
