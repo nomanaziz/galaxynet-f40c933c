@@ -3,6 +3,7 @@ import { Users, Award, Wifi, Shield, Zap, HeadphonesIcon, Clock, Server } from "
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
+import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -67,6 +68,7 @@ const About = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <TopBar />
       <Navbar />
 
       <section className="page-hero">
