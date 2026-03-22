@@ -56,7 +56,7 @@ const Offers = () => {
                 const cfg = typeConfig[offer.type] || typeConfig.offer;
                 const expired = offer.expiry_date && new Date(offer.expiry_date) < new Date();
                 return (
-                  <Card key={offer.id} className={`border hover:border-accent/40 transition-all ${expired ? "opacity-50" : ""}`}>
+                  <Card key={offer.id} className="border hover:border-accent/40 transition-all">
                     {offer.image_url && (
                       <img src={offer.image_url} alt={offer.title} className="w-full h-48 object-cover rounded-t-lg" />
                     )}
