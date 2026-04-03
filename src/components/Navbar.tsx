@@ -108,10 +108,10 @@ const Navbar = () => {
             <Link
               key={item.id}
               to={item.url}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 isActive(item.url)
                   ? "text-accent bg-accent/8 border-b-2 border-accent"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  : "text-foreground hover:text-accent hover:bg-accent/5"
               }`}
             >
               {getLabel(item)}
