@@ -180,6 +180,9 @@ const About = () => {
         </div>
       </section>
 
+      {/* Partners */}
+      <PartnersSection partners={partners} />
+
       <Footer />
     </div>
   );
