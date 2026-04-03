@@ -110,7 +110,7 @@ const Navbar = () => {
               to={item.url}
               className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive(item.url)
-                  ? "text-accent bg-accent/8"
+                  ? "text-accent bg-accent/8 border-b-2 border-accent"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
