@@ -100,7 +100,7 @@ const FestivalManager = () => {
 
   const toggleEnabled = useMutation({
     mutationFn: async ({ id, enabled }: { id: string; enabled: boolean }) => {
-      await supabase.from("festival_themes" as any).update({ enabled } as any).eq("id", id);
+      await (supabase as any).from("festival_themes").update({ enabled }).eq("id", id);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin_festivals"] }),
   });

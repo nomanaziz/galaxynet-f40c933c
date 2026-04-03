@@ -30,6 +30,7 @@ const mainItems = [
   { title: "Homepage", url: "/admin/homepage", icon: Home },
   { title: "Media", url: "/admin/media", icon: Image },
   { title: "Services", url: "/admin/services", icon: Globe },
+  { title: "Festivals", url: "/admin/festivals", icon: Sparkles },
 ];
 
 const aboutItems = [

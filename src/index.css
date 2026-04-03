@@ -185,4 +185,48 @@
     pointer-events: none;
     z-index: 1;
   }
+
+  /* Festival Animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    25% { transform: translateY(30vh) translateX(10px); }
+    50% { transform: translateY(60vh) translateX(-10px); }
+    75% { transform: translateY(90vh) translateX(5px); }
+    100% { transform: translateY(110vh) translateX(0); }
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+  }
+
+  @keyframes confetti-fall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  @keyframes soft-glow {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.3; }
+  }
+
+  .animate-float {
+    animation: float 8s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-twinkle {
+    animation: twinkle 2s ease-in-out infinite;
+    will-change: opacity, transform;
+  }
+
+  .animate-confetti-fall {
+    animation: confetti-fall 8s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-soft-glow {
+    animation: soft-glow 4s ease-in-out infinite;
+    will-change: opacity;
+  }
 }
