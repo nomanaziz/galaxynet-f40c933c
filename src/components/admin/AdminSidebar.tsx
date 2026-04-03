@@ -31,6 +31,7 @@ const mainItems = [
   { title: "Media", url: "/admin/media", icon: Image },
   { title: "Services", url: "/admin/services", icon: Globe },
   { title: "Festivals", url: "/admin/festivals", icon: Sparkles },
+  { title: "About Page", url: "/admin/about", icon: Info },
 ];
 
 const aboutItems = [
