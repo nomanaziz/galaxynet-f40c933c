@@ -257,6 +257,75 @@ export type Database = {
           },
         ]
       }
+      festival_themes: {
+        Row: {
+          accent_color: string | null
+          animation_type: string
+          banner_text_bn: string | null
+          banner_text_en: string | null
+          created_at: string
+          decoration_type: string
+          enabled: boolean
+          end_date: string
+          gradient_from: string | null
+          gradient_to: string | null
+          greeting_bn: string | null
+          greeting_en: string | null
+          hero_image_url: string | null
+          id: string
+          iftar_time: string | null
+          is_ramadan: boolean
+          name: string
+          name_bn: string | null
+          sehri_time: string | null
+          start_date: string
+        }
+        Insert: {
+          accent_color?: string | null
+          animation_type?: string
+          banner_text_bn?: string | null
+          banner_text_en?: string | null
+          created_at?: string
+          decoration_type?: string
+          enabled?: boolean
+          end_date: string
+          gradient_from?: string | null
+          gradient_to?: string | null
+          greeting_bn?: string | null
+          greeting_en?: string | null
+          hero_image_url?: string | null
+          id?: string
+          iftar_time?: string | null
+          is_ramadan?: boolean
+          name: string
+          name_bn?: string | null
+          sehri_time?: string | null
+          start_date: string
+        }
+        Update: {
+          accent_color?: string | null
+          animation_type?: string
+          banner_text_bn?: string | null
+          banner_text_en?: string | null
+          created_at?: string
+          decoration_type?: string
+          enabled?: boolean
+          end_date?: string
+          gradient_from?: string | null
+          gradient_to?: string | null
+          greeting_bn?: string | null
+          greeting_en?: string | null
+          hero_image_url?: string | null
+          id?: string
+          iftar_time?: string | null
+          is_ramadan?: boolean
+          name?: string
+          name_bn?: string | null
+          sehri_time?: string | null
+          start_date?: string
+        }
+        Relationships: []
+      }
       homepage_features: {
         Row: {
           created_at: string

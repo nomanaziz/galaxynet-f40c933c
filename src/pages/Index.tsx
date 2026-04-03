@@ -10,7 +10,11 @@ import HowToSubscribe from "@/components/home/HowToSubscribe";
 import CacheMarquee from "@/components/home/CacheMarquee";
 import WhoWeAre from "@/components/home/WhoWeAre";
 import PartnersSection from "@/components/home/PartnersSection";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { useFestivalTheme } from "@/hooks/useFestivalTheme";
+import FestivalBanner from "@/components/home/FestivalBanner";
+import FestivalDecorations from "@/components/home/FestivalDecorations";
+import RamadanPanel from "@/components/home/RamadanPanel";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import heroBanner from "@/assets/hero-banner.jpg";
@@ -25,6 +29,7 @@ const iconMap: Record<string, any> = {
 };
 
 const Index = () => {
+  const { festival, iftarCountdown } = useFestivalTheme();
   const [coverageCheck, setCoverageCheck] = useState("");
   const { t } = useLanguage();
   const [settings, setSettings] = useState<Record<string, string>>({});
@@ -61,8 +66,27 @@ const Index = () => {
 
       {/* Hero - Dark navy with background image */}
       <section className="relative overflow-hidden">
-        <img src={heroBanner} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={800} />
-        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(215,60%,8%,0.92)] via-[hsl(215,60%,12%,0.85)] to-[hsl(195,75%,22%,0.75)]" />
+        <img src={festival?.hero_image_url || heroBanner} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={800} />
+        <div
+          className="absolute inset-0"
+          style={festival ? {
+            background: `linear-gradient(135deg, ${festival.gradient_from || '#0c2340'}ee, ${festival.gradient_to || '#0e7490'}cc)`
+          } : undefined}
+        />
+        {!festival && <div className="absolute inset-0 bg-gradient-to-r from-[hsl(215,60%,8%,0.92)] via-[hsl(215,60%,12%,0.85)] to-[hsl(195,75%,22%,0.75)]" />}
+        
+        {/* Festival decorations */}
+        {festival && (
+          <FestivalDecorations
+            decorationType={festival.decoration_type}
+            animationType={festival.animation_type}
+            isRamadan={festival.is_ramadan}
+          />
+        )}
+        
+        {/* Festival banner */}
+        {festival && <FestivalBanner festival={festival} />}
+
         <div className="container mx-auto px-4 py-16 md:py-28 relative z-10">
           <div className="max-w-2xl animate-fade-up">
             <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-3">Galaxy Net</p>
@@ -98,6 +122,11 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Ramadan Panel */}
+      {festival?.is_ramadan && (
+        <RamadanPanel festival={festival} iftarCountdown={iftarCountdown} />
+      )}
 
       {/* Trust Stats */}
       <section className="py-8 md:py-10 border-b border-border bg-background">
