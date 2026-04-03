@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CreditCard, Loader2, ArrowRight, X } from "lucide-react";
+import { CreditCard, Loader2, ArrowRight, X, Zap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
