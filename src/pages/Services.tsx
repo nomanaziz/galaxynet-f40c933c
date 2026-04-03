@@ -104,10 +104,10 @@ const Services = () => {
       </section>
 
       {/* CTA */}
-      <section className="hero-gradient text-primary-foreground py-16">
+      <section className="bg-secondary/50 py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-3">{t("Need a Custom Solution?", "কাস্টম সমাধান দরকার?")}</h2>
-          <p className="text-primary-foreground/70 text-lg mb-8 max-w-xl mx-auto">
+          <h2 className="text-3xl font-bold text-foreground mb-3">{t("Need a Custom Solution?", "কাস্টম সমাধান দরকার?")}</h2>
+          <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
             {t("Our team can design a tailored solution for your needs.", "আমাদের দল আপনার প্রয়োজন অনুযায়ী সমাধান তৈরি করতে পারে।")}
           </p>
           <Link to="/new-connection">
