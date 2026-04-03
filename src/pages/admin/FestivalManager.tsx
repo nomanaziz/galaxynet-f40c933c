@@ -64,7 +64,7 @@ const FestivalManager = () => {
   const { data: festivals = [], isLoading } = useQuery({
     queryKey: ["admin_festivals"],
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from("festival_themes").select("*").order("start_date", { ascending: false });
+      const { data, error } = await supabase.from("festival_themes").select("*").order("start_date", { ascending: false });
       if (error) throw error;
       return (data || []) as FestivalRow[];
     },
@@ -73,9 +73,9 @@ const FestivalManager = () => {
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (editing) {
-        await (supabase as any).from("festival_themes").update(form).eq("id", editing.id);
+        await supabase.from("festival_themes").update(form).eq("id", editing.id);
       } else {
-        await (supabase as any).from("festival_themes").insert(form);
+        await supabase.from("festival_themes").insert(form);
       }
     },
     onSuccess: () => {
@@ -90,7 +90,7 @@ const FestivalManager = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await (supabase as any).from("festival_themes").delete().eq("id", id);
+      await supabase.from("festival_themes").delete().eq("id", id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_festivals"] });
@@ -100,7 +100,7 @@ const FestivalManager = () => {
 
   const toggleEnabled = useMutation({
     mutationFn: async ({ id, enabled }: { id: string; enabled: boolean }) => {
-      await (supabase as any).from("festival_themes").update({ enabled }).eq("id", id);
+      await supabase.from("festival_themes").update({ enabled }).eq("id", id);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin_festivals"] }),
   });
