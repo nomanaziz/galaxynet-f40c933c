@@ -32,7 +32,7 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
             <span className="text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
           </div>
         )}
-        <div className="mb-3 p-3 rounded-lg bg-accent/8">
+        <div className="mb-3 p-3 rounded-lg bg-accent/8 border border-accent/30">
           {plan.category === "dedicated" ? (
             <span className="text-2xl font-bold text-accent">{t("Call for Price", "মূল্যের জন্য কল করুন")}</span>
           ) : (
