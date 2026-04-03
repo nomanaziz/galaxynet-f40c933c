@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import NewConnection from "./pages/NewConnection";
 
 // Admin
 import AdminLogin from "./pages/admin/AdminLogin";
