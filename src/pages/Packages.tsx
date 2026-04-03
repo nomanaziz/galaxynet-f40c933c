@@ -127,7 +127,7 @@ const Packages = () => {
           <div className="mt-12 p-6 rounded-xl bg-secondary border text-center">
             <p className="text-foreground font-semibold">{t("Need a custom plan?", "কাস্টম প্ল্যান দরকার?")}</p>
             <p className="text-muted-foreground text-sm mt-1">{t("Contact us for tailored solutions.", "কাস্টম সমাধানের জন্য যোগাযোগ করুন।")}</p>
-            <Link to="/contact" className="inline-block mt-4">
+            <Link to="/new-connection" className="inline-block mt-4">
               <Button className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold">
                 {t("Contact Us", "যোগাযোগ করুন")}
               </Button>

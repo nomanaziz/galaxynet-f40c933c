@@ -363,9 +363,9 @@ const Index = () => {
                 {t("Check Coverage", "কভারেজ চেক")} <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link to="/contact">
+            <Link to="/new-connection">
               <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-8">
-                {t("Contact Us", "যোগাযোগ করুন")}
+                {t("New Connection", "নতুন সংযোগ")}
               </Button>
             </Link>
           </div>

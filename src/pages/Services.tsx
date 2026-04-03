@@ -110,7 +110,7 @@ const Services = () => {
           <p className="text-primary-foreground/70 text-lg mb-8 max-w-xl mx-auto">
             {t("Our team can design a tailored solution for your needs.", "আমাদের দল আপনার প্রয়োজন অনুযায়ী সমাধান তৈরি করতে পারে।")}
           </p>
-          <Link to="/contact">
+          <Link to="/new-connection">
             <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-8">
               {t("Contact Us", "যোগাযোগ করুন")} <ArrowRight className="ml-2 h-5 w-5" />
             </Button>

@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import breadcrumbImg from "@/assets/breadcrumb-city.jpg";
+import breadcrumbImg from "@/assets/breadcrumb-notices.jpg";
 
 const categoryConfig: Record<string, { label: string; labelBn: string; icon: typeof Bell; color: string }> = {
   maintenance: { label: "Maintenance", labelBn: "রক্ষণাবেক্ষণ", icon: Wrench, color: "bg-blue-100 text-blue-700" },

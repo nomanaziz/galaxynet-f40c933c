@@ -28,14 +28,13 @@ const Payment = () => {
     <div className="min-h-screen flex flex-col">
       <TopBar /><Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("Payment Methods", "পেমেন্ট পদ্ধতি")}</h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            {t("Choose your preferred payment method.", "আপনার পছন্দের পেমেন্ট পদ্ধতি বেছে নিন।")}
-          </p>
-        </div>
-      </section>
+      <PageHeroDark
+        title="Payment Methods"
+        titleBn="পেমেন্ট পদ্ধতি"
+        subtitle="Choose your preferred payment method."
+        subtitleBn="আপনার পছন্দের পেমেন্ট পদ্ধতি বেছে নিন।"
+        bgImage={breadcrumbImg}
+      />
 
       <section className="py-12 md:py-16 bg-background flex-1">
         <div className="container mx-auto px-4">
