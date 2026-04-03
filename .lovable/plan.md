@@ -1,29 +1,30 @@
 
 
-## Add "Memberships & Partners" Section to Home and About Pages
+## Redesign Package Selection on New Connection Page
 
-### Overview
-Restyle the existing Partners section on the Homepage and add a matching section to the About page, matching the reference design: a "মেম্বারশিপস ও পার্টনারস" badge/label above a row of partner logos on a light beige/cream background.
+### Changes to `src/pages/NewConnection.tsx`
 
-### Changes
+**1. Group packages by category with tabs/sections**
+- Replace the single flat `<Select>` dropdown with a tabbed interface: **হোম** | **কর্পোরেট** | **ডেডিকেটেড**
+- Use the existing `Tabs` component for category switching
 
-**1. Homepage Partners section (`src/pages/Index.tsx`, lines 333-353)**
-- Update the section styling: use a warm cream/beige background (`bg-[#f5f0e8]` or similar)
-- Replace the `<h2>` heading with a styled badge/pill label: "মেম্বারশিপস ও পার্টনারস" / "Memberships & Partners"
-- Keep the existing DB-driven partner logos logic intact
+**2. Shorter option labels**
+- Format: `80Mbps @ ৳1050` instead of the verbose current format
+- For Gbps speeds: `1Gbps @ ৳2500`
 
-**2. About page (`src/pages/About.tsx`)**
-- Add the same Partners section (fetch from `partners` table) between the Team section and the Footer
-- Same cream background, badge label, and logo row layout
-- Add Supabase query for partners in the existing `useEffect`
+**3. Dedicated category — custom Mbps input**
+- When "ডেডিকেটেড" tab is selected, hide the package dropdown
+- Show an `<Input>` field where the user types their required Mbps (e.g. "100")
+- Store this in a `dedicatedMbps` state, include it in `notes` JSON on submit
 
-**3. Shared component (optional but cleaner): `src/components/home/PartnersSection.tsx`**
-- Extract the partners display into a reusable component used by both pages
-- Props: `partners: any[]` array
-- Renders the badge label + logo row with cream background
+**4. State changes**
+- Add `activeCategory` state (default `"home"`)
+- Add `dedicatedMbps` state for the custom input
+- Reset `packageId` when switching categories
+- On submit: if dedicated, save `dedicatedMbps` in `notes`; otherwise save `package_id`
 
 ### Technical Notes
-- Partners data already exists in the `partners` DB table with admin CRUD
-- Homepage already fetches partners — About page needs to add the fetch
-- No new dependencies or DB changes needed
+- No DB changes needed — dedicated Mbps goes into the existing `notes` text field as JSON
+- Packages already have `category` field (`home`, `corporate`, `dedicated`)
+- Imports: add `Tabs, TabsList, TabsTrigger, TabsContent` (already used in Packages page)
 
