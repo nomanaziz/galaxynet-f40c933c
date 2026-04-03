@@ -30,7 +30,7 @@ export function useFestivalTheme() {
   const { data: festival = null } = useQuery({
     queryKey: ["active_festival", today],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("festival_themes")
         .select("*")
         .eq("enabled", true)
@@ -40,7 +40,7 @@ export function useFestivalTheme() {
         .limit(1)
         .maybeSingle();
       if (error) throw error;
-      return (data as FestivalTheme | null);
+      return data as FestivalTheme | null;
     },
     staleTime: 5 * 60 * 1000,
   });
