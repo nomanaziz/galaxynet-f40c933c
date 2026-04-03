@@ -64,7 +64,7 @@ const FestivalManager = () => {
   const { data: festivals = [], isLoading } = useQuery({
     queryKey: ["admin_festivals"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("festival_themes" as any).select("*").order("start_date", { ascending: false });
+      const { data, error } = await (supabase as any).from("festival_themes").select("*").order("start_date", { ascending: false });
       if (error) throw error;
       return (data || []) as FestivalRow[];
     },
