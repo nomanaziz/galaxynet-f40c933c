@@ -131,27 +131,27 @@ const Index = () => {
 
       {/* Why Choose Us — from DB */}
       {features.length > 0 && (
-        <section className="py-16 md:py-20 bg-background">
+        <section className="py-10 md:py-20 bg-background">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-bold text-primary mb-2">
                 {t("Why Choose Galaxy Net?", "কেন গ্যালাক্সি নেট?")}
               </h2>
-              <p className="text-muted-foreground max-w-lg mx-auto">
+              <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">
                 {t("Everything you need for a seamless internet experience", "নিরবচ্ছিন্ন ইন্টারনেট অভিজ্ঞতার জন্য যা কিছু দরকার")}
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
               {features.map((f) => {
                 const Icon = iconMap[f.icon_name] || Star;
                 return (
                   <Card key={f.id} className="group border hover:border-accent/40 transition-all hover:shadow-lg">
-                    <CardContent className="p-6">
-                      <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
-                        <Icon className="h-6 w-6 text-accent group-hover:text-accent-foreground transition-colors" />
+                    <CardContent className="p-3 md:p-6">
+                      <div className="h-9 w-9 md:h-12 md:w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3 md:mb-4 group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
+                        <Icon className="h-5 w-5 md:h-6 md:w-6 text-accent group-hover:text-accent-foreground transition-colors" />
                       </div>
-                      <h3 className="font-semibold text-foreground text-base mb-1">{t(f.title, f.title_bn || f.title)}</h3>
-                      <p className="text-muted-foreground text-sm">{t(f.description, f.description_bn || f.description)}</p>
+                      <h3 className="font-semibold text-foreground text-sm md:text-base mb-1">{t(f.title, f.title_bn || f.title)}</h3>
+                      <p className="text-muted-foreground text-xs md:text-sm">{t(f.description, f.description_bn || f.description)}</p>
                     </CardContent>
                   </Card>
                 );
