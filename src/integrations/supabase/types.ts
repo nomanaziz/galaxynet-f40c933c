@@ -713,7 +713,13 @@ export type Database = {
       coverage_location_type: "district" | "thana" | "zone"
       notice_category: "maintenance" | "offer" | "alert"
       offer_type: "offer" | "referral" | "coupon"
-      order_status: "pending" | "contacted" | "completed"
+      order_status:
+        | "pending"
+        | "contacted"
+        | "completed"
+        | "accepted"
+        | "out_of_coverage"
+        | "cancelled"
       package_category: "home" | "corporate" | "dedicated"
     }
     CompositeTypes: {
@@ -846,7 +852,14 @@ export const Constants = {
       coverage_location_type: ["district", "thana", "zone"],
       notice_category: ["maintenance", "offer", "alert"],
       offer_type: ["offer", "referral", "coupon"],
-      order_status: ["pending", "contacted", "completed"],
+      order_status: [
+        "pending",
+        "contacted",
+        "completed",
+        "accepted",
+        "out_of_coverage",
+        "cancelled",
+      ],
       package_category: ["home", "corporate", "dedicated"],
     },
   },
