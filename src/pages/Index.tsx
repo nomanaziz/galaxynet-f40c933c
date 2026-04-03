@@ -123,6 +123,11 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Ramadan Panel */}
+      {festival?.is_ramadan && (
+        <RamadanPanel festival={festival} iftarCountdown={iftarCountdown} />
+      )}
+
       {/* Trust Stats */}
       <section className="py-8 md:py-10 border-b border-border bg-background">
         <div className="container mx-auto px-4">
