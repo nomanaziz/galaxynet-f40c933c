@@ -131,9 +131,9 @@ const About = () => {
       {/* Journey */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 max-w-3xl">
-          <h2 className="text-3xl font-bold text-foreground text-center mb-4">{t("Our Journey", "আমাদের পথচলা")}</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-4">{t(journeyTitle.en, journeyTitle.bn)}</h2>
           <p className="text-muted-foreground text-center mb-12 max-w-lg mx-auto">
-            {t("From a small local ISP to serving 10,000+ customers across Bangladesh.", "একটি ছোট স্থানীয় ISP থেকে বাংলাদেশজুড়ে ১০,০০০+ গ্রাহকে সেবা প্রদান।")}
+            {t(journeySub.en, journeySub.bn)}
           </p>
           <div className="relative">
             <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-border" />
