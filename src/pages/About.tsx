@@ -55,11 +55,13 @@ const About = () => {
     // Fetch site settings
     supabase.from("site_settings").select("key, value").then(({ data }) => {
       const map: Record<string, string> = {};
-      (data ?? []).forEach((r: any) => { if (r.key?.startsWith("about_")) map[r.key] = r.value ?? ""; });
+      (data ?? []).forEach((r: any) => { if (r.key) map[r.key] = r.value ?? ""; });
       if (map.about_hero_en) setHeroEn(map.about_hero_en);
       if (map.about_hero_bn) setHeroBn(map.about_hero_bn);
       setStats(safeParse(map.about_stats, defaultStats));
       setTimeline(safeParse(map.about_timeline, defaultTimeline));
+      setJourneyTitle({ en: map.about_journey_title_en || "Our Journey", bn: map.about_journey_title_bn || "আমাদের পথচলা" });
+      setJourneySub({ en: map.about_journey_sub_en || "From a small local ISP to serving 10,000+ customers across Bangladesh.", bn: map.about_journey_sub_bn || "একটি ছোট স্থানীয় ISP থেকে বাংলাদেশজুড়ে ১০,০০০+ গ্রাহকে সেবা প্রদান।" });
     });
     // Fetch team from employees table
     supabase.from("employees")
