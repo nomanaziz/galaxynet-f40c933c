@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { CreditCard, Loader2, ArrowRight, X } from "lucide-react";
+import { CreditCard, Loader2, ArrowRight, X, Zap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
@@ -15,6 +16,7 @@ const Payment = () => {
   const [methods, setMethods] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMethod, setSelectedMethod] = useState<any>(null);
+  const [clientCode, setClientCode] = useState("");
   const { t, language } = useLanguage();
 
   useEffect(() => {
@@ -35,6 +37,37 @@ const Payment = () => {
         subtitleBn="আপনার পছন্দের পেমেন্ট পদ্ধতি বেছে নিন।"
         bgImage={breadcrumbImg}
       />
+
+      {/* Quick Bill Pay */}
+      <section className="py-10 md:py-14 bg-accent/10">
+        <div className="container mx-auto px-4 max-w-xl text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Zap className="h-6 w-6 text-accent" />
+            <h2 className="text-2xl font-bold text-foreground">
+              {t("Quick Bill Pay", "দ্রুত বিল পরিশোধ")}
+            </h2>
+          </div>
+          <p className="text-muted-foreground mb-6 text-sm">
+            {t("Enter your Client Code to pay your bill instantly.", "আপনার ক্লায়েন্ট কোড দিয়ে তাৎক্ষণিক বিল পরিশোধ করুন।")}
+          </p>
+          <div className="flex gap-3">
+            <Input
+              placeholder={t("Client Code", "ক্লায়েন্ট কোড")}
+              value={clientCode}
+              onChange={(e) => setClientCode(e.target.value)}
+              className="text-center text-lg font-mono"
+            />
+            <Button
+              disabled={!clientCode.trim()}
+              onClick={() => window.open("https://portal.galaxynetbd.com/BillPayment/Index", "_blank")}
+              className="shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground"
+            >
+              {t("Pay Now", "বিল পরিশোধ")}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
 
       <section className="py-12 md:py-16 bg-background flex-1">
         <div className="container mx-auto px-4">
