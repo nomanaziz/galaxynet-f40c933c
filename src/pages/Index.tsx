@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import HowToSubscribe from "@/components/home/HowToSubscribe";
 import CacheMarquee from "@/components/home/CacheMarquee";
 import WhoWeAre from "@/components/home/WhoWeAre";
+import PartnersSection from "@/components/home/PartnersSection";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -331,26 +332,7 @@ const Index = () => {
       <WhoWeAre />
 
       {/* Partners — from DB */}
-      {partners.length > 0 && (
-        <section className="py-14 bg-secondary/50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-primary text-center mb-8">
-              {t(settings.partner_section_title_en || "Our Partners", settings.partner_section_title_bn || "আমাদের পার্টনার")}
-            </h2>
-            <div className="flex flex-wrap justify-center gap-8 items-center">
-              {partners.map((p) => (
-                <div key={p.id} className="flex flex-col items-center gap-2">
-                  {p.logo_url ? (
-                    <img src={p.logo_url} alt={p.name} className="h-12 object-contain" loading="lazy" />
-                  ) : (
-                    <div className="h-12 w-24 bg-muted rounded flex items-center justify-center text-sm text-muted-foreground font-medium">{p.name}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      <PartnersSection partners={partners} />
 
       {/* CTA Banner */}
       <section className="hero-gradient text-primary-foreground py-16">

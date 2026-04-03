@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import PageHeroDark from "@/components/PageHeroDark";
+import PartnersSection from "@/components/home/PartnersSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import breadcrumbImg from "@/assets/breadcrumb-network.jpg";
@@ -48,6 +49,7 @@ const About = () => {
   const [stats, setStats] = useState(defaultStats);
   const [timeline, setTimeline] = useState(defaultTimeline);
   const [team, setTeam] = useState<TeamMember[]>([]);
+  const [partners, setPartners] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetch site settings
@@ -66,6 +68,9 @@ const About = () => {
       .eq("visible", true)
       .order("sort_order")
       .then(({ data }) => { setTeam((data as TeamMember[]) ?? []); });
+    // Fetch partners
+    supabase.from("partners").select("*").eq("visible", true).order("sort_order")
+      .then(({ data }) => { setPartners(data ?? []); });
   }, []);
 
   return (
@@ -174,6 +179,9 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      {/* Partners */}
+      <PartnersSection partners={partners} />
 
       <Footer />
     </div>
