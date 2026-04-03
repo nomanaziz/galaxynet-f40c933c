@@ -1,115 +1,45 @@
 
 
-## Festival Vibe System for Homepage
+## Seed All Bangladeshi Festival Themes with Generated Hero Images
 
 ### Overview
-Build a dynamic festival theming system that automatically detects Bangladeshi festivals/events and applies themed visuals, greetings, and decorations to the homepage. Includes admin controls and a special Ramadan mode.
+Insert all major Bangladeshi festivals into the `festival_themes` table with appropriate theming (colors, decorations, greetings) and generate themed hero images for each festival using AI image generation, then upload them to the existing `media` Supabase storage bucket.
 
-### Database Changes
+### Festivals to Add (2025-2026 dates)
 
-**New table: `festival_themes`**
-- `id` uuid PK
-- `name` text (e.g., "Eid ul-Fitr", "Pohela Boishakh")
-- `name_bn` text
-- `greeting_en` text (e.g., "Eid Mubarak!")
-- `greeting_bn` text
-- `start_date` date
-- `end_date` date
-- `hero_image_url` text (optional custom hero image)
-- `gradient_from` text (CSS color)
-- `gradient_to` text (CSS color)
-- `accent_color` text (CSS HSL value to override --accent)
-- `decoration_type` text (enum: 'confetti', 'lanterns', 'lights', 'alpana', 'stars', 'none')
-- `animation_type` text (enum: 'particles', 'glow', 'snowfall', 'none')
-- `is_ramadan` boolean default false
-- `sehri_time` text (e.g., "04:15 AM")
-- `iftar_time` text (e.g., "06:30 PM")
-- `enabled` boolean default true
-- `banner_text_en` text
-- `banner_text_bn` text
-- `created_at` timestamptz default now()
+| # | Festival | Bangla | Dates | Decoration | Gradient | Ramadan? |
+|---|----------|--------|-------|------------|----------|----------|
+| 1 | Ramadan | রমজান | Mar 1 – Mar 30, 2026 | stars | Dark blue → Deep purple | Yes |
+| 2 | Eid ul-Fitr | ঈদ উল ফিতর | Mar 31 – Apr 2, 2026 | lanterns | Gold → Deep green | No |
+| 3 | Pohela Boishakh | পহেলা বৈশাখ | Apr 14 – Apr 15, 2026 | alpana | Red → Deep orange | No |
+| 4 | Shab-e-Barat | শবে বরাত | Jan 15 – Jan 16, 2026 | stars | Indigo → Purple | No |
+| 5 | Eid ul-Adha | ঈদ উল আযহা | Jun 7 – Jun 9, 2026 | lanterns | Emerald → Teal | No |
+| 6 | Independence Day | স্বাধীনতা দিবস | Mar 26 – Mar 26, 2026 | confetti | Green → Red | No |
+| 7 | Victory Day | বিজয় দিবস | Dec 16 – Dec 16, 2025 | confetti | Green → Red | No |
+| 8 | International Mother Language Day | আন্তর্জাতিক মাতৃভাষা দিবস | Feb 21 – Feb 21, 2026 | lights | Red → Dark red | No |
+| 9 | Durga Puja | দুর্গা পূজা | Oct 2 – Oct 7, 2025 | lights | Saffron → Crimson | No |
+| 10 | Christmas | বড়দিন | Dec 25 – Dec 25, 2025 | lights | Red → Green | No |
+| 11 | New Year | নববর্ষ | Jan 1 – Jan 1, 2026 | confetti | Navy → Gold | No |
 
-RLS: Public SELECT where `enabled = true`, admin full CRUD.
+### Hero Image Generation
 
-### New Files
+For each festival, generate a themed banner/hero image (1920x600) using an AI image generation approach:
+- Use a Python script with Pillow to create gradient-based hero banners with festival-themed patterns, text overlays, and decorative elements
+- Each image will have the festival gradient as background, with subtle pattern overlays matching the decoration type
+- Upload each to the `media` bucket in Supabase storage at path `festivals/{slug}.png`
+- Store the public URL in `hero_image_url`
 
-**1. `src/hooks/useFestivalTheme.ts`**
-- Fetches active festival from `festival_themes` where `start_date <= today <= end_date AND enabled = true`
-- Returns current festival data or null (default theme)
-- Calculates Iftar countdown timer if `is_ramadan` is true
-- Memoized to avoid re-fetching
+### Implementation Steps
 
-**2. `src/components/home/FestivalBanner.tsx`**
-- Small banner/badge at top of hero showing festival name + greeting
-- Optional countdown to next major event (days/hours/mins)
-- Animated entrance with fade-in
+1. **Generate hero images** — Python script using Pillow to create 11 themed gradient banners with decorative patterns (geometric for alpana, crescent/stars for Eid/Ramadan, confetti dots for national days, etc.) and bilingual text overlays
+2. **Upload to Supabase storage** — Upload each image to `media` bucket under `festivals/` folder
+3. **Insert festival data** — SQL migration or direct insert with all festival rows including the storage URLs
+4. **Verify** — Query the table and check images are accessible
 
-**3. `src/components/home/FestivalDecorations.tsx`**
-- Renders lightweight CSS/SVG decorations based on `decoration_type`:
-  - `lanterns`: Floating lantern SVGs (Eid)
-  - `alpana`: Corner alpana patterns (Boishakh)
-  - `lights`: Twinkling light dots (Christmas/New Year)
-  - `confetti`: CSS confetti animation
-  - `stars`: Floating stars (Ramadan)
-- Uses CSS animations only (no heavy JS libraries)
-- `animation_type` controls background effects (subtle glow, particles via CSS)
-- All animations use `will-change` and `transform` for GPU acceleration
+### Technical Details
 
-**4. `src/components/home/RamadanPanel.tsx`**
-- Shows Sehri & Iftar times from DB
-- Live Iftar countdown timer (hours:minutes:seconds)
-- Styled with dark/spiritual theme (dark card, soft golden glow border)
-
-**5. `src/pages/admin/FestivalManager.tsx`**
-- CRUD for festival themes
-- Fields: name, dates, greeting, colors, decoration type, hero image upload, Ramadan toggle with sehri/iftar times
-- Enable/disable toggle per festival
-- Preview of selected decoration type
-
-### Modified Files
-
-**6. `src/pages/Index.tsx`**
-- Import and use `useFestivalTheme()` hook
-- When a festival is active:
-  - Override hero gradient colors with festival's `gradient_from`/`gradient_to`
-  - Show `FestivalBanner` component over hero
-  - Render `FestivalDecorations` as an overlay layer
-  - If Ramadan, show `RamadanPanel` below hero
-  - Apply festival hero image if provided
-- When no festival: default design (no changes)
-
-**7. `src/index.css`**
-- Add CSS keyframes for festival animations:
-  - `@keyframes float` (lanterns, stars)
-  - `@keyframes twinkle` (lights)
-  - `@keyframes confetti-fall`
-  - `@keyframes soft-glow` (Ramadan mode)
-- Festival decoration utility classes
-- Ramadan dark overlay styles
-
-**8. `src/components/admin/AdminSidebar.tsx`**
-- Add "Festival Themes" menu item linking to `/admin/festivals`
-
-**9. `src/App.tsx`**
-- Add route for `/admin/festivals` → `FestivalManager`
-
-### Auto-Revert System
-- The `useFestivalTheme` hook checks `end_date` — once today > end_date, the festival is no longer active and the default design applies automatically
-- No manual intervention needed
-
-### Performance Strategy
-- All animations are CSS-only (no canvas, no heavy JS particle libraries)
-- Decorations use `pointer-events: none` so they don't block interaction
-- Limited to 10-15 animated elements max
-- `will-change: transform` and `translateZ(0)` for GPU compositing
-- Lazy-loaded decoration components (only mounted when festival is active)
-- Festival data cached via React Query with 5-minute stale time
-
-### Ramadan Special Mode
-- When `is_ramadan = true` on the active festival:
-  - Hero section gets a darker, calmer gradient overlay
-  - Golden glow accents replace orange
-  - Floating star decorations
-  - Sehri/Iftar panel visible below hero with live countdown
-  - Subtle pulsing glow animation on accent elements
+- Images generated programmatically with Pillow (no external AI API needed)
+- Each image: 1920x600px PNG with gradient background + SVG-style decorative elements + festival name text
+- Uploaded via Supabase Storage REST API using the anon key
+- All festivals inserted with `enabled: true` so they auto-activate on their dates
 
