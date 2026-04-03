@@ -89,14 +89,13 @@ const Packages = () => {
       <TopBar />
       <Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("Internet Packages", "ইন্টারনেট প্যাকেজসমূহ")}</h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            {t("Choose the perfect plan for your home or business.", "আপনার ঘর বা ব্যবসার জন্য সেরা প্ল্যান বেছে নিন।")}
-          </p>
-        </div>
-      </section>
+      <PageHeroDark
+        title="Internet Packages"
+        titleBn="ইন্টারনেট প্যাকেজসমূহ"
+        subtitle="Choose the perfect plan for your home or business."
+        subtitleBn="আপনার ঘর বা ব্যবসার জন্য সেরা প্ল্যান বেছে নিন।"
+        bgImage={breadcrumbImg}
+      />
 
       <section className="py-16 bg-background flex-1">
         <div className="container mx-auto px-4">
