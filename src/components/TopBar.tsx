@@ -24,7 +24,7 @@ const TopBar = () => {
         <div className="flex-1 overflow-hidden">
           {notice && (
             <div className="animate-marquee whitespace-nowrap">
-              <span className="text-primary-foreground/80">{notice}</span>
+              <span className="text-primary-foreground/95">{notice}</span>
             </div>
           )}
         </div>
@@ -36,7 +36,7 @@ const TopBar = () => {
           )}
           <div className="hidden sm:flex items-center gap-1.5">
             {[Facebook, Youtube, MessageCircle].map((Icon, i) => (
-              <a key={i} href="#" className="text-primary-foreground/50 hover:text-accent transition-colors">
+              <a key={i} href="#" className="text-primary-foreground/80 hover:text-accent transition-colors">
                 <Icon className="h-3 w-3" />
               </a>
             ))}

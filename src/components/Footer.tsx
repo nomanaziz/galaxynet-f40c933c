@@ -60,7 +60,7 @@ const Footer = () => {
               <div className="flex items-center gap-2.5 mb-4">
                 <img src={logo} alt={siteName} className="h-10 w-auto brightness-0 invert" />
               </div>
-              <p className="text-primary-foreground/70 text-sm leading-relaxed mb-4">
+              <p className="text-primary-foreground/90 text-sm leading-relaxed mb-4">
                 {tagline}
               </p>
               <div className="flex gap-2">
@@ -83,7 +83,7 @@ const Footer = () => {
               <ul className="space-y-2.5">
                 {quickLinks.map((link) => (
                   <li key={link.href}>
-                    <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-accent transition-colors">
+                    <Link to={link.href} className="text-sm text-primary-foreground/90 hover:text-accent transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -99,7 +99,7 @@ const Footer = () => {
               <ul className="space-y-2.5">
                 {resourceLinks.map((link) => (
                   <li key={link.href}>
-                    <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-accent transition-colors">
+                    <Link to={link.href} className="text-sm text-primary-foreground/90 hover:text-accent transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -112,7 +112,7 @@ const Footer = () => {
               <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-accent">
                 {t("Contact", "যোগাযোগ")}
               </h4>
-              <ul className="space-y-3 text-sm text-primary-foreground/70">
+              <ul className="space-y-3 text-sm text-primary-foreground/90">
                 <li className="flex items-start gap-2.5">
                   <Phone className="h-4 w-4 mt-0.5 text-accent shrink-0" />
                   <a href={`tel:${phone}`} className="hover:text-accent transition-colors">{phone}</a>
@@ -137,7 +137,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/10">
-          <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-primary-foreground/50 text-xs">
+          <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-primary-foreground/80 text-xs">
             <span>© {new Date().getFullYear()} {siteName}. {t("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}</span>
             <span>Developed by: <a href="https://finehost.net" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">FineHost.net</a></span>
           </div>
