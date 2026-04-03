@@ -40,7 +40,6 @@ const Notices = () => {
         subtitleBn="রক্ষণাবেক্ষণ, অফার ও সেবা আপডেট সম্পর্কে জানুন।"
         bgImage={breadcrumbImg}
       />
-      </section>
 
       <section className="py-12 md:py-16 bg-background flex-1">
         <div className="container mx-auto px-4 max-w-3xl">

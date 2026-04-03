@@ -41,8 +41,6 @@ const Offers = () => {
         subtitleBn="আমাদের সর্বশেষ ডিল ও প্রমোশন মিস করবেন না!"
         bgImage={breadcrumbImg}
       />
-        </div>
-      </section>
 
       <section className="py-12 md:py-16 bg-background flex-1">
         <div className="container mx-auto px-4 max-w-4xl">
