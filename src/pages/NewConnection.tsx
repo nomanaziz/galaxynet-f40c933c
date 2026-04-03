@@ -77,11 +77,13 @@ const NewConnection = () => {
     <div className="min-h-screen bg-gradient-to-br from-[hsl(215,60%,8%)] via-[hsl(215,60%,12%)] to-[hsl(195,75%,22%)]">
       {/* Minimal Header */}
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <img src={logo} alt="Galaxy Net" className="h-10 brightness-0 invert" />
-        <div className="flex items-center gap-2 text-white/70 text-sm">
-          <Wifi className="h-4 w-4 text-accent" />
-          <span>Galaxy Net</span>
-        </div>
+        <Link to="/">
+          <img src={logo} alt="Galaxy Net" className="h-10 brightness-0 invert" />
+        </Link>
+        <Link to="/" className="flex items-center gap-2 text-white/70 text-sm hover:text-white transition-colors">
+          <Home className="h-4 w-4 text-accent" />
+          <span>হোমপেজ</span>
+        </Link>
       </div>
 
       <div className="container mx-auto px-4 py-6 md:py-12">
