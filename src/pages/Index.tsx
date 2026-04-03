@@ -194,7 +194,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(215,60%,8%,0.85)] to-[hsl(195,75%,22%,0.6)]" />
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
           <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-            {t("Ultimate Gaming & Streaming", "চূড়ান্ত গেমিং ও স্ট্রিমিং")}
+            {t("Ultimate Gaming & Streaming", "আলট্রা গেমিং ও স্ট্রিমিং")}
           </h3>
           <p className="text-white/60 text-sm md:text-base max-w-lg">
             {t("Low latency, high speed — perfect for gamers and content lovers", "কম লেটেন্সি, হাই স্পিড — গেমার ও কন্টেন্ট প্রেমীদের জন্য পারফেক্ট")}
