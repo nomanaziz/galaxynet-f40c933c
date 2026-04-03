@@ -24,7 +24,7 @@ const TopBar = () => {
         <div className="flex-1 overflow-hidden">
           {notice && (
             <div className="animate-marquee whitespace-nowrap">
-              <span className="text-primary-foreground/80">{notice}</span>
+              <span className="text-primary-foreground/95">{notice}</span>
             </div>
           )}
         </div>
