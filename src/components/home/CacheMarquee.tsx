@@ -1,19 +1,38 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const cacheLogos = [
-  { name: "Google", color: "text-blue-600", bg: "bg-blue-50" },
-  { name: "Meta", color: "text-blue-500", bg: "bg-blue-50" },
-  { name: "YouTube", color: "text-red-600", bg: "bg-red-50" },
-  { name: "Netflix", color: "text-red-700", bg: "bg-red-50" },
-  { name: "TikTok", color: "text-gray-900", bg: "bg-gray-50" },
-  { name: "Steam", color: "text-indigo-700", bg: "bg-indigo-50" },
-  { name: "Apple", color: "text-gray-800", bg: "bg-gray-50" },
-  { name: "Cloudflare", color: "text-orange-500", bg: "bg-orange-50" },
-  { name: "Akamai", color: "text-blue-700", bg: "bg-blue-50" },
-  { name: "Microsoft", color: "text-sky-600", bg: "bg-sky-50" },
-  { name: "Amazon", color: "text-amber-600", bg: "bg-amber-50" },
-  { name: "Facebook", color: "text-blue-600", bg: "bg-blue-50" },
+  { name: "Google", logo: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" },
+  { name: "Meta", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo.svg/200px-Meta_Platforms_Inc._logo.svg.png" },
+  { name: "YouTube", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/200px-YouTube_Logo_2017.svg.png" },
+  { name: "Netflix", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/200px-Netflix_2015_logo.svg.png" },
+  { name: "TikTok", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/TikTok_logo.svg/150px-TikTok_logo.svg.png" },
+  { name: "Steam", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/120px-Steam_icon_logo.svg.png" },
+  { name: "Apple", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/100px-Apple_logo_black.svg.png" },
+  { name: "Cloudflare", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Cloudflare_Logo.png/200px-Cloudflare_Logo.png" },
+  { name: "Akamai", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Akamai_logo.svg/200px-Akamai_logo.svg.png" },
+  { name: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Microsoft_logo_%282012%29.svg/200px-Microsoft_logo_%282012%29.svg.png" },
+  { name: "Amazon", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/200px-Amazon_logo.svg.png" },
+  { name: "Facebook", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/200px-Facebook_Logo_%282019%29.png" },
 ];
+
+const LogoItem = ({ logo }: { logo: typeof cacheLogos[0] }) => {
+  return (
+    <div className="inline-flex items-center justify-center mx-3 md:mx-5 px-5 py-3 rounded-xl bg-white border border-border shadow-sm min-w-[120px] h-[56px] hover:shadow-md transition-shadow">
+      <img
+        src={logo.logo}
+        alt={logo.name}
+        className="max-h-[28px] max-w-[100px] object-contain"
+        onError={(e) => {
+          const target = e.currentTarget;
+          target.style.display = "none";
+          const fallback = target.nextElementSibling as HTMLElement;
+          if (fallback) fallback.style.display = "block";
+        }}
+      />
+      <span className="font-bold text-sm text-foreground tracking-tight hidden">{logo.name}</span>
+    </div>
+  );
+};
 
 const CacheMarquee = () => {
   const { t } = useLanguage();
@@ -33,12 +52,7 @@ const CacheMarquee = () => {
       <div className="relative overflow-hidden">
         <div className="flex animate-marquee-loop whitespace-nowrap">
           {[...cacheLogos, ...cacheLogos].map((logo, i) => (
-            <div
-              key={i}
-              className={`inline-flex items-center justify-center mx-4 md:mx-6 px-6 py-3 rounded-xl ${logo.bg} border border-border shadow-sm min-w-[130px] hover:shadow-md transition-shadow`}
-            >
-              <span className={`${logo.color} font-bold text-base tracking-tight`}>{logo.name}</span>
-            </div>
+            <LogoItem key={i} logo={logo} />
           ))}
         </div>
       </div>
