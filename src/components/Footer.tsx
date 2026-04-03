@@ -83,7 +83,7 @@ const Footer = () => {
               <ul className="space-y-2.5">
                 {quickLinks.map((link) => (
                   <li key={link.href}>
-                    <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-accent transition-colors">
+                    <Link to={link.href} className="text-sm text-primary-foreground/90 hover:text-accent transition-colors">
                       {link.label}
                     </Link>
                   </li>
