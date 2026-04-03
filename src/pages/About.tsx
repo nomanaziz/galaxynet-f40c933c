@@ -49,6 +49,7 @@ const About = () => {
   const [stats, setStats] = useState(defaultStats);
   const [timeline, setTimeline] = useState(defaultTimeline);
   const [team, setTeam] = useState<TeamMember[]>([]);
+  const [partners, setPartners] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetch site settings
