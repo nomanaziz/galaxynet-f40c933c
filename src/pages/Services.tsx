@@ -41,8 +41,6 @@ const Services = () => {
         subtitleBn="বাড়ি ও ব্যবসার জন্য সম্পূর্ণ সংযোগ সমাধান।"
         bgImage={breadcrumbImg}
       />
-        </div>
-      </section>
 
       {/* Highlights */}
       <section className="py-8 border-b border-border">
