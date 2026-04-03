@@ -10,6 +10,7 @@ import logo from "@/assets/logo.png";
 
 const NewConnection = () => {
   const [areas, setAreas] = useState<any[]>([]);
+  const [packages, setPackages] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const { toast } = useToast();
@@ -18,9 +19,11 @@ const NewConnection = () => {
   const [area, setArea] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
+  const [packageId, setPackageId] = useState("");
 
   useEffect(() => {
     supabase.from("coverage_locations").select("id, name, name_bn").order("name").then(({ data }) => setAreas(data ?? []));
+    supabase.from("packages").select("*").eq("visible", true).order("sort_order").then(({ data }) => setPackages(data ?? []));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,6 +43,7 @@ const NewConnection = () => {
       phone: phone.trim(),
       address: address.trim() || "N/A",
       area,
+      package_id: packageId || null,
       notes: JSON.stringify({ source: "landing_page" }),
     });
 
@@ -131,6 +135,20 @@ const NewConnection = () => {
             <div className="space-y-1.5">
               <Label className="text-sm font-semibold">ফোন নাম্বার <span className="text-red-500">*</span></Label>
               <Input placeholder="01XXXXXXXXX" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required maxLength={15} />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm font-semibold">প্যাকেজ নির্বাচন করুন</Label>
+              <Select value={packageId} onValueChange={setPackageId}>
+                <SelectTrigger><SelectValue placeholder="প্যাকেজ বাছাই করুন (ঐচ্ছিক)" /></SelectTrigger>
+                <SelectContent>
+                  {packages.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} — {p.speed >= 1000 ? `${p.speed / 1000} Gbps` : `${p.speed} Mbps`} — ৳{p.price}/মাস
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <Button type="submit" disabled={submitting} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-base py-6">

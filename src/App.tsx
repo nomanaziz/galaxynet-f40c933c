@@ -16,7 +16,7 @@ import Notices from "./pages/Notices";
 import Offers from "./pages/Offers";
 import Payment from "./pages/Payment";
 import Selfcare from "./pages/Selfcare";
-import GetConnected from "./pages/GetConnected";
+import { Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import Login from "./pages/Login";
@@ -69,7 +69,7 @@ const App = () => (
             <Route path="/offers" element={<Offers />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/selfcare" element={<Selfcare />} />
-            <Route path="/get-connected" element={<GetConnected />} />
+            <Route path="/get-connected" element={<Navigate to="/new-connection" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/new-connection" element={<NewConnection />} />
