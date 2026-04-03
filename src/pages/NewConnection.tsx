@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, Wifi, Zap, Shield, BadgeCheck, Home } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
 
@@ -21,6 +22,8 @@ const NewConnection = () => {
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [packageId, setPackageId] = useState("");
+  const [activeCategory, setActiveCategory] = useState("home");
+  const [dedicatedMbps, setDedicatedMbps] = useState("");
 
   useEffect(() => {
     supabase.from("coverage_locations").select("id, name, name_bn").order("name").then(({ data }) => setAreas(data ?? []));
@@ -39,13 +42,17 @@ const NewConnection = () => {
     }
 
     setSubmitting(true);
+    const notesData: any = { source: "landing_page" };
+    if (activeCategory === "dedicated") {
+      notesData.dedicated_mbps = dedicatedMbps;
+    }
     const { error } = await supabase.from("connection_orders").insert({
       name: name.trim(),
       phone: phone.trim(),
       address: address.trim() || "N/A",
       area,
-      package_id: packageId || null,
-      notes: JSON.stringify({ source: "landing_page" }),
+      package_id: activeCategory !== "dedicated" ? (packageId || null) : null,
+      notes: JSON.stringify(notesData),
     });
 
     setSubmitting(false);
@@ -142,16 +149,47 @@ const NewConnection = () => {
 
             <div className="space-y-1.5">
               <Label className="text-sm font-semibold">প্যাকেজ নির্বাচন করুন</Label>
-              <Select value={packageId} onValueChange={setPackageId}>
-                <SelectTrigger><SelectValue placeholder="প্যাকেজ বাছাই করুন (ঐচ্ছিক)" /></SelectTrigger>
-                <SelectContent>
-                  {packages.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name} — {p.speed >= 1000 ? `${p.speed / 1000} Gbps` : `${p.speed} Mbps`} — ৳{p.price}/মাস
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Tabs value={activeCategory} onValueChange={(v) => { setActiveCategory(v); setPackageId(""); }}>
+                <TabsList className="w-full">
+                  <TabsTrigger value="home" className="flex-1">হোম</TabsTrigger>
+                  <TabsTrigger value="corporate" className="flex-1">কর্পোরেট</TabsTrigger>
+                  <TabsTrigger value="dedicated" className="flex-1">ডেডিকেটেড</TabsTrigger>
+                </TabsList>
+                <TabsContent value="home">
+                  <Select value={packageId} onValueChange={setPackageId}>
+                    <SelectTrigger><SelectValue placeholder="প্যাকেজ বাছাই করুন" /></SelectTrigger>
+                    <SelectContent>
+                      {packages.filter(p => p.category === "home").map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.speed >= 1000 ? `${p.speed / 1000}Gbps` : `${p.speed}Mbps`} @ ৳{p.price}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TabsContent>
+                <TabsContent value="corporate">
+                  <Select value={packageId} onValueChange={setPackageId}>
+                    <SelectTrigger><SelectValue placeholder="প্যাকেজ বাছাই করুন" /></SelectTrigger>
+                    <SelectContent>
+                      {packages.filter(p => p.category === "corporate").map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.speed >= 1000 ? `${p.speed / 1000}Gbps` : `${p.speed}Mbps`} @ ৳{p.price}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TabsContent>
+                <TabsContent value="dedicated">
+                  <Input
+                    type="number"
+                    placeholder="আপনার প্রয়োজনীয় Mbps লিখুন (যেমন: 100)"
+                    value={dedicatedMbps}
+                    onChange={(e) => setDedicatedMbps(e.target.value)}
+                    min={1}
+                    required
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
 
             <Button type="submit" disabled={submitting} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-base py-6">
