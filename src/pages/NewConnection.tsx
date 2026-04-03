@@ -22,6 +22,8 @@ const NewConnection = () => {
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [packageId, setPackageId] = useState("");
+  const [activeCategory, setActiveCategory] = useState("home");
+  const [dedicatedMbps, setDedicatedMbps] = useState("");
 
   useEffect(() => {
     supabase.from("coverage_locations").select("id, name, name_bn").order("name").then(({ data }) => setAreas(data ?? []));
