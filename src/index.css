@@ -40,6 +40,8 @@
     --galaxy-orange: 25 100% 50%;
     --galaxy-orange-dark: 25 100% 42%;
     --galaxy-orange-light: 25 100% 62%;
+    --galaxy-navy: 215 60% 12%;
+    --galaxy-navy-light: 215 50% 20%;
 
     --sidebar-background: 195 75% 27%;
     --sidebar-foreground: 0 0% 100%;
@@ -95,11 +97,19 @@
   }
 
   .hero-gradient {
-    background: linear-gradient(160deg, hsl(var(--galaxy-blue-dark)) 0%, hsl(var(--galaxy-blue)) 70%, hsl(215 45% 35%) 100%);
+    background: linear-gradient(160deg, hsl(var(--galaxy-navy)) 0%, hsl(var(--galaxy-blue-dark)) 40%, hsl(var(--galaxy-blue)) 100%);
   }
 
   .hero-gradient-soft {
     background: linear-gradient(160deg, hsl(220 20% 97%) 0%, hsl(215 30% 94%) 50%, hsl(25 60% 96%) 100%);
+  }
+
+  .gradient-navy-dark {
+    background: linear-gradient(160deg, hsl(var(--galaxy-navy)) 0%, hsl(var(--galaxy-navy-light)) 50%, hsl(var(--galaxy-blue-dark)) 100%);
+  }
+
+  .gradient-orange-strip {
+    background: linear-gradient(90deg, hsl(var(--galaxy-orange)) 0%, hsl(15 100% 55%) 50%, hsl(340 80% 55%) 100%);
   }
 
   .orange-gradient {
@@ -131,8 +141,17 @@
     100% { transform: translateX(-100%); }
   }
 
+  @keyframes marquee-loop {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
   .animate-marquee {
     animation: marquee 20s linear infinite;
+  }
+
+  .animate-marquee-loop {
+    animation: marquee-loop 25s linear infinite;
   }
 
   .page-hero {
@@ -148,5 +167,18 @@
       radial-gradient(circle at 20% 50%, hsl(195 75% 37% / 0.06) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, hsl(25 100% 50% / 0.04) 0%, transparent 40%);
     pointer-events: none;
+  }
+
+  .page-hero-dark {
+    @apply py-16 md:py-20 text-center relative overflow-hidden;
+  }
+
+  .page-hero-dark::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, hsl(215 60% 12% / 0.85) 0%, hsl(195 75% 22% / 0.80) 50%, hsl(195 75% 37% / 0.75) 100%);
+    pointer-events: none;
+    z-index: 1;
   }
 }
