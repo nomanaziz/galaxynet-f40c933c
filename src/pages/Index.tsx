@@ -29,6 +29,7 @@ const iconMap: Record<string, any> = {
 };
 
 const Index = () => {
+  const { festival, iftarCountdown } = useFestivalTheme();
   const [coverageCheck, setCoverageCheck] = useState("");
   const { t } = useLanguage();
   const [settings, setSettings] = useState<Record<string, string>>({});
