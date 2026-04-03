@@ -30,7 +30,7 @@ const TopBar = () => {
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {hotline && (
-            <a href={`tel:${hotline}`} className="flex items-center gap-1 text-accent font-semibold hover:text-accent/80 transition-colors">
+            <a href={`tel:${hotline}`} className="flex items-center gap-1 text-white font-bold hover:text-accent transition-colors">
               <Phone className="h-3 w-3" /> {hotline}
             </a>
           )}
