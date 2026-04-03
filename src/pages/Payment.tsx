@@ -15,6 +15,7 @@ const Payment = () => {
   const [methods, setMethods] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMethod, setSelectedMethod] = useState<any>(null);
+  const [clientCode, setClientCode] = useState("");
   const { t, language } = useLanguage();
 
   useEffect(() => {
