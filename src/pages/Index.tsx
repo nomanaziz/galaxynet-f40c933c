@@ -66,8 +66,27 @@ const Index = () => {
 
       {/* Hero - Dark navy with background image */}
       <section className="relative overflow-hidden">
-        <img src={heroBanner} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={800} />
-        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(215,60%,8%,0.92)] via-[hsl(215,60%,12%,0.85)] to-[hsl(195,75%,22%,0.75)]" />
+        <img src={festival?.hero_image_url || heroBanner} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={800} />
+        <div
+          className="absolute inset-0"
+          style={festival ? {
+            background: `linear-gradient(135deg, ${festival.gradient_from || '#0c2340'}ee, ${festival.gradient_to || '#0e7490'}cc)`
+          } : undefined}
+        />
+        {!festival && <div className="absolute inset-0 bg-gradient-to-r from-[hsl(215,60%,8%,0.92)] via-[hsl(215,60%,12%,0.85)] to-[hsl(195,75%,22%,0.75)]" />}
+        
+        {/* Festival decorations */}
+        {festival && (
+          <FestivalDecorations
+            decorationType={festival.decoration_type}
+            animationType={festival.animation_type}
+            isRamadan={festival.is_ramadan}
+          />
+        )}
+        
+        {/* Festival banner */}
+        {festival && <FestivalBanner festival={festival} />}
+
         <div className="container mx-auto px-4 py-16 md:py-28 relative z-10">
           <div className="max-w-2xl animate-fade-up">
             <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-3">Galaxy Net</p>
