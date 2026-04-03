@@ -8,8 +8,10 @@ import { Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import breadcrumbImg from "@/assets/breadcrumb-network.jpg";
 
 const iconMap: Record<string, LucideIcon> = {
   wifi: Wifi, "building-2": Building2, server: Server, camera: Camera, network: Network,
