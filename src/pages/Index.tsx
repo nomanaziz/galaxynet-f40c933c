@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import HowToSubscribe from "@/components/home/HowToSubscribe";
 import CacheMarquee from "@/components/home/CacheMarquee";
 import WhoWeAre from "@/components/home/WhoWeAre";
+import PartnersSection from "@/components/home/PartnersSection";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";

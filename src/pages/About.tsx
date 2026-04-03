@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import PageHeroDark from "@/components/PageHeroDark";
+import PartnersSection from "@/components/home/PartnersSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import breadcrumbImg from "@/assets/breadcrumb-network.jpg";
