@@ -1,29 +1,27 @@
 
 
-## Add Quick Bill Pay Section to Payment Page
+## Mobile Optimizations for Homepage Sections
 
-### Overview
-Add a prominent "Quick Bill Pay" section at the top of the Payment page. Users enter their Client Code and get redirected to `https://portal.galaxynetbd.com/BillPayment/Index` with the code pre-filled via URL parameter.
+### Changes to `src/pages/Index.tsx`
 
-### Changes to `src/pages/Payment.tsx`
+**1. Smaller feature cards on mobile (কেন গ্যালাক্সি নেট?)**
+- Change grid from `grid-cols-1` to `grid-cols-2` on mobile
+- Reduce card padding from `p-6` to `p-3` on mobile (`p-3 md:p-6`)
+- Reduce icon container from `h-12 w-12` to `h-9 w-9` on mobile
+- Reduce icon size from `h-6 w-6` to `h-5 w-5` on mobile
+- Reduce section padding `py-16` to `py-10` on mobile
 
-**1. Add Quick Bill Pay section above payment methods**
-- New section with a styled card containing:
-  - Heading: "Quick Bill Pay" / "দ্রুত বিল পরিশোধ"
-  - Input field labeled "Client Code" / "ক্লায়েন্ট কোড"
-  - "Pay Now" / "বিল পরিশোধ করুন" button
-- Styled with accent background, centered layout
+**2. Smaller package cards on mobile (জনপ্রিয় প্যাকেজ)**
+- Change grid from `grid-cols-1` to `grid-cols-2` on mobile
+- Reduce card padding from `p-6` to `p-3` on mobile
+- Reduce package name from `text-xl` to `text-base` on mobile
+- Reduce speed text from `text-3xl` to `text-xl` on mobile
+- Reduce price text from `text-2xl` to `text-lg` on mobile
+- Reduce feature list text and spacing
+- Reduce section padding
 
-**2. Behavior**
-- User types their Client Code in the input
-- On click "Pay Now", opens `https://portal.galaxynetbd.com/BillPayment/Index` in a new tab
-- Basic validation: require non-empty client code before enabling the button
+**3. Remove blue gradient from "কাস্টম সমাধান দরকার?" in Services page**
 
-**3. State additions**
-- `clientCode` string state for the input field
-
-### Technical Notes
-- No DB changes needed
-- The portal URL is opened in a new tab — the external portal handles the actual payment
-- Input validated client-side (non-empty, trimmed)
+### Changes to `src/pages/Services.tsx`
+- Replace `hero-gradient text-primary-foreground` with a simpler style like `bg-secondary/50` with regular text colors, removing the blue gradient CTA section
 
