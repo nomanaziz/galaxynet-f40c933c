@@ -47,6 +47,7 @@ import DesignationManager from "./pages/admin/DesignationManager";
 import EmployeeManager from "./pages/admin/EmployeeManager";
 import ServicesManager from "./pages/admin/ServicesManager";
 import FestivalManager from "./pages/admin/FestivalManager";
+import AboutManager from "./pages/admin/AboutManager";
 
 const queryClient = new QueryClient();
 
