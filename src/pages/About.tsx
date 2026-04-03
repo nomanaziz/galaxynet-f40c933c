@@ -68,6 +68,9 @@ const About = () => {
       .eq("visible", true)
       .order("sort_order")
       .then(({ data }) => { setTeam((data as TeamMember[]) ?? []); });
+    // Fetch partners
+    supabase.from("partners").select("*").eq("visible", true).order("sort_order")
+      .then(({ data }) => { setPartners(data ?? []); });
   }, []);
 
   return (
