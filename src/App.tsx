@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import NewConnection from "./pages/NewConnection";
 
 // Admin
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -71,6 +72,7 @@ const App = () => (
             <Route path="/get-connected" element={<GetConnected />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/new-connection" element={<NewConnection />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
