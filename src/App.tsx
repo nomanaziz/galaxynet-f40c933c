@@ -72,6 +72,7 @@ const App = () => (
             <Route path="/get-connected" element={<GetConnected />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/new-connection" element={<NewConnection />} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
