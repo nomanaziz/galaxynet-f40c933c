@@ -219,7 +219,7 @@ const Index = () => {
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold text-foreground">{t(pkg.name, pkg.name_bn || pkg.name)}</h3>
                     <div className="my-3"><span className="text-3xl font-bold text-foreground">{pkg.speed} Mbps</span></div>
-                    <div className="mb-4 p-3 rounded-lg bg-accent/8">
+                    <div className="mb-4 p-3 rounded-lg bg-accent/8 border border-accent/30">
                       <span className="text-2xl font-bold text-accent">৳{pkg.price}</span>
                       <span className="text-muted-foreground text-sm">/{t("month", "মাস")}</span>
                     </div>
