@@ -16,7 +16,7 @@ import Notices from "./pages/Notices";
 import Offers from "./pages/Offers";
 import Payment from "./pages/Payment";
 import Selfcare from "./pages/Selfcare";
-import { Navigate } from "react-router-dom";
+
 import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import Login from "./pages/Login";
