@@ -90,7 +90,7 @@ const FestivalManager = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await supabase.from("festival_themes" as any).delete().eq("id", id);
+      await (supabase as any).from("festival_themes").delete().eq("id", id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin_festivals"] });
