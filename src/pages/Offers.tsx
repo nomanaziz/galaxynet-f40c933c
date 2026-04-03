@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import breadcrumbImg from "@/assets/banner-speed.jpg";
 
 const typeConfig: Record<string, { label: string; labelBn: string; color: string }> = {
   offer: { label: "Offer", labelBn: "অফার", color: "bg-green-100 text-green-700" },
