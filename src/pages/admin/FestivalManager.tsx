@@ -73,9 +73,9 @@ const FestivalManager = () => {
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (editing) {
-        await supabase.from("festival_themes" as any).update(form as any).eq("id", editing.id);
+        await (supabase as any).from("festival_themes").update(form).eq("id", editing.id);
       } else {
-        await supabase.from("festival_themes" as any).insert(form as any);
+        await (supabase as any).from("festival_themes").insert(form);
       }
     },
     onSuccess: () => {
