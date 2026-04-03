@@ -6,9 +6,16 @@ import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import HowToSubscribe from "@/components/home/HowToSubscribe";
+import CacheMarquee from "@/components/home/CacheMarquee";
+import WhoWeAre from "@/components/home/WhoWeAre";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import heroBanner from "@/assets/hero-banner.jpg";
+import bannerFiber from "@/assets/banner-fiber.jpg";
+import bannerGaming from "@/assets/banner-gaming.jpg";
+import bannerSpeed from "@/assets/banner-speed.jpg";
 
 const iconMap: Record<string, any> = {
   zap: Zap, headphones: HeadphonesIcon, gauge: Gauge, shield: Shield, wifi: Wifi,
@@ -46,64 +53,52 @@ const Index = () => {
     { num: "BDIX", label: t("Connected", "সংযুক্ত"), icon: Server },
   ];
 
-
   return (
     <div className="min-h-screen flex flex-col">
       <TopBar />
       <Navbar />
 
-      {/* Hero */}
-      <section className="hero-gradient-soft relative overflow-hidden">
-        <div className="container mx-auto px-4 py-20 md:py-28 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-fade-up">
-              <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-3">Galaxy Net</p>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-[1.1] mb-4">
-                {t(settings.hero_title_en || "Best Fiber Internet in Your Area", settings.hero_title_bn || "আপনার এলাকায় সেরা ফাইবার ইন্টারনেট")}
-              </h1>
-              <p className="text-muted-foreground text-lg mb-8 max-w-lg">
-                {t(settings.hero_subtitle_en || "Fast, reliable and affordable high-speed internet service", settings.hero_subtitle_bn || "দ্রুত, নির্ভরযোগ্য এবং সাশ্রয়ী মূল্যে হাই-স্পিড ইন্টারনেট সেবা")}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link to={settings.hero_cta_url || "/coverage"}>
-                  <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-7">
-                    {t(settings.hero_cta_text_en || "Check Coverage", settings.hero_cta_text_bn || "কভারেজ চেক")}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link to="/contact">
-                  <Button size="lg" variant="outline" className="font-semibold px-7">
-                    {t("Contact Us", "যোগাযোগ করুন")}
-                  </Button>
-                </Link>
-              </div>
+      {/* Hero - Dark navy with background image */}
+      <section className="relative overflow-hidden">
+        <img src={heroBanner} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={800} />
+        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(215,60%,8%,0.92)] via-[hsl(215,60%,12%,0.85)] to-[hsl(195,75%,22%,0.75)]" />
+        <div className="container mx-auto px-4 py-16 md:py-28 relative z-10">
+          <div className="max-w-2xl animate-fade-up">
+            <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-3">Galaxy Net</p>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-4">
+              {t(settings.hero_title_en || "Best Fiber Internet in Your Area", settings.hero_title_bn || "আপনার এলাকায় সেরা ফাইবার ইন্টারনেট")}
+            </h1>
+            <p className="text-white/70 text-base md:text-lg mb-6 max-w-lg">
+              {t(settings.hero_subtitle_en || "Fast, reliable and affordable high-speed internet service", settings.hero_subtitle_bn || "দ্রুত, নির্ভরযোগ্য এবং সাশ্রয়ী মূল্যে হাই-স্পিড ইন্টারনেট সেবা")}
+            </p>
+            {/* Starting price badge */}
+            <div className="inline-flex items-center gap-2 bg-accent/20 border border-accent/30 rounded-full px-4 py-2 mb-6">
+              <Banknote className="h-5 w-5 text-accent" />
+              <span className="text-white text-sm font-medium">{t("Starting from", "শুরু")} <span className="text-accent font-bold text-lg">৳750</span>/{t("month", "মাস")}</span>
             </div>
-            <div className="hidden lg:flex justify-center items-center">
-              <div className="relative w-80 h-80">
-                <div className="absolute inset-0 rounded-full bg-accent/5 animate-pulse" />
-                <div className="absolute inset-6 rounded-full bg-accent/8" />
-                <div className="absolute inset-12 rounded-full bg-accent/12 flex items-center justify-center">
-                  <div className="relative">
-                    <Wifi className="h-20 w-20 text-accent" />
-                    <div className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-green-400 flex items-center justify-center">
-                      <CheckCircle className="h-4 w-4 text-white" />
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute top-4 right-8 h-3 w-3 rounded-full bg-accent/40 animate-bounce" style={{ animationDelay: "0.2s" }} />
-                <div className="absolute bottom-8 left-4 h-4 w-4 rounded-full bg-primary/20 animate-bounce" style={{ animationDelay: "0.5s" }} />
-              </div>
+            <div className="flex flex-wrap gap-3">
+              <Link to={settings.hero_cta_url || "/coverage"}>
+                <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-7 text-base">
+                  {t(settings.hero_cta_text_en || "Check Coverage", settings.hero_cta_text_bn || "কভারেজ চেক")}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link to="/packages">
+                <Button size="lg" variant="outline" className="font-semibold px-7 text-base border-white/30 text-white hover:bg-white/10">
+                  {t("View Packages", "প্যাকেজ দেখুন")}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
       {/* Trust Stats */}
-      <section className="py-10 border-b border-border">
+      <section className="py-8 md:py-10 border-b border-border bg-background">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {trustStats.map((s) => (
-              <div key={s.label} className="flex items-center gap-3 justify-center">
+              <div key={s.label} className="flex items-center gap-3 justify-center p-3 rounded-xl bg-secondary/60">
                 <div className="h-11 w-11 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
                   <s.icon className="h-5 w-5 text-accent" />
                 </div>
@@ -117,11 +112,22 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Fiber Banner Strip */}
+      <section className="relative h-24 md:h-32 overflow-hidden">
+        <img src={bannerFiber} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" width={1920} height={512} />
+        <div className="absolute inset-0 gradient-orange-strip opacity-60" />
+        <div className="relative z-10 h-full flex items-center justify-center">
+          <p className="text-white font-bold text-lg md:text-2xl tracking-wide text-center px-4">
+            {t("100% Fiber Optic Network — Ultra Fast & Reliable", "১০০% ফাইবার অপটিক নেটওয়ার্ক — আল্ট্রা ফাস্ট ও নির্ভরযোগ্য")}
+          </p>
+        </div>
+      </section>
+
       {/* Why Choose Us — from DB */}
       {features.length > 0 && (
-        <section className="py-20 bg-background">
+        <section className="py-16 md:py-20 bg-background">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-14">
+            <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
                 {t("Why Choose Galaxy Net?", "কেন গ্যালাক্সি নেট?")}
               </h2>
@@ -133,7 +139,7 @@ const Index = () => {
               {features.map((f) => {
                 const Icon = iconMap[f.icon_name] || Star;
                 return (
-                  <Card key={f.id} className="group border hover:border-accent/40 transition-all hover:shadow-md">
+                  <Card key={f.id} className="group border hover:border-accent/40 transition-all hover:shadow-lg">
                     <CardContent className="p-6">
                       <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
                         <Icon className="h-6 w-6 text-accent group-hover:text-accent-foreground transition-colors" />
@@ -150,18 +156,18 @@ const Index = () => {
       )}
 
       {/* Services Preview */}
-      <section className="py-14 bg-secondary/50">
+      <section className="py-12 md:py-14 bg-secondary/50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-primary mb-2">{t("Our Services", "আমাদের সেবাসমূহ")}</h2>
           </div>
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <div className="flex gap-4 mb-8 overflow-x-auto pb-2 md:flex-wrap md:justify-center md:overflow-visible scrollbar-none">
             {services.map((s) => {
               const Icon = iconMap[s.icon_name] || Wifi;
               return (
-                <div key={s.id} className="flex flex-col items-center p-5 rounded-xl bg-background border hover:border-accent/40 transition-all min-w-[110px] hover:shadow-sm">
+                <div key={s.id} className="flex flex-col items-center p-5 rounded-xl bg-background border hover:border-accent/40 transition-all min-w-[110px] hover:shadow-sm shrink-0">
                   <Icon className="h-7 w-7 text-accent mb-2" />
-                  <p className="font-medium text-foreground text-sm">{t(s.title, s.title_bn || s.title)}</p>
+                  <p className="font-medium text-foreground text-sm text-center">{t(s.title, s.title_bn || s.title)}</p>
                 </div>
               );
             })}
@@ -176,14 +182,31 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Gaming & Cache Banner */}
+      <section className="relative h-48 md:h-56 overflow-hidden">
+        <img src={bannerGaming} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" width={1920} height={512} />
+        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(215,60%,8%,0.85)] to-[hsl(195,75%,22%,0.6)]" />
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+            {t("Ultimate Gaming & Streaming", "চূড়ান্ত গেমিং ও স্ট্রিমিং")}
+          </h3>
+          <p className="text-white/60 text-sm md:text-base max-w-lg">
+            {t("Low latency, high speed — perfect for gamers and content lovers", "কম লেটেন্সি, হাই স্পিড — গেমার ও কন্টেন্ট প্রেমীদের জন্য পারফেক্ট")}
+          </p>
+        </div>
+      </section>
+
+      {/* Cache Server Marquee */}
+      <CacheMarquee />
+
       {/* Popular Packages — from DB */}
-      <section className="py-20 bg-background">
+      <section className="py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-14">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("Popular Packages", "জনপ্রিয় প্যাকেজ")}</h2>
             <p className="text-muted-foreground">{t("Choose the perfect plan for you", "আপনার জন্য সেরা প্ল্যান বেছে নিন")}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {packages.map((pkg) => {
               const featureList = Array.isArray(pkg.features) ? pkg.features : [];
               return (
@@ -230,6 +253,18 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Speed Banner */}
+      <section className="relative h-40 md:h-48 overflow-hidden">
+        <img src={bannerSpeed} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" width={1920} height={512} />
+        <div className="absolute inset-0 bg-gradient-to-l from-[hsl(215,60%,8%,0.8)] to-[hsl(25,100%,50%,0.3)]" />
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-1">
+            {t("Blazing Fast Speeds up to 1 Gbps", "১ Gbps পর্যন্ত অবিশ্বাস্য গতি")}
+          </h3>
+          <p className="text-white/60 text-sm">{t("Experience the difference with fiber optic technology", "ফাইবার অপটিক প্রযুক্তিতে পার্থক্য অনুভব করুন")}</p>
+        </div>
+      </section>
+
       {/* Coverage CTA */}
       <section className="py-14 bg-secondary/50">
         <div className="container mx-auto px-4 max-w-xl text-center">
@@ -238,7 +273,7 @@ const Index = () => {
           </div>
           <h2 className="text-2xl font-bold text-primary mb-2">{t("Check If We're In Your Area", "আপনার এলাকায় আমরা আছি কিনা দেখুন")}</h2>
           <div className="flex gap-3 mt-6">
-            <Input placeholder={t("Enter your area...", "এলাকার নাম...")} value={coverageCheck} onChange={(e) => setCoverageCheck(e.target.value)} />
+            <Input placeholder={t("Enter your area...", "এলাকার নাম...")} value={coverageCheck} onChange={(e) => setCoverageCheck(e.target.value)} className="text-base" />
             <Link to={`/coverage?q=${encodeURIComponent(coverageCheck)}`}>
               <Button className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shrink-0">
                 <Search className="h-4 w-4 mr-1" /> {t("Check", "চেক")}
@@ -248,11 +283,14 @@ const Index = () => {
         </div>
       </section>
 
+      {/* How to Subscribe */}
+      <HowToSubscribe />
+
       {/* Testimonials — from DB */}
       {testimonials.length > 0 && (
-        <section className="py-20 bg-background">
+        <section className="py-16 md:py-20 bg-background">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-14">
+            <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("Customer Reviews", "গ্রাহকদের মতামত")}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -284,6 +322,9 @@ const Index = () => {
         </section>
       )}
 
+      {/* Who We Are */}
+      <WhoWeAre />
+
       {/* Partners — from DB */}
       {partners.length > 0 && (
         <section className="py-14 bg-secondary/50">
@@ -295,7 +336,7 @@ const Index = () => {
               {partners.map((p) => (
                 <div key={p.id} className="flex flex-col items-center gap-2">
                   {p.logo_url ? (
-                    <img src={p.logo_url} alt={p.name} className="h-12 object-contain" />
+                    <img src={p.logo_url} alt={p.name} className="h-12 object-contain" loading="lazy" />
                   ) : (
                     <div className="h-12 w-24 bg-muted rounded flex items-center justify-center text-sm text-muted-foreground font-medium">{p.name}</div>
                   )}

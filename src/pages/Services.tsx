@@ -8,8 +8,10 @@ import { Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import breadcrumbImg from "@/assets/breadcrumb-network.jpg";
 
 const iconMap: Record<string, LucideIcon> = {
   wifi: Wifi, "building-2": Building2, server: Server, camera: Camera, network: Network,
@@ -32,14 +34,13 @@ const Services = () => {
       <TopBar />
       <Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("Our Services", "আমাদের সেবাসমূহ")}</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            {t("Complete connectivity solutions for homes and businesses.", "বাড়ি ও ব্যবসার জন্য সম্পূর্ণ সংযোগ সমাধান।")}
-          </p>
-        </div>
-      </section>
+      <PageHeroDark
+        title="Our Services"
+        titleBn="আমাদের সেবাসমূহ"
+        subtitle="Complete connectivity solutions for homes and businesses."
+        subtitleBn="বাড়ি ও ব্যবসার জন্য সম্পূর্ণ সংযোগ সমাধান।"
+        bgImage={breadcrumbImg}
+      />
 
       {/* Highlights */}
       <section className="py-8 border-b border-border">

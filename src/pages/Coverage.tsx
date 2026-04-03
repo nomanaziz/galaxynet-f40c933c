@@ -7,9 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import PageHeroDark from "@/components/PageHeroDark";
 import { Link, useSearchParams } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import breadcrumbImg from "@/assets/breadcrumb-city.jpg";
 
 interface Location {
   id: string;
@@ -110,14 +112,13 @@ const Coverage = () => {
       <TopBar />
       <Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("Coverage Area", "কভারেজ এলাকা")}</h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            {t("Check if Galaxy Net is available in your area", "আপনার এলাকায় গ্যালাক্সি নেট আছে কিনা দেখুন")}
-          </p>
-        </div>
-      </section>
+      <PageHeroDark
+        title="Coverage Area"
+        titleBn="কভারেজ এলাকা"
+        subtitle="Check if Galaxy Net is available in your area"
+        subtitleBn="আপনার এলাকায় গ্যালাক্সি নেট আছে কিনা দেখুন"
+        bgImage={breadcrumbImg}
+      />
 
       {/* Check area section */}
       <section className="py-12 bg-background">

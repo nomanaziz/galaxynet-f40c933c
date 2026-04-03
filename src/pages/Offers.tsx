@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import breadcrumbImg from "@/assets/banner-speed.jpg";
 
 const typeConfig: Record<string, { label: string; labelBn: string; color: string }> = {
   offer: { label: "Offer", labelBn: "অফার", color: "bg-green-100 text-green-700" },
@@ -32,14 +34,13 @@ const Offers = () => {
     <div className="min-h-screen flex flex-col">
       <TopBar /><Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("Offers & Promotions", "অফার ও প্রমোশন")}</h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            {t("Don't miss our latest deals and promotions!", "আমাদের সর্বশেষ ডিল ও প্রমোশন মিস করবেন না!")}
-          </p>
-        </div>
-      </section>
+      <PageHeroDark
+        title="Offers & Promotions"
+        titleBn="অফার ও প্রমোশন"
+        subtitle="Don't miss our latest deals and promotions!"
+        subtitleBn="আমাদের সর্বশেষ ডিল ও প্রমোশন মিস করবেন না!"
+        bgImage={breadcrumbImg}
+      />
 
       <section className="py-12 md:py-16 bg-background flex-1">
         <div className="container mx-auto px-4 max-w-4xl">

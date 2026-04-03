@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import breadcrumbImg from "@/assets/breadcrumb-city.jpg";
 
 const categoryConfig: Record<string, { label: string; labelBn: string; icon: typeof Bell; color: string }> = {
   maintenance: { label: "Maintenance", labelBn: "রক্ষণাবেক্ষণ", icon: Wrench, color: "bg-blue-100 text-blue-700" },
@@ -31,14 +33,13 @@ const Notices = () => {
       <TopBar />
       <Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("Notices & Updates", "নোটিশ ও আপডেট")}</h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            {t("Stay informed about maintenance, offers, and service updates.", "রক্ষণাবেক্ষণ, অফার ও সেবা আপডেট সম্পর্কে জানুন।")}
-          </p>
-        </div>
-      </section>
+      <PageHeroDark
+        title="Notices & Updates"
+        titleBn="নোটিশ ও আপডেট"
+        subtitle="Stay informed about maintenance, offers, and service updates."
+        subtitleBn="রক্ষণাবেক্ষণ, অফার ও সেবা আপডেট সম্পর্কে জানুন।"
+        bgImage={breadcrumbImg}
+      />
 
       <section className="py-12 md:py-16 bg-background flex-1">
         <div className="container mx-auto px-4 max-w-3xl">
