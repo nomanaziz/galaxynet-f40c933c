@@ -131,27 +131,27 @@ const Index = () => {
 
       {/* Why Choose Us — from DB */}
       {features.length > 0 && (
-        <section className="py-16 md:py-20 bg-background">
+        <section className="py-10 md:py-20 bg-background">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-bold text-primary mb-2">
                 {t("Why Choose Galaxy Net?", "কেন গ্যালাক্সি নেট?")}
               </h2>
-              <p className="text-muted-foreground max-w-lg mx-auto">
+              <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">
                 {t("Everything you need for a seamless internet experience", "নিরবচ্ছিন্ন ইন্টারনেট অভিজ্ঞতার জন্য যা কিছু দরকার")}
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
               {features.map((f) => {
                 const Icon = iconMap[f.icon_name] || Star;
                 return (
                   <Card key={f.id} className="group border hover:border-accent/40 transition-all hover:shadow-lg">
-                    <CardContent className="p-6">
-                      <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
-                        <Icon className="h-6 w-6 text-accent group-hover:text-accent-foreground transition-colors" />
+                    <CardContent className="p-3 md:p-6">
+                      <div className="h-9 w-9 md:h-12 md:w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3 md:mb-4 group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
+                        <Icon className="h-5 w-5 md:h-6 md:w-6 text-accent group-hover:text-accent-foreground transition-colors" />
                       </div>
-                      <h3 className="font-semibold text-foreground text-base mb-1">{t(f.title, f.title_bn || f.title)}</h3>
-                      <p className="text-muted-foreground text-sm">{t(f.description, f.description_bn || f.description)}</p>
+                      <h3 className="font-semibold text-foreground text-sm md:text-base mb-1">{t(f.title, f.title_bn || f.title)}</h3>
+                      <p className="text-muted-foreground text-xs md:text-sm">{t(f.description, f.description_bn || f.description)}</p>
                     </CardContent>
                   </Card>
                 );
@@ -206,38 +206,38 @@ const Index = () => {
       <CacheMarquee />
 
       {/* Popular Packages — from DB */}
-      <section className="py-16 md:py-20 bg-background">
+      <section className="py-10 md:py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("Popular Packages", "জনপ্রিয় প্যাকেজ")}</h2>
-            <p className="text-muted-foreground">{t("Choose the perfect plan for you", "আপনার জন্য সেরা প্ল্যান বেছে নিন")}</p>
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-4xl font-bold text-primary mb-2">{t("Popular Packages", "জনপ্রিয় প্যাকেজ")}</h2>
+            <p className="text-muted-foreground text-sm md:text-base">{t("Choose the perfect plan for you", "আপনার জন্য সেরা প্ল্যান বেছে নিন")}</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 max-w-5xl mx-auto">
             {packages.map((pkg) => {
               const featureList = Array.isArray(pkg.features) ? pkg.features : [];
               return (
                 <Card key={pkg.id} className={`relative overflow-hidden transition-all hover:shadow-lg ${pkg.popular ? "border-accent shadow-md ring-1 ring-accent/20" : "border hover:border-accent/40"}`}>
                   {pkg.popular && (
-                    <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
+                    <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-bl-lg">
                       {t("POPULAR", "জনপ্রিয়")}
                     </div>
                   )}
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-bold text-foreground">{t(pkg.name, pkg.name_bn || pkg.name)}</h3>
-                    <div className="my-3"><span className="text-3xl font-bold text-foreground">{pkg.speed} Mbps</span></div>
-                    <div className="mb-4 p-3 rounded-lg bg-accent/8 border border-accent/30">
-                      <span className="text-2xl font-bold text-accent">৳{pkg.price}</span>
-                      <span className="text-muted-foreground text-sm">/{t("month", "মাস")}</span>
+                  <CardContent className="p-3 md:p-6">
+                    <h3 className="text-base md:text-xl font-bold text-foreground">{t(pkg.name, pkg.name_bn || pkg.name)}</h3>
+                    <div className="my-2 md:my-3"><span className="text-xl md:text-3xl font-bold text-foreground">{pkg.speed} Mbps</span></div>
+                    <div className="mb-3 md:mb-4 p-2 md:p-3 rounded-lg bg-accent/8 border border-accent/30">
+                      <span className="text-lg md:text-2xl font-bold text-accent">৳{pkg.price}</span>
+                      <span className="text-muted-foreground text-xs md:text-sm">/{t("month", "মাস")}</span>
                     </div>
-                    <ul className="space-y-2 mb-6">
+                    <ul className="space-y-1 md:space-y-2 mb-4 md:mb-6">
                       {featureList.map((f: string, i: number) => (
-                        <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <CheckCircle className="h-4 w-4 text-accent shrink-0" /> {f}
+                        <li key={i} className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-muted-foreground">
+                          <CheckCircle className="h-3 w-3 md:h-4 md:w-4 text-accent shrink-0" /> {f}
                         </li>
                       ))}
                     </ul>
                     <Link to="/packages">
-                      <Button variant="outline" className="w-full font-semibold">
+                      <Button variant="outline" className="w-full font-semibold text-xs md:text-sm">
                         {t("View Details", "বিস্তারিত")}
                       </Button>
                     </Link>
