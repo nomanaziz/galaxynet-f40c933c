@@ -34,12 +34,13 @@ const Offers = () => {
     <div className="min-h-screen flex flex-col">
       <TopBar /><Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("Offers & Promotions", "অফার ও প্রমোশন")}</h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            {t("Don't miss our latest deals and promotions!", "আমাদের সর্বশেষ ডিল ও প্রমোশন মিস করবেন না!")}
-          </p>
+      <PageHeroDark
+        title="Offers & Promotions"
+        titleBn="অফার ও প্রমোশন"
+        subtitle="Don't miss our latest deals and promotions!"
+        subtitleBn="আমাদের সর্বশেষ ডিল ও প্রমোশন মিস করবেন না!"
+        bgImage={breadcrumbImg}
+      />
         </div>
       </section>
 

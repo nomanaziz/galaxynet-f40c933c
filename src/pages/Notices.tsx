@@ -33,13 +33,13 @@ const Notices = () => {
       <TopBar />
       <Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("Notices & Updates", "নোটিশ ও আপডেট")}</h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            {t("Stay informed about maintenance, offers, and service updates.", "রক্ষণাবেক্ষণ, অফার ও সেবা আপডেট সম্পর্কে জানুন।")}
-          </p>
-        </div>
+      <PageHeroDark
+        title="Notices & Updates"
+        titleBn="নোটিশ ও আপডেট"
+        subtitle="Stay informed about maintenance, offers, and service updates."
+        subtitleBn="রক্ষণাবেক্ষণ, অফার ও সেবা আপডেট সম্পর্কে জানুন।"
+        bgImage={breadcrumbImg}
+      />
       </section>
 
       <section className="py-12 md:py-16 bg-background flex-1">

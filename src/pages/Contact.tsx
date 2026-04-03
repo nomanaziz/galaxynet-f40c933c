@@ -58,14 +58,13 @@ const Contact = () => {
       <TopBar />
       <Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("Contact Us", "যোগাযোগ করুন")}</h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            {t("Have questions? We're here to help 24/7.", "প্রশ্ন আছে? আমরা ২৪/৭ সাহায্য করতে প্রস্তুত।")}
-          </p>
-        </div>
-      </section>
+      <PageHeroDark
+        title="Contact Us"
+        titleBn="যোগাযোগ করুন"
+        subtitle="Have questions? We're here to help 24/7."
+        subtitleBn="প্রশ্ন আছে? আমরা ২৪/৭ সাহায্য করতে প্রস্তুত।"
+        bgImage={breadcrumbImg}
+      />
 
       <section className="py-16 bg-background flex-1">
         <div className="container mx-auto px-4">

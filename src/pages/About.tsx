@@ -73,12 +73,13 @@ const About = () => {
       <TopBar />
       <Navbar />
 
-      <section className="page-hero">
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{t("About Galaxy Net", "গ্যালাক্সি নেট সম্পর্কে")}</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t(heroEn, heroBn)}</p>
-        </div>
-      </section>
+      <PageHeroDark
+        title="About Galaxy Net"
+        titleBn="গ্যালাক্সি নেট সম্পর্কে"
+        subtitle={heroEn}
+        subtitleBn={heroBn}
+        bgImage={breadcrumbImg}
+      />
 
       {/* Stats */}
       <section className="py-12 bg-background">
