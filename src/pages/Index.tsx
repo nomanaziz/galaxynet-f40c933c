@@ -88,6 +88,11 @@ const Index = () => {
                   {t("View Packages", "প্যাকেজ দেখুন")}
                 </Button>
               </Link>
+              <Link to="/new-connection">
+                <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-7 text-base">
+                  {t("New Connection", "নতুন সংযোগ")}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
