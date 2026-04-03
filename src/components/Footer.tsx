@@ -112,7 +112,7 @@ const Footer = () => {
               <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-accent">
                 {t("Contact", "যোগাযোগ")}
               </h4>
-              <ul className="space-y-3 text-sm text-primary-foreground/70">
+              <ul className="space-y-3 text-sm text-primary-foreground/90">
                 <li className="flex items-start gap-2.5">
                   <Phone className="h-4 w-4 mt-0.5 text-accent shrink-0" />
                   <a href={`tel:${phone}`} className="hover:text-accent transition-colors">{phone}</a>
