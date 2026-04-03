@@ -11,7 +11,7 @@ import PageHeroDark from "@/components/PageHeroDark";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import breadcrumbImg from "@/assets/banner-fiber.jpg";
+import breadcrumbImg from "@/assets/breadcrumb-packages.jpg";
 
 const badgeIcons: Record<string, typeof Server> = { BDIX: Server, FTP: Globe, Cache: MonitorPlay, Dedicated: Zap };
 
