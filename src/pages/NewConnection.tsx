@@ -42,13 +42,17 @@ const NewConnection = () => {
     }
 
     setSubmitting(true);
+    const notesData: any = { source: "landing_page" };
+    if (activeCategory === "dedicated") {
+      notesData.dedicated_mbps = dedicatedMbps;
+    }
     const { error } = await supabase.from("connection_orders").insert({
       name: name.trim(),
       phone: phone.trim(),
       address: address.trim() || "N/A",
       area,
-      package_id: packageId || null,
-      notes: JSON.stringify({ source: "landing_page" }),
+      package_id: activeCategory !== "dedicated" ? (packageId || null) : null,
+      notes: JSON.stringify(notesData),
     });
 
     setSubmitting(false);
