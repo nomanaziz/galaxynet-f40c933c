@@ -149,16 +149,47 @@ const NewConnection = () => {
 
             <div className="space-y-1.5">
               <Label className="text-sm font-semibold">প্যাকেজ নির্বাচন করুন</Label>
-              <Select value={packageId} onValueChange={setPackageId}>
-                <SelectTrigger><SelectValue placeholder="প্যাকেজ বাছাই করুন (ঐচ্ছিক)" /></SelectTrigger>
-                <SelectContent>
-                  {packages.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name} — {p.speed >= 1000 ? `${p.speed / 1000} Gbps` : `${p.speed} Mbps`} — ৳{p.price}/মাস
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Tabs value={activeCategory} onValueChange={(v) => { setActiveCategory(v); setPackageId(""); }}>
+                <TabsList className="w-full">
+                  <TabsTrigger value="home" className="flex-1">হোম</TabsTrigger>
+                  <TabsTrigger value="corporate" className="flex-1">কর্পোরেট</TabsTrigger>
+                  <TabsTrigger value="dedicated" className="flex-1">ডেডিকেটেড</TabsTrigger>
+                </TabsList>
+                <TabsContent value="home">
+                  <Select value={packageId} onValueChange={setPackageId}>
+                    <SelectTrigger><SelectValue placeholder="প্যাকেজ বাছাই করুন" /></SelectTrigger>
+                    <SelectContent>
+                      {packages.filter(p => p.category === "home").map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.speed >= 1000 ? `${p.speed / 1000}Gbps` : `${p.speed}Mbps`} @ ৳{p.price}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TabsContent>
+                <TabsContent value="corporate">
+                  <Select value={packageId} onValueChange={setPackageId}>
+                    <SelectTrigger><SelectValue placeholder="প্যাকেজ বাছাই করুন" /></SelectTrigger>
+                    <SelectContent>
+                      {packages.filter(p => p.category === "corporate").map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.speed >= 1000 ? `${p.speed / 1000}Gbps` : `${p.speed}Mbps`} @ ৳{p.price}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TabsContent>
+                <TabsContent value="dedicated">
+                  <Input
+                    type="number"
+                    placeholder="আপনার প্রয়োজনীয় Mbps লিখুন (যেমন: 100)"
+                    value={dedicatedMbps}
+                    onChange={(e) => setDedicatedMbps(e.target.value)}
+                    min={1}
+                    required
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
 
             <Button type="submit" disabled={submitting} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-base py-6">
