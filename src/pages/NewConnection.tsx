@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, Wifi, Zap, Shield, BadgeCheck } from "lucide-react";
+import { CheckCircle, Wifi, Zap, Shield, BadgeCheck, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
 
@@ -76,11 +77,13 @@ const NewConnection = () => {
     <div className="min-h-screen bg-gradient-to-br from-[hsl(215,60%,8%)] via-[hsl(215,60%,12%)] to-[hsl(195,75%,22%)]">
       {/* Minimal Header */}
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <img src={logo} alt="Galaxy Net" className="h-10 brightness-0 invert" />
-        <div className="flex items-center gap-2 text-white/70 text-sm">
-          <Wifi className="h-4 w-4 text-accent" />
-          <span>Galaxy Net</span>
-        </div>
+        <Link to="/">
+          <img src={logo} alt="Galaxy Net" className="h-10 brightness-0 invert" />
+        </Link>
+        <Link to="/" className="flex items-center gap-2 text-white/70 text-sm hover:text-white transition-colors">
+          <Home className="h-4 w-4 text-accent" />
+          <span>হোমপেজ</span>
+        </Link>
       </div>
 
       <div className="container mx-auto px-4 py-6 md:py-12">
