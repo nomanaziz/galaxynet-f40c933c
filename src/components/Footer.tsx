@@ -60,7 +60,7 @@ const Footer = () => {
               <div className="flex items-center gap-2.5 mb-4">
                 <img src={logo} alt={siteName} className="h-10 w-auto brightness-0 invert" />
               </div>
-              <p className="text-primary-foreground/70 text-sm leading-relaxed mb-4">
+              <p className="text-primary-foreground/90 text-sm leading-relaxed mb-4">
                 {tagline}
               </p>
               <div className="flex gap-2">
