@@ -18,6 +18,7 @@ const settingsKeys = [
   { key: "facebook", label: "Facebook URL" },
   { key: "hotline", label: "Hotline Number" },
   { key: "maintenance_mode", label: "Maintenance Mode (true/false)" },
+  { key: "whatsapp_number", label: "WhatsApp Number (e.g. 8801646078000)" },
 ];
 
 const topbarKeys = [
