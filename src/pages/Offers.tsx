@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import breadcrumbImg from "@/assets/banner-speed.jpg";
+import breadcrumbImg from "@/assets/breadcrumb-offers.jpg";
 
 const typeConfig: Record<string, { label: string; labelBn: string; color: string }> = {
   offer: { label: "Offer", labelBn: "অফার", color: "bg-green-100 text-green-700" },

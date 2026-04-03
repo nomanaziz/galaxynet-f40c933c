@@ -11,7 +11,7 @@ import PageHeroDark from "@/components/PageHeroDark";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import breadcrumbImg from "@/assets/banner-fiber.jpg";
+import breadcrumbImg from "@/assets/breadcrumb-packages.jpg";
 
 const badgeIcons: Record<string, typeof Server> = { BDIX: Server, FTP: Globe, Cache: MonitorPlay, Dedicated: Zap };
 
@@ -32,7 +32,7 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
             <span className="text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
           </div>
         )}
-        <div className="mb-3 p-3 rounded-lg bg-accent/8">
+        <div className="mb-3 p-3 rounded-lg bg-accent/8 border border-accent/30">
           {plan.category === "dedicated" ? (
             <span className="text-2xl font-bold text-accent">{t("Call for Price", "মূল্যের জন্য কল করুন")}</span>
           ) : (
@@ -60,7 +60,7 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
             </li>
           ))}
         </ul>
-        <Link to="/contact">
+        <Link to="/new-connection">
           <Button variant={plan.popular ? "default" : "outline"} className={`w-full font-semibold ${plan.popular ? "bg-accent hover:bg-accent/90 text-accent-foreground" : ""}`}>
             {t("Contact Us", "যোগাযোগ করুন")}
           </Button>
@@ -127,7 +127,7 @@ const Packages = () => {
           <div className="mt-12 p-6 rounded-xl bg-secondary border text-center">
             <p className="text-foreground font-semibold">{t("Need a custom plan?", "কাস্টম প্ল্যান দরকার?")}</p>
             <p className="text-muted-foreground text-sm mt-1">{t("Contact us for tailored solutions.", "কাস্টম সমাধানের জন্য যোগাযোগ করুন।")}</p>
-            <Link to="/contact" className="inline-block mt-4">
+            <Link to="/new-connection" className="inline-block mt-4">
               <Button className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold">
                 {t("Contact Us", "যোগাযোগ করুন")}
               </Button>

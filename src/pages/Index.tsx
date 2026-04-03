@@ -88,6 +88,11 @@ const Index = () => {
                   {t("View Packages", "প্যাকেজ দেখুন")}
                 </Button>
               </Link>
+              <Link to="/new-connection">
+                <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-7 text-base">
+                  {t("New Connection", "নতুন সংযোগ")}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -219,7 +224,7 @@ const Index = () => {
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold text-foreground">{t(pkg.name, pkg.name_bn || pkg.name)}</h3>
                     <div className="my-3"><span className="text-3xl font-bold text-foreground">{pkg.speed} Mbps</span></div>
-                    <div className="mb-4 p-3 rounded-lg bg-accent/8">
+                    <div className="mb-4 p-3 rounded-lg bg-accent/8 border border-accent/30">
                       <span className="text-2xl font-bold text-accent">৳{pkg.price}</span>
                       <span className="text-muted-foreground text-sm">/{t("month", "মাস")}</span>
                     </div>
@@ -358,9 +363,9 @@ const Index = () => {
                 {t("Check Coverage", "কভারেজ চেক")} <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link to="/contact">
+            <Link to="/new-connection">
               <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-8">
-                {t("Contact Us", "যোগাযোগ করুন")}
+                {t("New Connection", "নতুন সংযোগ")}
               </Button>
             </Link>
           </div>

@@ -52,24 +52,6 @@ const Footer = () => {
 
   return (
     <>
-      {/* Gradient Service Strip */}
-      <section className="gradient-orange-strip py-8 md:py-10">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-4 md:gap-6">
-            {footerServices.map((svc) => (
-              <div key={svc.label} className="flex flex-col items-center gap-2">
-                <div className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                  <svc.icon className="h-6 w-6 md:h-7 md:w-7 text-white" />
-                </div>
-                <span className="text-white text-xs md:text-sm font-semibold text-center leading-tight">
-                  {t(svc.label, svc.label_bn)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <footer className="bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
