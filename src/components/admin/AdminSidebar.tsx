@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Package, MapPin, ShoppingCart, FileText,
   Bell, Settings, Users, LogOut, Menu, CreditCard, Home, Image, ExternalLink,
-  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog, Globe
+  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog, Globe, Info
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import logo from "@/assets/logo.png";
@@ -31,6 +31,7 @@ const mainItems = [
   { title: "Media", url: "/admin/media", icon: Image },
   { title: "Services", url: "/admin/services", icon: Globe },
   { title: "Festivals", url: "/admin/festivals", icon: Sparkles },
+  { title: "About Page", url: "/admin/about", icon: Info },
 ];
 
 const aboutItems = [

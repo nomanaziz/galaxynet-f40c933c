@@ -47,6 +47,7 @@ import DesignationManager from "./pages/admin/DesignationManager";
 import EmployeeManager from "./pages/admin/EmployeeManager";
 import ServicesManager from "./pages/admin/ServicesManager";
 import FestivalManager from "./pages/admin/FestivalManager";
+import AboutManager from "./pages/admin/AboutManager";
 
 const queryClient = new QueryClient();
 
@@ -99,6 +100,7 @@ const App = () => (
               <Route path="employees" element={<EmployeeManager />} />
               <Route path="services" element={<ServicesManager />} />
               <Route path="festivals" element={<FestivalManager />} />
+              <Route path="about" element={<AboutManager />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
