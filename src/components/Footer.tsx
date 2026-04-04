@@ -106,6 +106,13 @@ const Footer = () => {
                     </Link>
                   </li>
                 ))}
+                {btrcUrl && (
+                  <li>
+                    <a href={btrcUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary-foreground/90 hover:text-accent transition-colors">
+                      {t("BTRC Approved Tariff", "বিটিআরসি অনুমোদিত ট্যারিফ")}
+                    </a>
+                  </li>
+                )}
               </ul>
             </div>
 

@@ -40,8 +40,6 @@ const TopBar = () => {
               <FileText className="h-3 w-3" /> {t("BTRC Tariff", "বিটিআরসি ট্যারিফ")}
             </a>
           )}
-            </a>
-          )}
           <div className="hidden sm:flex items-center gap-1.5">
             {[Facebook, Youtube, MessageCircle].map((Icon, i) => (
               <a key={i} href="#" className="text-primary-foreground/80 hover:text-accent transition-colors">
