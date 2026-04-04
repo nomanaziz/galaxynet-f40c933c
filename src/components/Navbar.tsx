@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ChevronDown, Globe, User, LogIn, LogOut, ExternalLink, Shield, UserPlus } from "lucide-react";
+import { Menu, ChevronDown, Globe, User, LogIn, LogOut, ExternalLink, Shield, UserPlus } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
