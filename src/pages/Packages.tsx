@@ -97,7 +97,7 @@ const Packages = () => {
         bgImage={breadcrumbImg}
       />
 
-      <section className="py-16 bg-background flex-1">
+      <section className="py-8 sm:py-16 bg-background flex-1">
         <div className="container mx-auto px-4">
           {loading ? (
             <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
