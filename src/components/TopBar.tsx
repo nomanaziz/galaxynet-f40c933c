@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Phone, Facebook, Youtube, MessageCircle } from "lucide-react";
+import { Phone, Facebook, Youtube, MessageCircle, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 
