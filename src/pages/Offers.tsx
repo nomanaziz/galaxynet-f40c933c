@@ -9,6 +9,17 @@ import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import breadcrumbImg from "@/assets/breadcrumb-offers.jpg";
+import offerReferFriend from "@/assets/offer-refer-friend.jpg";
+import offer500Discount from "@/assets/offer-500-discount.jpg";
+import offerFreeConnection from "@/assets/offer-free-connection.jpg";
+import offer1000Discount from "@/assets/offer-1000-discount.jpg";
+
+const FALLBACK_IMAGES: Record<string, string> = {
+  "Make a Referral and Earn BDT 500!": offerReferFriend,
+  "500 BDT Discount on Connection Charge": offer500Discount,
+  "Free Connection Charge on 4 Months Advance Payment": offerFreeConnection,
+  "1000 BDT Discount on Connection Charge": offer1000Discount,
+};
 
 const typeConfig: Record<string, { label: string; labelBn: string; color: string }> = {
   offer: { label: "Offer", labelBn: "অফার", color: "bg-green-100 text-green-700" },
@@ -58,9 +69,10 @@ const Offers = () => {
                 const expired = offer.expiry_date && new Date(offer.expiry_date) < new Date();
                 return (
                   <Card key={offer.id} className="border hover:border-accent/40 transition-all">
-                    {offer.image_url && (
-                      <img src={offer.image_url} alt={offer.title} className="w-full h-48 object-cover rounded-t-lg" />
+                    {(offer.image_url || FALLBACK_IMAGES[offer.title]) && (
+                      <img src={offer.image_url || FALLBACK_IMAGES[offer.title]} alt={offer.title} className="w-full h-48 object-cover rounded-t-lg" loading="lazy" />
                     )}
+
                     <CardContent className="p-6">
                       <div className="flex items-center gap-2 mb-3">
                         <Badge className={`${cfg.color} border-0`}>
