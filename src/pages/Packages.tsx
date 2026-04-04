@@ -21,24 +21,24 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
   return (
     <Card className={`relative overflow-hidden transition-all hover:shadow-lg ${plan.popular ? "border-accent shadow-md ring-1 ring-accent/20" : "border hover:border-accent/40"}`}>
       {plan.popular && (
-        <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
+        <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-2 sm:px-3 py-1 rounded-bl-lg">
           {t("POPULAR", "জনপ্রিয়")}
         </div>
       )}
-      <CardContent className="p-6">
-        <h3 className="text-xl font-bold text-foreground">{t(plan.name, plan.name_bn || plan.name)}</h3>
+      <CardContent className="p-3 sm:p-6">
+        <h3 className="text-base sm:text-xl font-bold text-foreground">{t(plan.name, plan.name_bn || plan.name)}</h3>
         {plan.category !== "dedicated" && (
-          <div className="flex items-end gap-1 my-3">
-            <span className="text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
+          <div className="flex items-end gap-1 my-2 sm:my-3">
+            <span className="text-xl sm:text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
           </div>
         )}
-        <div className="mb-3 p-3 rounded-lg bg-accent/8 border border-accent/30">
+        <div className="mb-2 sm:mb-3 p-2 sm:p-3 rounded-lg bg-accent/8 border border-accent/30">
           {plan.category === "dedicated" ? (
-            <span className="text-2xl font-bold text-accent">{t("Call for Price", "মূল্যের জন্য কল করুন")}</span>
+            <span className="text-lg sm:text-2xl font-bold text-accent">{t("Call for Price", "মূল্যের জন্য কল করুন")}</span>
           ) : (
             <>
-              <span className="text-2xl font-bold text-accent">৳{plan.price}</span>
-              <span className="text-muted-foreground text-sm">/{t("month", "মাস")}</span>
+              <span className="text-lg sm:text-2xl font-bold text-accent">৳{plan.price}</span>
+              <span className="text-muted-foreground text-xs sm:text-sm">/{t("month", "মাস")}</span>
             </>
           )}
         </div>
@@ -52,9 +52,9 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
             );
           })}
         </div>
-        <ul className="space-y-2 mb-6">
+        <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6">
           {featureList.map((f: string, i: number) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+            <li key={i} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
               <CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" />
               <span>{f}</span>
             </li>
@@ -97,14 +97,14 @@ const Packages = () => {
         bgImage={breadcrumbImg}
       />
 
-      <section className="py-16 bg-background flex-1">
+      <section className="py-8 sm:py-16 bg-background flex-1">
         <div className="container mx-auto px-4">
           {loading ? (
             <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
           ) : (
             <Tabs defaultValue="home" className="w-full">
-              <div className="flex justify-center mb-6">
-                <TabsList className="h-11 p-1">
+              <div className="flex justify-center mb-4 sm:mb-6">
+                <TabsList className="h-auto sm:h-11 p-1 flex-wrap">
                   <TabsTrigger value="home" className="px-5 text-sm font-medium">{t("Home Plans", "হোম প্ল্যান")}</TabsTrigger>
                   <TabsTrigger value="corporate" className="px-5 text-sm font-medium">{t("Corporate Plans", "কর্পোরেট প্ল্যান")}</TabsTrigger>
                   <TabsTrigger value="dedicated" className="px-5 text-sm font-medium">{t("Dedicated", "ডেডিকেটেড")}</TabsTrigger>
@@ -113,7 +113,7 @@ const Packages = () => {
 
               {["home", "corporate", "dedicated"].map(cat => (
                 <TabsContent key={cat} value={cat}>
-                  <div className={`grid grid-cols-1 ${cat === "dedicated" ? "sm:grid-cols-1 lg:grid-cols-1 max-w-lg mx-auto" : "sm:grid-cols-2 lg:grid-cols-4"} gap-5`}>
+                  <div className={`grid ${cat === "dedicated" ? "grid-cols-1 max-w-lg mx-auto" : "grid-cols-2 lg:grid-cols-4"} gap-3 sm:gap-5`}>
                     {filterPlans(cat).map(plan => <PlanCard key={plan.id} plan={plan} t={t} />)}
                   </div>
                   {filterPlans(cat).length === 0 && (

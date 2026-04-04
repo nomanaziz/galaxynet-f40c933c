@@ -54,9 +54,9 @@ const Footer = () => {
     <>
       <footer className="bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10">
             {/* Brand */}
-            <div>
+            <div className="col-span-2 lg:col-span-1">
               <div className="flex items-center gap-2.5 mb-4">
                 <img src={logo} alt={siteName} className="h-10 w-auto brightness-0 invert" />
               </div>
@@ -108,7 +108,7 @@ const Footer = () => {
             </div>
 
             {/* Contact */}
-            <div>
+            <div className="col-span-2 lg:col-span-1">
               <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-accent">
                 {t("Contact", "যোগাযোগ")}
               </h4>

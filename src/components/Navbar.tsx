@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ChevronDown, Globe, User, LogIn, LogOut, ExternalLink, Shield, UserPlus } from "lucide-react";
+import { Menu, ChevronDown, Globe, User, LogIn, LogOut, ExternalLink, Shield, UserPlus } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
@@ -104,7 +104,11 @@ const Navbar = () => {
 
         {/* Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-1">
-          {menuItems.map((item) => (
+          {menuItems.length === 0 ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-5 w-16 rounded bg-muted animate-pulse" />
+            ))
+          ) : menuItems.map((item) => (
             <Link
               key={item.id}
               to={item.url}
@@ -195,15 +199,8 @@ const Navbar = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72 p-0 bg-background">
-              <div className="flex items-center justify-between p-4 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <img src={logo} alt="Galaxy Net" className="h-8 w-auto" />
-                </div>
-                <SheetClose asChild>
-                  <Button variant="ghost" size="icon">
-                    <X className="h-5 w-5" />
-                  </Button>
-                </SheetClose>
+              <div className="flex items-center p-4 border-b border-border">
+                <img src={logo} alt="Galaxy Net" className="h-8 w-auto" />
               </div>
               <nav className="flex flex-col p-4 gap-1">
                 {menuItems.map((item) => (
