@@ -17,6 +17,7 @@ const TopBar = () => {
 
   const notice = t(settings.topbar_notice_en || "", settings.topbar_notice_bn || "");
   const hotline = settings.hotline || "";
+  const btrcUrl = settings.btrc_tariff_url || "";
 
   return (
     <div className="bg-primary text-primary-foreground text-xs py-1.5 border-b border-primary-foreground/10">
