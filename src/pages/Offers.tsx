@@ -71,7 +71,8 @@ const Offers = () => {
                   <Card key={offer.id} className="border hover:border-accent/40 transition-all">
                     {(offer.image_url || FALLBACK_IMAGES[offer.title]) && (
                       <img src={offer.image_url || FALLBACK_IMAGES[offer.title]} alt={offer.title} className="w-full h-48 object-cover rounded-t-lg" loading="lazy" />
-                    )
+                    )}
+
                     <CardContent className="p-6">
                       <div className="flex items-center gap-2 mb-3">
                         <Badge className={`${cfg.color} border-0`}>
