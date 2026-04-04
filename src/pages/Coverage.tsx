@@ -12,27 +12,25 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import breadcrumbImg from "@/assets/breadcrumb-city.jpg";
-
-interface Location {
-  id: string;
-  name: string;
-  name_bn: string | null;
-  type: "division" | "district" | "thana" | "zone";
-  parent_id: string | null;
-  enabled: boolean;
-}
+import {
+  CoverageLocation,
+  CoverageArea,
+  buildLocationMap,
+  buildDisabledLocationIds,
+  getLocationBreadcrumb,
+  getDescendantIds,
+} from "@/lib/coverageHierarchy";
 
 const Coverage = () => {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const [checkResult, setCheckResult] = useState<null | boolean>(null);
   const [checkInput, setCheckInput] = useState(searchParams.get("q") || "");
-  const [areas, setAreas] = useState<any[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
+  const [areas, setAreas] = useState<CoverageArea[]>([]);
+  const [locations, setLocations] = useState<CoverageLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
 
-  // Cascading filter state
   const [filterDivision, setFilterDivision] = useState("");
   const [filterDistrict, setFilterDistrict] = useState("");
   const [filterThana, setFilterThana] = useState("");
@@ -43,35 +41,14 @@ const Coverage = () => {
       supabase.from("coverage_areas").select("*").order("name"),
       supabase.from("coverage_locations").select("*").order("sort_order"),
     ]).then(([areasRes, locsRes]) => {
-      setAreas(areasRes.data ?? []);
-      setLocations((locsRes.data ?? []) as Location[]);
+      setAreas((areasRes.data ?? []) as CoverageArea[]);
+      setLocations((locsRes.data ?? []) as CoverageLocation[]);
       setLoading(false);
     });
   }, []);
 
-  const locationMap = useMemo(() => {
-    const m = new Map<string, Location>();
-    locations.forEach(l => m.set(l.id, l));
-    return m;
-  }, [locations]);
-
-  // Build set of disabled location IDs (including cascading from parents)
-  const disabledLocationIds = useMemo(() => {
-    const disabled = new Set<string>();
-    const isAncestorDisabled = (locId: string): boolean => {
-      const loc = locationMap.get(locId);
-      if (!loc) return false;
-      if (!loc.enabled) return true;
-      if (loc.parent_id) return isAncestorDisabled(loc.parent_id);
-      return false;
-    };
-    locations.forEach(l => {
-      if (!l.enabled || isAncestorDisabled(l.id)) disabled.add(l.id);
-    });
-    return disabled;
-  }, [locations, locationMap]);
-
-  // Only show enabled locations in filters
+  const locationMap = useMemo(() => buildLocationMap(locations), [locations]);
+  const disabledLocationIds = useMemo(() => buildDisabledLocationIds(locations, locationMap), [locations, locationMap]);
   const enabledLocations = useMemo(() => locations.filter(l => !disabledLocationIds.has(l.id)), [locations, disabledLocationIds]);
 
   const divisions = useMemo(() => enabledLocations.filter(l => l.type === "division"), [enabledLocations]);
@@ -88,32 +65,10 @@ const Coverage = () => {
     return enabledLocations.filter(l => l.type === "zone" && l.parent_id === filterThana);
   }, [enabledLocations, filterThana]);
 
-  const getBreadcrumb = (locationId: string | null): string => {
-    if (!locationId) return "";
-    const parts: string[] = [];
-    let current = locationMap.get(locationId);
-    while (current) {
-      parts.unshift(t(current.name, current.name_bn || current.name));
-      current = current.parent_id ? locationMap.get(current.parent_id) : undefined;
-    }
-    return parts.join(" > ");
-  };
-
-  // Helper to get all descendant zone/thana IDs under a location
-  const getDescendantIds = (parentId: string, targetType?: string): string[] => {
-    const children = enabledLocations.filter(l => l.parent_id === parentId);
-    let ids: string[] = [];
-    for (const child of children) {
-      if (!targetType || child.type === targetType) ids.push(child.id);
-      ids = ids.concat(getDescendantIds(child.id, targetType));
-    }
-    return ids;
-  };
-
   const filtered = useMemo(() => {
     return areas.filter((area) => {
-      // Filter out areas whose location is disabled
       if (area.location_id && disabledLocationIds.has(area.location_id)) return false;
+      if (!area.available) return false;
 
       const matchesSearch = search === "" || area.name.toLowerCase().includes(search.toLowerCase()) || (area.name_bn || "").includes(search);
 
@@ -122,14 +77,14 @@ const Coverage = () => {
         matchesLocation = area.location_id === filterZone;
       } else if (filterThana) {
         const zoneIds = enabledLocations.filter(l => l.type === "zone" && l.parent_id === filterThana).map(l => l.id);
-        matchesLocation = area.location_id === filterThana || zoneIds.includes(area.location_id);
+        matchesLocation = area.location_id === filterThana || zoneIds.includes(area.location_id ?? "");
       } else if (filterDistrict) {
         const thanaIds = enabledLocations.filter(l => l.type === "thana" && l.parent_id === filterDistrict).map(l => l.id);
         const zoneIds = enabledLocations.filter(l => l.type === "zone" && thanaIds.includes(l.parent_id!)).map(l => l.id);
-        matchesLocation = thanaIds.includes(area.location_id) || zoneIds.includes(area.location_id);
+        matchesLocation = thanaIds.includes(area.location_id ?? "") || zoneIds.includes(area.location_id ?? "");
       } else if (filterDivision) {
-        const allIds = getDescendantIds(filterDivision);
-        matchesLocation = allIds.includes(area.location_id);
+        const allIds = getDescendantIds(filterDivision, enabledLocations);
+        matchesLocation = allIds.includes(area.location_id ?? "");
       }
 
       return matchesSearch && matchesLocation;
@@ -139,7 +94,7 @@ const Coverage = () => {
   const handleCheck = () => {
     if (!checkInput.trim()) return;
     const found = areas.some(
-      (area) => area.available && !disabledLocationIds.has(area.location_id) &&
+      (area) => area.available && !(area.location_id && disabledLocationIds.has(area.location_id)) &&
         (area.name.toLowerCase().includes(checkInput.toLowerCase()) || (area.name_bn || "").includes(checkInput))
     );
     setCheckResult(found);
@@ -271,16 +226,15 @@ const Coverage = () => {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {filtered.map((area) => (
-                  <div key={area.id} className={`flex flex-col items-center text-center p-4 rounded-xl bg-background border hover:border-accent/40 hover:shadow-sm transition-all ${!area.available ? "opacity-50" : ""}`}>
+                  <div key={area.id} className="flex flex-col items-center text-center p-4 rounded-xl bg-background border hover:border-accent/40 hover:shadow-sm transition-all">
                     <MapPin className="h-5 w-5 text-accent mb-2" />
                     <p className="font-medium text-foreground text-sm">{t(area.name, area.name_bn || area.name)}</p>
                     {area.location_id && (
-                      <p className="text-xs text-muted-foreground mt-1">{getBreadcrumb(area.location_id)}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{getLocationBreadcrumb(area.location_id, locationMap, t)}</p>
                     )}
                     {!area.location_id && (area.zone || area.district) && (
                       <Badge variant="secondary" className="mt-2 text-xs">{area.zone || area.district}</Badge>
                     )}
-                    {!area.available && <span className="text-xs text-destructive mt-1">{t("Coming Soon", "শীঘ্রই আসছে")}</span>}
                   </div>
                 ))}
               </div>
