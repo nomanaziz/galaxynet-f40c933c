@@ -42,6 +42,8 @@ const Footer = () => {
     { href: "/contact", label: t("Contact", "যোগাযোগ") },
   ];
 
+  const btrcUrl = settings.btrc_tariff_url || "";
+
   const resourceLinks = [
     { href: "/order", label: t("New Connection", "নতুন সংযোগ") },
     { href: "/speed-test", label: t("Speed Test", "স্পিড টেস্ট") },
