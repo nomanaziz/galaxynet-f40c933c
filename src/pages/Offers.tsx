@@ -69,8 +69,9 @@ const Offers = () => {
                 const expired = offer.expiry_date && new Date(offer.expiry_date) < new Date();
                 return (
                   <Card key={offer.id} className="border hover:border-accent/40 transition-all">
-                    {offer.image_url && (
-                      <img src={offer.image_url} alt={offer.title} className="w-full h-48 object-cover rounded-t-lg" />
+                    {(offer.image_url || FALLBACK_IMAGES[offer.title]) && (
+                      <img src={offer.image_url || FALLBACK_IMAGES[offer.title]} alt={offer.title} className="w-full h-48 object-cover rounded-t-lg" loading="lazy" />
+                    )}
                     )}
                     <CardContent className="p-6">
                       <div className="flex items-center gap-2 mb-3">
