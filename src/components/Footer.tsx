@@ -108,7 +108,7 @@ const Footer = () => {
             </div>
 
             {/* Contact */}
-            <div>
+            <div className="col-span-2 lg:col-span-1">
               <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-accent">
                 {t("Contact", "যোগাযোগ")}
               </h4>

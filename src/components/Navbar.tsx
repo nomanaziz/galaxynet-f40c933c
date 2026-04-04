@@ -199,15 +199,8 @@ const Navbar = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72 p-0 bg-background">
-              <div className="flex items-center justify-between p-4 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <img src={logo} alt="Galaxy Net" className="h-8 w-auto" />
-                </div>
-                <SheetClose asChild>
-                  <Button variant="ghost" size="icon">
-                    <X className="h-5 w-5" />
-                  </Button>
-                </SheetClose>
+              <div className="flex items-center p-4 border-b border-border">
+                <img src={logo} alt="Galaxy Net" className="h-8 w-auto" />
               </div>
               <nav className="flex flex-col p-4 gap-1">
                 {menuItems.map((item) => (
