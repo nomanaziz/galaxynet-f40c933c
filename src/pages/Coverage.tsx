@@ -19,7 +19,46 @@ import {
   buildDisabledLocationIds,
   getLocationBreadcrumb,
   getDescendantIds,
+  getAncestorOfType,
+  buildAreaSortKey,
 } from "@/lib/coverageHierarchy";
+
+// Division accent border colors (HSL-based semantic approach)
+const DIVISION_COLORS: Record<string, string> = {
+  "Dhaka": "border-l-blue-500",
+  "Chattogram": "border-l-emerald-500",
+  "Rajshahi": "border-l-orange-500",
+  "Khulna": "border-l-teal-500",
+  "Barisal": "border-l-cyan-500",
+  "Sylhet": "border-l-green-500",
+  "Rangpur": "border-l-purple-500",
+  "Mymensingh": "border-l-rose-500",
+};
+
+// District-level decorative emoji icons
+const DISTRICT_ICONS: Record<string, string> = {
+  "Dhaka": "🕌", "Gazipur": "🏭", "Narayanganj": "🧵", "Tangail": "🧶",
+  "Manikganj": "🌾", "Munshiganj": "⛵", "Narsingdi": "🪡", "Madaripur": "🚣",
+  "Shariatpur": "🌊", "Faridpur": "🏛️", "Gopalganj": "🏠", "Rajbari": "🌿",
+  "Kishoreganj": "🐟", "Chattogram": "⛰️", "Cox's Bazar": "🏖️",
+  "Comilla": "🍚", "Noakhali": "🌶️", "Feni": "🌳", "Lakshmipur": "🐄",
+  "Chandpur": "🚢", "Brahmanbaria": "📚", "Rangamati": "🏔️",
+  "Bandarban": "🗻", "Khagrachhari": "🌄", "Rajshahi": "🥭",
+  "Chapainawabganj": "🍇", "Naogaon": "🏛️", "Natore": "🌸",
+  "Nawabganj": "🥭", "Pabna": "🧈", "Sirajganj": "🧣",
+  "Bogra": "🍶", "Joypurhat": "🌻", "Khulna": "🐅",
+  "Satkhira": "🦐", "Jessore": "🌺", "Bagerhat": "🕌",
+  "Narail": "🥥", "Magura": "🌾", "Kushtia": "📖",
+  "Meherpur": "🏡", "Chuadanga": "🌽", "Jhenaidah": "🍈",
+  "Barisal": "🚤", "Patuakhali": "🐠", "Bhola": "🏝️",
+  "Pirojpur": "🥥", "Barguna": "🦀", "Jhalokathi": "🌴",
+  "Sylhet": "🍵", "Moulvibazar": "🍃", "Habiganj": "🌱",
+  "Sunamganj": "🐦", "Rangpur": "🌾", "Dinajpur": "🍚",
+  "Nilphamari": "🌿", "Kurigram": "🌊", "Lalmonirhat": "🚂",
+  "Gaibandha": "🐃", "Thakurgaon": "🧱", "Panchagarh": "🏔️",
+  "Mymensingh": "🌉", "Jamalpur": "🌾", "Sherpur": "🦌",
+  "Netrokona": "🎣",
+};
 
 const Coverage = () => {
   const [searchParams] = useSearchParams();
@@ -91,6 +130,35 @@ const Coverage = () => {
     });
   }, [areas, search, filterDivision, filterDistrict, filterThana, filterZone, enabledLocations, disabledLocationIds]);
 
+  // Sort filtered areas by Division > District > Thana > Zone > Name
+  const sortedFiltered = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      const keyA = buildAreaSortKey(a, locationMap);
+      const keyB = buildAreaSortKey(b, locationMap);
+      for (let i = 0; i < 4; i++) {
+        if ((keyA[i] as number) !== (keyB[i] as number)) return (keyA[i] as number) - (keyB[i] as number);
+      }
+      return (keyA[4] as string).localeCompare(keyB[4] as string);
+    });
+  }, [filtered, locationMap]);
+
+  // Group sorted areas by division for headers
+  const groupedByDivision = useMemo(() => {
+    const groups: { division: CoverageLocation | null; areas: CoverageArea[] }[] = [];
+    let currentDivId: string | null = null;
+    for (const area of sortedFiltered) {
+      const div = getAncestorOfType(area.location_id, "division", locationMap);
+      const divId = div?.id ?? null;
+      if (divId !== currentDivId) {
+        groups.push({ division: div, areas: [area] });
+        currentDivId = divId;
+      } else {
+        groups[groups.length - 1].areas.push(area);
+      }
+    }
+    return groups;
+  }, [sortedFiltered, locationMap]);
+
   const handleCheck = () => {
     if (!checkInput.trim()) return;
     const found = areas.some(
@@ -98,6 +166,24 @@ const Coverage = () => {
         (area.name.toLowerCase().includes(checkInput.toLowerCase()) || (area.name_bn || "").includes(checkInput))
     );
     setCheckResult(found);
+  };
+
+  const getDistrictIcon = (area: CoverageArea) => {
+    const dist = getAncestorOfType(area.location_id, "district", locationMap);
+    if (dist) return DISTRICT_ICONS[dist.name] || "📍";
+    return "📍";
+  };
+
+  const getDivisionColor = (area: CoverageArea) => {
+    const div = getAncestorOfType(area.location_id, "division", locationMap);
+    if (div) return DIVISION_COLORS[div.name] || "border-l-accent";
+    return "border-l-accent";
+  };
+
+  const getDistrictName = (area: CoverageArea) => {
+    const dist = getAncestorOfType(area.location_id, "district", locationMap);
+    if (!dist) return null;
+    return t(dist.name, dist.name_bn || dist.name);
   };
 
   return (
@@ -224,22 +310,43 @@ const Coverage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {filtered.map((area) => (
-                  <div key={area.id} className="flex flex-col items-center text-center p-4 rounded-xl bg-background border hover:border-accent/40 hover:shadow-sm transition-all">
-                    <MapPin className="h-5 w-5 text-accent mb-2" />
-                    <p className="font-medium text-foreground text-sm">{t(area.name, area.name_bn || area.name)}</p>
-                    {area.location_id && (
-                      <p className="text-xs text-muted-foreground mt-1">{getLocationBreadcrumb(area.location_id, locationMap, t)}</p>
-                    )}
-                    {!area.location_id && (area.zone || area.district) && (
-                      <Badge variant="secondary" className="mt-2 text-xs">{area.zone || area.district}</Badge>
-                    )}
+              {/* Grouped area cards */}
+              {groupedByDivision.map((group, gi) => (
+                <div key={gi} className="mb-8">
+                  {group.division && !filterDivision && (
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-px flex-1 bg-border" />
+                      <h3 className="text-base font-bold text-foreground whitespace-nowrap">
+                        {t(group.division.name + " Division", (group.division.name_bn || group.division.name) + " বিভাগ")}
+                      </h3>
+                      <Badge variant="secondary" className="text-xs">{group.areas.length}</Badge>
+                      <div className="h-px flex-1 bg-border" />
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    {group.areas.map((area) => (
+                      <div
+                        key={area.id}
+                        className={`relative overflow-hidden flex flex-col items-center text-center p-5 rounded-xl bg-background border border-l-4 ${getDivisionColor(area)} hover:shadow-md transition-all group`}
+                      >
+                        {/* Decorative watermark emoji */}
+                        <span className="absolute bottom-1 right-1 text-4xl opacity-[0.08] pointer-events-none select-none group-hover:opacity-[0.15] transition-opacity">
+                          {getDistrictIcon(area)}
+                        </span>
+                        <MapPin className="h-4 w-4 text-accent mb-1.5" />
+                        <p className="font-semibold text-foreground text-sm leading-tight">{t(area.name, area.name_bn || area.name)}</p>
+                        {getDistrictName(area) && (
+                          <span className="mt-1.5 text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                            {getDistrictName(area)}
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
 
-              {filtered.length === 0 && (
+              {sortedFiltered.length === 0 && (
                 <div className="text-center py-12">
                   <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                   <p className="text-muted-foreground">{t("No areas found", "কোনো এলাকা পাওয়া যায়নি")}</p>
