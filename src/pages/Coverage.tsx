@@ -17,8 +17,9 @@ interface Location {
   id: string;
   name: string;
   name_bn: string | null;
-  type: "district" | "thana" | "zone";
+  type: "division" | "district" | "thana" | "zone";
   parent_id: string | null;
+  enabled: boolean;
 }
 
 const Coverage = () => {
@@ -32,6 +33,7 @@ const Coverage = () => {
   const { t } = useLanguage();
 
   // Cascading filter state
+  const [filterDivision, setFilterDivision] = useState("");
   const [filterDistrict, setFilterDistrict] = useState("");
   const [filterThana, setFilterThana] = useState("");
   const [filterZone, setFilterZone] = useState("");
@@ -47,21 +49,44 @@ const Coverage = () => {
     });
   }, []);
 
-  const districts = useMemo(() => locations.filter(l => l.type === "district"), [locations]);
-  const thanas = useMemo(() => {
-    if (!filterDistrict) return [];
-    return locations.filter(l => l.type === "thana" && l.parent_id === filterDistrict);
-  }, [locations, filterDistrict]);
-  const zones = useMemo(() => {
-    if (!filterThana) return [];
-    return locations.filter(l => l.type === "zone" && l.parent_id === filterThana);
-  }, [locations, filterThana]);
-
   const locationMap = useMemo(() => {
     const m = new Map<string, Location>();
     locations.forEach(l => m.set(l.id, l));
     return m;
   }, [locations]);
+
+  // Build set of disabled location IDs (including cascading from parents)
+  const disabledLocationIds = useMemo(() => {
+    const disabled = new Set<string>();
+    const isAncestorDisabled = (locId: string): boolean => {
+      const loc = locationMap.get(locId);
+      if (!loc) return false;
+      if (!loc.enabled) return true;
+      if (loc.parent_id) return isAncestorDisabled(loc.parent_id);
+      return false;
+    };
+    locations.forEach(l => {
+      if (!l.enabled || isAncestorDisabled(l.id)) disabled.add(l.id);
+    });
+    return disabled;
+  }, [locations, locationMap]);
+
+  // Only show enabled locations in filters
+  const enabledLocations = useMemo(() => locations.filter(l => !disabledLocationIds.has(l.id)), [locations, disabledLocationIds]);
+
+  const divisions = useMemo(() => enabledLocations.filter(l => l.type === "division"), [enabledLocations]);
+  const districts = useMemo(() => {
+    if (!filterDivision) return [];
+    return enabledLocations.filter(l => l.type === "district" && l.parent_id === filterDivision);
+  }, [enabledLocations, filterDivision]);
+  const thanas = useMemo(() => {
+    if (!filterDistrict) return [];
+    return enabledLocations.filter(l => l.type === "thana" && l.parent_id === filterDistrict);
+  }, [enabledLocations, filterDistrict]);
+  const zones = useMemo(() => {
+    if (!filterThana) return [];
+    return enabledLocations.filter(l => l.type === "zone" && l.parent_id === filterThana);
+  }, [enabledLocations, filterThana]);
 
   const getBreadcrumb = (locationId: string | null): string => {
     if (!locationId) return "";
@@ -74,35 +99,48 @@ const Coverage = () => {
     return parts.join(" > ");
   };
 
-  // Get all zone IDs under a thana, or all zone IDs under a district
-  const getZoneIdsForDistrict = (distId: string) => {
-    const thanaIds = locations.filter(l => l.type === "thana" && l.parent_id === distId).map(l => l.id);
-    return locations.filter(l => l.type === "zone" && thanaIds.includes(l.parent_id!)).map(l => l.id);
+  // Helper to get all descendant zone/thana IDs under a location
+  const getDescendantIds = (parentId: string, targetType?: string): string[] => {
+    const children = enabledLocations.filter(l => l.parent_id === parentId);
+    let ids: string[] = [];
+    for (const child of children) {
+      if (!targetType || child.type === targetType) ids.push(child.id);
+      ids = ids.concat(getDescendantIds(child.id, targetType));
+    }
+    return ids;
   };
 
   const filtered = useMemo(() => {
     return areas.filter((area) => {
+      // Filter out areas whose location is disabled
+      if (area.location_id && disabledLocationIds.has(area.location_id)) return false;
+
       const matchesSearch = search === "" || area.name.toLowerCase().includes(search.toLowerCase()) || (area.name_bn || "").includes(search);
 
       let matchesLocation = true;
       if (filterZone) {
         matchesLocation = area.location_id === filterZone;
       } else if (filterThana) {
-        const zoneIds = locations.filter(l => l.type === "zone" && l.parent_id === filterThana).map(l => l.id);
-        matchesLocation = zoneIds.includes(area.location_id);
+        const zoneIds = enabledLocations.filter(l => l.type === "zone" && l.parent_id === filterThana).map(l => l.id);
+        matchesLocation = area.location_id === filterThana || zoneIds.includes(area.location_id);
       } else if (filterDistrict) {
-        const zoneIds = getZoneIdsForDistrict(filterDistrict);
-        matchesLocation = zoneIds.includes(area.location_id);
+        const thanaIds = enabledLocations.filter(l => l.type === "thana" && l.parent_id === filterDistrict).map(l => l.id);
+        const zoneIds = enabledLocations.filter(l => l.type === "zone" && thanaIds.includes(l.parent_id!)).map(l => l.id);
+        matchesLocation = thanaIds.includes(area.location_id) || zoneIds.includes(area.location_id);
+      } else if (filterDivision) {
+        const allIds = getDescendantIds(filterDivision);
+        matchesLocation = allIds.includes(area.location_id);
       }
 
       return matchesSearch && matchesLocation;
     });
-  }, [areas, search, filterDistrict, filterThana, filterZone, locations]);
+  }, [areas, search, filterDivision, filterDistrict, filterThana, filterZone, enabledLocations, disabledLocationIds]);
 
   const handleCheck = () => {
     if (!checkInput.trim()) return;
     const found = areas.some(
-      (area) => area.available && (area.name.toLowerCase().includes(checkInput.toLowerCase()) || (area.name_bn || "").includes(checkInput))
+      (area) => area.available && !disabledLocationIds.has(area.location_id) &&
+        (area.name.toLowerCase().includes(checkInput.toLowerCase()) || (area.name_bn || "").includes(checkInput))
     );
     setCheckResult(found);
   };
@@ -181,11 +219,21 @@ const Coverage = () => {
           ) : (
             <>
               {/* Cascading filters */}
-              <div className="flex flex-col sm:flex-row gap-3 justify-center items-end mb-8 max-w-3xl mx-auto">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-end mb-8 max-w-4xl mx-auto flex-wrap">
+                <div className="w-full sm:w-auto">
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("Division", "বিভাগ")}</label>
+                  <Select value={filterDivision} onValueChange={(v) => { setFilterDivision(v === "all" ? "" : v); setFilterDistrict(""); setFilterThana(""); setFilterZone(""); }}>
+                    <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder={t("All Divisions", "সকল বিভাগ")} /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("All Divisions", "সকল বিভাগ")}</SelectItem>
+                      {divisions.map(d => <SelectItem key={d.id} value={d.id}>{t(d.name, d.name_bn || d.name)}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="w-full sm:w-auto">
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("District", "জেলা")}</label>
-                  <Select value={filterDistrict} onValueChange={(v) => { setFilterDistrict(v === "all" ? "" : v); setFilterThana(""); setFilterZone(""); }}>
-                    <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder={t("All Districts", "সকল জেলা")} /></SelectTrigger>
+                  <Select value={filterDistrict} onValueChange={(v) => { setFilterDistrict(v === "all" ? "" : v); setFilterThana(""); setFilterZone(""); }} disabled={!filterDivision}>
+                    <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder={t("All Districts", "সকল জেলা")} /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">{t("All Districts", "সকল জেলা")}</SelectItem>
                       {districts.map(d => <SelectItem key={d.id} value={d.id}>{t(d.name, d.name_bn || d.name)}</SelectItem>)}
@@ -195,7 +243,7 @@ const Coverage = () => {
                 <div className="w-full sm:w-auto">
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("Thana", "থানা")}</label>
                   <Select value={filterThana} onValueChange={(v) => { setFilterThana(v === "all" ? "" : v); setFilterZone(""); }} disabled={!filterDistrict}>
-                    <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder={t("All Thanas", "সকল থানা")} /></SelectTrigger>
+                    <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder={t("All Thanas", "সকল থানা")} /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">{t("All Thanas", "সকল থানা")}</SelectItem>
                       {thanas.map(t2 => <SelectItem key={t2.id} value={t2.id}>{t(t2.name, t2.name_bn || t2.name)}</SelectItem>)}
@@ -205,7 +253,7 @@ const Coverage = () => {
                 <div className="w-full sm:w-auto">
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("Zone", "জোন")}</label>
                   <Select value={filterZone} onValueChange={(v) => setFilterZone(v === "all" ? "" : v)} disabled={!filterThana}>
-                    <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder={t("All Zones", "সকল জোন")} /></SelectTrigger>
+                    <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder={t("All Zones", "সকল জোন")} /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">{t("All Zones", "সকল জোন")}</SelectItem>
                       {zones.map(z => <SelectItem key={z.id} value={z.id}>{t(z.name, z.name_bn || z.name)}</SelectItem>)}
