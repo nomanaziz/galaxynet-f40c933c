@@ -52,9 +52,9 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
             );
           })}
         </div>
-        <ul className="space-y-2 mb-6">
+        <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6">
           {featureList.map((f: string, i: number) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+            <li key={i} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
               <CheckCircle className="h-4 w-4 text-accent shrink-0 mt-0.5" />
               <span>{f}</span>
             </li>
