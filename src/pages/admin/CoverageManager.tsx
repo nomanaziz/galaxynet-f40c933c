@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,38 +12,30 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, Pencil, Trash2, Loader2, ChevronRight, ChevronDown, MapPin, CheckSquare, XSquare, Trash, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, ChevronRight, ChevronDown, MapPin, CheckSquare, XSquare, Trash, Upload, Eye, EyeOff, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-interface Location {
-  id: string;
-  name: string;
-  name_bn: string | null;
-  type: "division" | "district" | "thana" | "zone";
-  parent_id: string | null;
-  sort_order: number;
-  enabled: boolean;
-}
-
-interface Area {
-  id: string;
-  name: string;
-  name_bn: string | null;
-  zone: string | null;
-  district: string | null;
-  available: boolean;
-  location_id: string | null;
-}
+import {
+  CoverageLocation,
+  CoverageArea,
+  buildLocationMap,
+  buildDisabledLocationIds,
+  getLocationBreadcrumb,
+  getDisabledAncestorType,
+} from "@/lib/coverageHierarchy";
 
 // ─── LOCATIONS TAB ───
 
-const LocationsTab = () => {
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [loading, setLoading] = useState(true);
+interface LocationsTabProps {
+  locations: CoverageLocation[];
+  loading: boolean;
+  onRefresh: () => void;
+}
+
+const LocationsTab = ({ locations, loading, onRefresh }: LocationsTabProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editing, setEditing] = useState<Location | null>(null);
-  const [form, setForm] = useState({ name: "", name_bn: "", type: "division" as Location["type"], parent_id: null as string | null });
+  const [editing, setEditing] = useState<CoverageLocation | null>(null);
+  const [form, setForm] = useState({ name: "", name_bn: "", type: "division" as CoverageLocation["type"], parent_id: null as string | null });
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [openDivisions, setOpenDivisions] = useState<Set<string>>(new Set());
@@ -51,26 +43,18 @@ const LocationsTab = () => {
   const [openThanas, setOpenThanas] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
-  const fetchLocations = async () => {
-    const { data } = await supabase.from("coverage_locations").select("*").order("sort_order");
-    setLocations((data ?? []) as Location[]);
-    setLoading(false);
-  };
-
-  useEffect(() => { fetchLocations(); }, []);
-
   const divisions = useMemo(() => locations.filter(l => l.type === "division"), [locations]);
   const districtsOf = (divId: string) => locations.filter(l => l.type === "district" && l.parent_id === divId);
   const thanasOf = (distId: string) => locations.filter(l => l.type === "thana" && l.parent_id === distId);
   const zonesOf = (thanaId: string) => locations.filter(l => l.type === "zone" && l.parent_id === thanaId);
 
-  const openAdd = (type: Location["type"], parentId: string | null) => {
+  const openAdd = (type: CoverageLocation["type"], parentId: string | null) => {
     setEditing(null);
     setForm({ name: "", name_bn: "", type, parent_id: parentId });
     setDialogOpen(true);
   };
 
-  const openEdit = (loc: Location) => {
+  const openEdit = (loc: CoverageLocation) => {
     setEditing(loc);
     setForm({ name: loc.name, name_bn: loc.name_bn ?? "", type: loc.type, parent_id: loc.parent_id });
     setDialogOpen(true);
@@ -90,7 +74,7 @@ const LocationsTab = () => {
     }
     setSaving(false);
     setDialogOpen(false);
-    fetchLocations();
+    onRefresh();
   };
 
   const handleDelete = async () => {
@@ -99,13 +83,13 @@ const LocationsTab = () => {
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     else toast({ title: "Location deleted" });
     setDeleteId(null);
-    fetchLocations();
+    onRefresh();
   };
 
-  const toggleEnabled = async (loc: Location) => {
+  const toggleEnabled = async (loc: CoverageLocation) => {
     const { error } = await supabase.from("coverage_locations").update({ enabled: !loc.enabled }).eq("id", loc.id);
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
-    fetchLocations();
+    onRefresh();
   };
 
   const handleSeedData = async () => {
@@ -114,7 +98,7 @@ const LocationsTab = () => {
       const { data, error } = await supabase.functions.invoke("seed-bangladesh-locations");
       if (error) throw error;
       toast({ title: "Data seeded successfully", description: `${data.divisions} divisions, ${data.districts} districts, ${data.thanas} thanas` });
-      fetchLocations();
+      onRefresh();
     } catch (e: any) {
       toast({ title: "Seed failed", description: e.message, variant: "destructive" });
     }
@@ -260,63 +244,101 @@ const LocationsTab = () => {
 
 // ─── AREAS TAB ───
 
-const AreasTab = () => {
-  const [areas, setAreas] = useState<Area[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [loading, setLoading] = useState(true);
+interface AreasTabProps {
+  areas: CoverageArea[];
+  locations: CoverageLocation[];
+  loading: boolean;
+  onRefresh: () => void;
+}
+
+const AreasTab = ({ areas, locations, loading, onRefresh }: AreasTabProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [editing, setEditing] = useState<Area | null>(null);
+  const [editing, setEditing] = useState<CoverageArea | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [form, setForm] = useState({ name: "", name_bn: "", available: true, location_id: null as string | null });
   const [saving, setSaving] = useState(false);
+  const [showHidden, setShowHidden] = useState(false);
+  const [search, setSearch] = useState("");
 
-  // Cascading dropdown state
-  const [selDivision, setSelDivision] = useState<string>("");
-  const [selDistrict, setSelDistrict] = useState<string>("");
-  const [selThana, setSelThana] = useState<string>("");
-  const [selZone, setSelZone] = useState<string>("");
+  // Cascading filter state
+  const [filterDivision, setFilterDivision] = useState("");
+  const [filterDistrict, setFilterDistrict] = useState("");
+  const [filterThana, setFilterThana] = useState("");
+  const [filterZone, setFilterZone] = useState("");
+
+  // Dialog cascading dropdown state
+  const [selDivision, setSelDivision] = useState("");
+  const [selDistrict, setSelDistrict] = useState("");
+  const [selThana, setSelThana] = useState("");
+  const [selZone, setSelZone] = useState("");
 
   const { toast } = useToast();
 
-  const fetchAll = async () => {
-    const [areasRes, locsRes] = await Promise.all([
-      supabase.from("coverage_areas").select("*").order("name"),
-      supabase.from("coverage_locations").select("*").order("sort_order"),
-    ]);
-    setAreas((areasRes.data ?? []) as Area[]);
-    setLocations((locsRes.data ?? []) as Location[]);
-    setLoading(false);
-  };
+  const locationMap = useMemo(() => buildLocationMap(locations), [locations]);
+  const disabledLocationIds = useMemo(() => buildDisabledLocationIds(locations, locationMap), [locations, locationMap]);
 
-  useEffect(() => { fetchAll(); }, []);
+  // Enabled-only locations for dialog dropdowns
+  const enabledLocations = useMemo(() => locations.filter(l => !disabledLocationIds.has(l.id)), [locations, disabledLocationIds]);
 
   const divisionsList = useMemo(() => locations.filter(l => l.type === "division"), [locations]);
-  const districts = useMemo(() => locations.filter(l => l.type === "district"), [locations]);
-  const thanas = useMemo(() => locations.filter(l => l.type === "thana"), [locations]);
-  const zones = useMemo(() => locations.filter(l => l.type === "zone"), [locations]);
+  const enabledDivisions = useMemo(() => enabledLocations.filter(l => l.type === "division"), [enabledLocations]);
 
-  const districtsForDivision = selDivision ? districts.filter(d => d.parent_id === selDivision) : [];
-  const thanasForDistrict = selDistrict ? thanas.filter(t => t.parent_id === selDistrict) : [];
-  const zonesForThana = selThana ? zones.filter(z => z.parent_id === selThana) : [];
+  // Filter dropdowns (show all for filtering)
+  const filterDistricts = useMemo(() => filterDivision ? locations.filter(l => l.type === "district" && l.parent_id === filterDivision) : [], [locations, filterDivision]);
+  const filterThanas = useMemo(() => filterDistrict ? locations.filter(l => l.type === "thana" && l.parent_id === filterDistrict) : [], [locations, filterDistrict]);
+  const filterZones = useMemo(() => filterThana ? locations.filter(l => l.type === "zone" && l.parent_id === filterThana) : [], [locations, filterThana]);
 
-  const locationMap = useMemo(() => {
-    const m = new Map<string, Location>();
-    locations.forEach(l => m.set(l.id, l));
-    return m;
-  }, [locations]);
+  // Dialog dropdowns (enabled only)
+  const dialogDistricts = useMemo(() => selDivision ? enabledLocations.filter(l => l.type === "district" && l.parent_id === selDivision) : [], [enabledLocations, selDivision]);
+  const dialogThanas = useMemo(() => selDistrict ? enabledLocations.filter(l => l.type === "thana" && l.parent_id === selDistrict) : [], [enabledLocations, selDistrict]);
+  const dialogZones = useMemo(() => selThana ? enabledLocations.filter(l => l.type === "zone" && l.parent_id === selThana) : [], [enabledLocations, selThana]);
 
-  const getBreadcrumb = (locationId: string | null): string => {
-    if (!locationId) return "—";
-    const parts: string[] = [];
-    let current = locationMap.get(locationId);
-    while (current) {
-      parts.unshift(current.name);
-      current = current.parent_id ? locationMap.get(current.parent_id) : undefined;
-    }
-    return parts.join(" > ");
-  };
+  // Compute effective areas
+  const computedAreas = useMemo(() => {
+    return areas.map(area => {
+      const isHierarchyDisabled = area.location_id ? disabledLocationIds.has(area.location_id) : false;
+      const disabledBy = area.location_id && isHierarchyDisabled ? getDisabledAncestorType(area.location_id, locationMap) : null;
+      return { ...area, isHierarchyDisabled, disabledBy };
+    });
+  }, [areas, disabledLocationIds, locationMap]);
+
+  // Filter areas
+  const filteredAreas = useMemo(() => {
+    return computedAreas.filter(area => {
+      // Hide hierarchy-disabled unless showHidden
+      if (area.isHierarchyDisabled && !showHidden) return false;
+
+      // Search
+      if (search) {
+        const q = search.toLowerCase();
+        if (!area.name.toLowerCase().includes(q) && !(area.name_bn || "").includes(search)) return false;
+      }
+
+      // Cascading location filter
+      if (filterZone) {
+        return area.location_id === filterZone;
+      } else if (filterThana) {
+        const zoneIds = locations.filter(l => l.type === "zone" && l.parent_id === filterThana).map(l => l.id);
+        return area.location_id === filterThana || zoneIds.includes(area.location_id ?? "");
+      } else if (filterDistrict) {
+        const thanaIds = locations.filter(l => l.type === "thana" && l.parent_id === filterDistrict).map(l => l.id);
+        const zoneIds = locations.filter(l => l.type === "zone" && thanaIds.includes(l.parent_id!)).map(l => l.id);
+        return thanaIds.includes(area.location_id ?? "") || zoneIds.includes(area.location_id ?? "");
+      } else if (filterDivision) {
+        const distIds = locations.filter(l => l.type === "district" && l.parent_id === filterDivision).map(l => l.id);
+        const thanaIds = locations.filter(l => l.type === "thana" && distIds.includes(l.parent_id!)).map(l => l.id);
+        const zoneIds = locations.filter(l => l.type === "zone" && thanaIds.includes(l.parent_id!)).map(l => l.id);
+        return distIds.includes(area.location_id ?? "") || thanaIds.includes(area.location_id ?? "") || zoneIds.includes(area.location_id ?? "");
+      }
+
+      return true;
+    });
+  }, [computedAreas, showHidden, search, filterDivision, filterDistrict, filterThana, filterZone, locations]);
+
+  const visibleCount = computedAreas.filter(a => !a.isHierarchyDisabled).length;
+  const hiddenCount = computedAreas.filter(a => a.isHierarchyDisabled).length;
 
   const openNew = () => {
     setEditing(null);
@@ -325,7 +347,7 @@ const AreasTab = () => {
     setDialogOpen(true);
   };
 
-  const openEdit = (a: Area) => {
+  const openEdit = (a: CoverageArea) => {
     setEditing(a);
     setForm({ name: a.name, name_bn: a.name_bn ?? "", available: a.available, location_id: a.location_id });
     if (a.location_id) {
@@ -371,7 +393,7 @@ const AreasTab = () => {
     }
     setSaving(false);
     setDialogOpen(false);
-    fetchAll();
+    onRefresh();
   };
 
   const handleDelete = async () => {
@@ -379,11 +401,13 @@ const AreasTab = () => {
     await supabase.from("coverage_areas").delete().eq("id", deleteId);
     setDeleteId(null);
     toast({ title: "Area deleted" });
-    fetchAll();
+    onRefresh();
   };
 
   const toggleSelect = (id: string) => setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
-  const toggleAll = () => setSelected(prev => prev.size === areas.length ? new Set() : new Set(areas.map(a => a.id)));
+
+  const selectableAreas = filteredAreas.filter(a => !a.isHierarchyDisabled);
+  const toggleAll = () => setSelected(prev => prev.size === selectableAreas.length ? new Set() : new Set(selectableAreas.map(a => a.id)));
 
   const bulkSetAvailable = async (val: boolean) => {
     const ids = Array.from(selected);
@@ -391,7 +415,7 @@ const AreasTab = () => {
     await Promise.all(ids.map(id => supabase.from("coverage_areas").update({ available: val }).eq("id", id)));
     toast({ title: `${ids.length} areas marked ${val ? "available" : "unavailable"}` });
     setSelected(new Set());
-    fetchAll();
+    onRefresh();
   };
 
   const bulkDelete = async () => {
@@ -400,16 +424,78 @@ const AreasTab = () => {
     toast({ title: `${ids.length} areas deleted` });
     setSelected(new Set());
     setBulkDeleteOpen(false);
-    fetchAll();
+    onRefresh();
   };
 
   if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin" /></div>;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{areas.length} coverage areas</p>
+      {/* Stats bar */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-4 text-sm">
+          <span className="text-muted-foreground">Total: <strong>{areas.length}</strong></span>
+          <span className="text-green-600">Visible: <strong>{visibleCount}</strong></span>
+          {hiddenCount > 0 && (
+            <span className="text-orange-600">Hidden by hierarchy: <strong>{hiddenCount}</strong></span>
+          )}
+        </div>
         <Button onClick={openNew} size="sm"><Plus className="mr-1 h-4 w-4" />Add Area</Button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 items-end flex-wrap">
+        <div className="w-full sm:w-auto">
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Division</label>
+          <Select value={filterDivision} onValueChange={(v) => { setFilterDivision(v === "all" ? "" : v); setFilterDistrict(""); setFilterThana(""); setFilterZone(""); }}>
+            <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="All Divisions" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Divisions</SelectItem>
+              {divisionsList.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="w-full sm:w-auto">
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">District</label>
+          <Select value={filterDistrict} onValueChange={(v) => { setFilterDistrict(v === "all" ? "" : v); setFilterThana(""); setFilterZone(""); }} disabled={!filterDivision}>
+            <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="All Districts" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Districts</SelectItem>
+              {filterDistricts.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="w-full sm:w-auto">
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Thana</label>
+          <Select value={filterThana} onValueChange={(v) => { setFilterThana(v === "all" ? "" : v); setFilterZone(""); }} disabled={!filterDistrict}>
+            <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="All Thanas" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Thanas</SelectItem>
+              {filterThanas.map(t2 => <SelectItem key={t2.id} value={t2.id}>{t2.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="w-full sm:w-auto">
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Zone</label>
+          <Select value={filterZone} onValueChange={(v) => setFilterZone(v === "all" ? "" : v)} disabled={!filterThana}>
+            <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder="All Zones" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Zones</SelectItem>
+              {filterZones.map(z => <SelectItem key={z.id} value={z.id}>{z.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="w-full sm:w-auto">
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Search</label>
+          <Input placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} className="w-full sm:w-48" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch checked={showHidden} onCheckedChange={setShowHidden} />
+          <label className="text-xs text-muted-foreground whitespace-nowrap">
+            {showHidden ? <Eye className="h-3.5 w-3.5 inline mr-1" /> : <EyeOff className="h-3.5 w-3.5 inline mr-1" />}
+            Show hidden
+          </label>
+        </div>
       </div>
 
       {selected.size > 0 && (
@@ -426,24 +512,43 @@ const AreasTab = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="w-10">
-              <Checkbox checked={selected.size === areas.length && areas.length > 0} onCheckedChange={toggleAll} />
+              <Checkbox checked={selectableAreas.length > 0 && selected.size === selectableAreas.length} onCheckedChange={toggleAll} />
             </TableHead>
             <TableHead>Name (EN)</TableHead>
             <TableHead>Name (BN)</TableHead>
             <TableHead>Location</TableHead>
-            <TableHead>Available</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {areas.map(area => (
-            <TableRow key={area.id}>
-              <TableCell><Checkbox checked={selected.has(area.id)} onCheckedChange={() => toggleSelect(area.id)} /></TableCell>
+          {filteredAreas.map(area => (
+            <TableRow key={area.id} className={area.isHierarchyDisabled ? "opacity-50 bg-muted/30" : ""}>
+              <TableCell>
+                <Checkbox
+                  checked={selected.has(area.id)}
+                  onCheckedChange={() => toggleSelect(area.id)}
+                  disabled={area.isHierarchyDisabled}
+                />
+              </TableCell>
               <TableCell className="font-medium">{area.name}</TableCell>
               <TableCell>{area.name_bn}</TableCell>
-              <TableCell className="text-sm text-muted-foreground">{getBreadcrumb(area.location_id)}</TableCell>
+              <TableCell className="text-sm text-muted-foreground">{getLocationBreadcrumb(area.location_id, locationMap)}</TableCell>
               <TableCell>
-                <Switch checked={area.available} onCheckedChange={async (v) => { await supabase.from("coverage_areas").update({ available: v }).eq("id", area.id); fetchAll(); }} />
+                {area.isHierarchyDisabled ? (
+                  <Badge variant="outline" className="text-orange-600 border-orange-300 text-xs">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    Hidden by {area.disabledBy}
+                  </Badge>
+                ) : (
+                  <Switch
+                    checked={area.available}
+                    onCheckedChange={async (v) => {
+                      await supabase.from("coverage_areas").update({ available: v }).eq("id", area.id);
+                      onRefresh();
+                    }}
+                  />
+                )}
               </TableCell>
               <TableCell className="flex gap-1">
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(area)}><Pencil className="h-4 w-4" /></Button>
@@ -451,9 +556,17 @@ const AreasTab = () => {
               </TableCell>
             </TableRow>
           ))}
+          {filteredAreas.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                {areas.length === 0 ? "No coverage areas yet." : "No areas match the current filters."}
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
 
+      {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>{editing ? "Edit Area" : "Add Area"}</DialogTitle></DialogHeader>
@@ -468,7 +581,7 @@ const AreasTab = () => {
                 <Select value={selDivision} onValueChange={(v) => { setSelDivision(v); setSelDistrict(""); setSelThana(""); setSelZone(""); }}>
                   <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
                   <SelectContent>
-                    {divisionsList.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                    {enabledDivisions.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -477,7 +590,7 @@ const AreasTab = () => {
                 <Select value={selDistrict} onValueChange={(v) => { setSelDistrict(v); setSelThana(""); setSelZone(""); }} disabled={!selDivision}>
                   <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
                   <SelectContent>
-                    {districtsForDivision.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                    {dialogDistricts.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -486,7 +599,7 @@ const AreasTab = () => {
                 <Select value={selThana} onValueChange={(v) => { setSelThana(v); setSelZone(""); }} disabled={!selDistrict}>
                   <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
                   <SelectContent>
-                    {thanasForDistrict.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                    {dialogThanas.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -495,11 +608,17 @@ const AreasTab = () => {
                 <Select value={selZone} onValueChange={setSelZone} disabled={!selThana}>
                   <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
                   <SelectContent>
-                    {zonesForThana.map(z => <SelectItem key={z.id} value={z.id}>{z.name}</SelectItem>)}
+                    {dialogZones.map(z => <SelectItem key={z.id} value={z.id}>{z.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
             </div>
+            {editing && editing.location_id && disabledLocationIds.has(editing.location_id) && (
+              <div className="flex items-center gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-700">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                This area is currently hidden because its parent location is disabled in the hierarchy.
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <Switch checked={form.available} onCheckedChange={v => setForm(f => ({ ...f, available: v }))} />
               <Label>Available</Label>
@@ -534,6 +653,23 @@ const AreasTab = () => {
 // ─── MAIN COMPONENT ───
 
 const CoverageManager = () => {
+  const [areas, setAreas] = useState<CoverageArea[]>([]);
+  const [locations, setLocations] = useState<CoverageLocation[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAll = useCallback(async () => {
+    setLoading(true);
+    const [areasRes, locsRes] = await Promise.all([
+      supabase.from("coverage_areas").select("*").order("name"),
+      supabase.from("coverage_locations").select("*").order("sort_order"),
+    ]);
+    setAreas((areasRes.data ?? []) as CoverageArea[]);
+    setLocations((locsRes.data ?? []) as CoverageLocation[]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Coverage Management</h2>
@@ -542,8 +678,12 @@ const CoverageManager = () => {
           <TabsTrigger value="locations">Locations (Hierarchy)</TabsTrigger>
           <TabsTrigger value="areas">Coverage Areas</TabsTrigger>
         </TabsList>
-        <TabsContent value="locations"><LocationsTab /></TabsContent>
-        <TabsContent value="areas"><AreasTab /></TabsContent>
+        <TabsContent value="locations">
+          <LocationsTab locations={locations} loading={loading} onRefresh={fetchAll} />
+        </TabsContent>
+        <TabsContent value="areas">
+          <AreasTab areas={areas} locations={locations} loading={loading} onRefresh={fetchAll} />
+        </TabsContent>
       </Tabs>
     </div>
   );
