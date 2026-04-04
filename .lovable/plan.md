@@ -1,56 +1,93 @@
 
+## Main fix
+`Coverage Areas` tab-কে `Location Hierarchy`-র সাথে সরাসরি bind করতে হবে, যাতে parent division/district/thana disable হলে child areas admin panel এবং public coverage—দুই জায়গাতেই automatic inherit করে hidden/disabled হয়।
 
-## Import Bangladesh Location Data & Add Enable/Disable System
+## আমি যা দেখেছি
+- DB-তে `coverage_areas.location_id` already আছে, এবং **622/622 area linked**।
+- সব linked area এখন `thana`-র সাথে attached।
+- Public `Coverage.tsx` already ancestor-chain দেখে hidden logic apply করছে।
+- কিন্তু admin `CoverageManager`-এর `AreasTab` এখনো `coverage_areas` flat ভাবে load করে, তাই hierarchy off করলেও **সব 622 area** দেখায়।
+- অর্থাৎ সমস্যা linkage-এ না; সমস্যা হলো **admin list এবং effective status calculation**-এ।
 
-### What This Does
-Load the full Bangladesh Division > District > Thana hierarchy (8 divisions, 64 districts, 622 thanas) from the uploaded Excel into the coverage system. Each thana also becomes a coverage area. Admin can disable any location level (e.g., disable a whole district) and all areas underneath automatically hide from the public coverage page.
+## Implementation plan
 
-### Current State
-- Hierarchy: district > thana > zone (3 levels, enum `coverage_location_type`)
-- Existing data: 1 district, 2 thanas, 8 zones, 2 coverage areas
-- No enable/disable toggle on locations
+### 1) Shared hierarchy logic এক জায়গায় আনা
+একটা shared helper বানানো হবে যেখানে থাকবে:
+- `locationMap`
+- ancestor disabled check
+- descendant lookup
+- effective area visibility/status calculation
 
-### Plan
+এটা admin আর public—দুই জায়গায় reuse হবে, যাতে একই rule everywhere কাজ করে।
 
-**1. Database Migration**
-- Add `division` to the `coverage_location_type` enum (new top level)
-- Add `enabled` boolean column to `coverage_locations` (default `true`)
-- This makes the hierarchy: division > district > thana > zone
+### 2) Admin CoverageManager data flow refactor
+`CoverageManager` parent component-এ `areas`, `locations`, `refreshData()` lift করা হবে।
+- `LocationsTab` location toggle করলে
+- `AreasTab` একই fresh data থেকে instant updated state পাবে
 
-**2. Seed Data via Edge Function**
-- Create an edge function `seed-bangladesh-locations` that:
-  - Clears existing coverage_locations and coverage_areas (fresh start since only test data exists)
-  - Inserts 8 Divisions (Dhaka, Chattogram, Rajshahi, Khulna, Barisal, Sylhet, Rangpur, Mymensingh)
-  - Inserts 64 Districts under their divisions
-  - Inserts 622 Thanas under their districts (with Bangla names from the Excel)
-  - Creates a coverage_area for each thana (622 areas), linked to the thana's location_id, with `available = true`
+এতে hierarchy change আর area list mismatch থাকবে না।
 
-**3. Update CoverageManager (Admin)**
-- Add an enable/disable toggle (Switch) on each location in the Locations tab
-- When a district is disabled, visually indicate it (dimmed/strikethrough)
-- Update the hierarchy display to support the new "division" level (division > district > thana > zone)
-- Update the Areas tab cascading dropdowns to include division as the first level
+### 3) Areas tab-কে hierarchy-based করা
+বর্তমান flat 622-row table-এর বদলে list hierarchy follow করবে:
+- Division filter
+- District filter
+- Thana filter
+- Zone filter
 
-**4. Update Coverage Page (Public)**
-- When fetching coverage areas, also fetch locations with `enabled` status
-- Filter out areas whose parent chain contains any disabled location
-- For example: if "Dhaka" district is disabled, all thanas under Dhaka won't appear in the coverage list
-- The cascading filters (Division > District > Thana > Zone) will also exclude disabled locations
+Default behavior:
+- শুধু **effective-enabled** areas দেখাবে
+- optional admin toggle থাকবে: `Show hierarchy-hidden areas`
 
-**5. Update Coverage.tsx Filters**
-- Add Division as the first cascading dropdown
-- Adjust the existing District > Thana > Zone filters to work under Division
+তখন 7 district/division off থাকলে 622 না দেখিয়ে only active branch-এর area দেখাবে।
 
-### Files to Modify
-1. **Migration SQL** -- add `division` enum value, add `enabled` column
-2. **New edge function** `supabase/functions/seed-bangladesh-locations/index.ts` -- seed all data
-3. **`src/pages/admin/CoverageManager.tsx`** -- division level, enable/disable toggle
-4. **`src/pages/Coverage.tsx`** -- division filter, respect `enabled` flag
-5. **`src/integrations/supabase/types.ts`** -- will auto-update after migration
+### 4) Automatic inherited disable system
+প্রতি area row-র জন্য effective state calculate হবে:
+- `manual state` = `coverage_areas.available`
+- `hierarchy state` = linked location + parent chain enabled কিনা
 
-### Technical Details
-- The Excel has 622 thanas across 64 districts and 8 divisions
-- Each thana becomes both a `coverage_location` (type=thana) AND a `coverage_area`
-- The `enabled` column on `coverage_locations` cascades logically: if a division is disabled, all districts/thanas/zones underneath are treated as disabled on the public page
-- No changes to RLS policies needed -- the filtering is done client-side based on the `enabled` boolean
+যদি parent district/division off হয়:
+- area row `Hidden by hierarchy` badge পাবে
+- area switch/edit action disabled বা read-only হবে
+- normal list থেকে hide হবে
+- bulk available/unavailable action-এও include হবে না
 
+Parent আবার on করলে area automatic ফিরে আসবে, এবং আগের manual `available` state preserve থাকবে।
+
+### 5) Admin UX clearer করা
+Areas tab-এ দেখানো হবে:
+- total linked areas
+- visible by hierarchy
+- hidden by hierarchy
+
+প্রতি row-তে breadcrumb/reason দেখানো হবে, যেমন:
+`Dhaka > Manikganj > Singair`
+এবং badge:
+`Hidden by District` / `Hidden by Division`
+
+### 6) Create/Edit area guard
+নতুন area add/edit করার সময়:
+- disabled branch-এর নিচে area assign করা যাবে না
+- dropdown-এ only effective-enabled locations দেখানো হবে
+- existing area disabled branch-এর নিচে থাকলে warning দেখানো হবে
+
+## Files
+- `src/pages/admin/CoverageManager.tsx`
+- `src/pages/Coverage.tsx`
+- `src/lib/coverageHierarchy.ts` (new shared helper)
+
+## Technical note
+এই fix-এর জন্য নতুন migration দরকার নেই, কারণ:
+- `coverage_areas.location_id` already exists
+- সব 622 area already linked
+- main issue হলো UI/data derivation, schema না
+
+## Preferred approach
+আমি **derived/effective status** approach recommend করছি:
+- safer
+- instant
+- parent on/off করলে correct reflect করবে
+- manual area availability নষ্ট হবে না
+
+### Alternative (not preferred)
+Parent disable হলে DB-তে child `coverage_areas.available = false` লিখে দেওয়া।
+এটা avoid করা ভালো, কারণ re-enable করলে কোন area আগে manually off ছিল আর কোনটা auto-off হয়েছিল—ওটা differentiate করা কঠিন হয়ে যাবে।
