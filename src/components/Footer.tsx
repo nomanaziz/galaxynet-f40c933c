@@ -42,6 +42,8 @@ const Footer = () => {
     { href: "/contact", label: t("Contact", "যোগাযোগ") },
   ];
 
+  const btrcUrl = settings.btrc_tariff_url || "";
+
   const resourceLinks = [
     { href: "/order", label: t("New Connection", "নতুন সংযোগ") },
     { href: "/speed-test", label: t("Speed Test", "স্পিড টেস্ট") },
@@ -104,6 +106,13 @@ const Footer = () => {
                     </Link>
                   </li>
                 ))}
+                {btrcUrl && (
+                  <li>
+                    <a href={btrcUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary-foreground/90 hover:text-accent transition-colors">
+                      {t("BTRC Approved Tariff", "বিটিআরসি অনুমোদিত ট্যারিফ")}
+                    </a>
+                  </li>
+                )}
               </ul>
             </div>
 

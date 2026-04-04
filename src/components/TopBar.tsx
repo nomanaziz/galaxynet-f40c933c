@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Phone, Facebook, Youtube, MessageCircle } from "lucide-react";
+import { Phone, Facebook, Youtube, MessageCircle, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -17,6 +17,7 @@ const TopBar = () => {
 
   const notice = t(settings.topbar_notice_en || "", settings.topbar_notice_bn || "");
   const hotline = settings.hotline || "";
+  const btrcUrl = settings.btrc_tariff_url || "";
 
   return (
     <div className="bg-primary text-primary-foreground text-xs py-1.5 border-b border-primary-foreground/10">
@@ -32,6 +33,11 @@ const TopBar = () => {
           {hotline && (
             <a href={`tel:${hotline}`} className="flex items-center gap-1 text-white font-bold hover:text-accent transition-colors">
               <Phone className="h-3 w-3" /> {hotline}
+            </a>
+          )}
+          {btrcUrl && (
+            <a href={btrcUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary-foreground/90 hover:text-accent transition-colors">
+              <FileText className="h-3 w-3" /> {t("BTRC Tariff", "বিটিআরসি ট্যারিফ")}
             </a>
           )}
           <div className="hidden sm:flex items-center gap-1.5">

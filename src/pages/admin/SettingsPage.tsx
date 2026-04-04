@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Upload, Trash2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const settingsKeys = [
@@ -63,7 +63,6 @@ const aboutTextKeys = [
 const aboutJsonKeys = [
   { key: "about_stats", label: "Stats (JSON)", help: '[{"num":"10,000+","label":"Happy Customers","label_bn":"সন্তুষ্ট গ্রাহক","icon":"Users"}]' },
   { key: "about_timeline", label: "Timeline (JSON)", help: '[{"year":"2015","title":"Founded","title_bn":"প্রতিষ্ঠিত","desc":"Started...","desc_bn":"শুরু..."}]' },
-  
 ];
 
 const allKeys = [
@@ -75,6 +74,7 @@ const SettingsPage = () => {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -96,6 +96,38 @@ const SettingsPage = () => {
     }
     setSaving(false);
     toast({ title: "Settings saved" });
+  };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      toast({ title: "Only PDF files allowed", variant: "destructive" });
+      return;
+    }
+    setUploadingPdf(true);
+    // Remove old file first (ignore errors)
+    await supabase.storage.from("media").remove(["btrc-tariff.pdf"]);
+    const { error } = await supabase.storage.from("media").upload("btrc-tariff.pdf", file, { upsert: true });
+    if (error) {
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+      setUploadingPdf(false);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("media").getPublicUrl("btrc-tariff.pdf");
+    const url = urlData.publicUrl;
+    await supabase.from("site_settings").upsert({ key: "btrc_tariff_url", value: url }, { onConflict: "key" });
+    setSettings(s => ({ ...s, btrc_tariff_url: url }));
+    setUploadingPdf(false);
+    toast({ title: "BTRC Tariff PDF uploaded!" });
+    e.target.value = "";
+  };
+
+  const handlePdfDelete = async () => {
+    await supabase.storage.from("media").remove(["btrc-tariff.pdf"]);
+    await supabase.from("site_settings").upsert({ key: "btrc_tariff_url", value: "" }, { onConflict: "key" });
+    setSettings(s => ({ ...s, btrc_tariff_url: "" }));
+    toast({ title: "BTRC Tariff PDF removed" });
   };
 
   if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin" /></div>;
@@ -140,6 +172,8 @@ const SettingsPage = () => {
     </Card>
   );
 
+  const btrcUrl = settings.btrc_tariff_url || "";
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Site Settings</h2>
@@ -149,6 +183,33 @@ const SettingsPage = () => {
       {renderSection("Selfcare Portal", selfcareKeys)}
       {renderSection("Contact Page", contactKeys)}
       {renderJsonSection("About Page", aboutTextKeys, aboutJsonKeys)}
+
+      <Card>
+        <CardHeader><CardTitle>BTRC Approved Tariff (PDF)</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          {btrcUrl ? (
+            <div className="flex items-center gap-3">
+              <a href={btrcUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
+                <FileText className="h-4 w-4" /> View Current PDF
+              </a>
+              <Button size="sm" variant="destructive" onClick={handlePdfDelete}>
+                <Trash2 className="h-3 w-3 mr-1" /> Remove
+              </Button>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No PDF uploaded yet.</p>
+          )}
+          <div>
+            <Input type="file" accept="application/pdf" onChange={handlePdfUpload} className="hidden" id="btrc-pdf-upload" />
+            <Button asChild disabled={uploadingPdf} variant="outline">
+              <label htmlFor="btrc-pdf-upload" className="cursor-pointer">
+                <Upload className="mr-2 h-4 w-4" /> {uploadingPdf ? "Uploading..." : btrcUrl ? "Replace PDF" : "Upload PDF"}
+              </label>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Button onClick={handleSave} disabled={saving} size="lg">
         {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
         Save All Settings
