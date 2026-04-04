@@ -21,24 +21,24 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
   return (
     <Card className={`relative overflow-hidden transition-all hover:shadow-lg ${plan.popular ? "border-accent shadow-md ring-1 ring-accent/20" : "border hover:border-accent/40"}`}>
       {plan.popular && (
-        <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
+        <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-2 sm:px-3 py-1 rounded-bl-lg">
           {t("POPULAR", "জনপ্রিয়")}
         </div>
       )}
-      <CardContent className="p-6">
-        <h3 className="text-xl font-bold text-foreground">{t(plan.name, plan.name_bn || plan.name)}</h3>
+      <CardContent className="p-3 sm:p-6">
+        <h3 className="text-base sm:text-xl font-bold text-foreground">{t(plan.name, plan.name_bn || plan.name)}</h3>
         {plan.category !== "dedicated" && (
-          <div className="flex items-end gap-1 my-3">
-            <span className="text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
+          <div className="flex items-end gap-1 my-2 sm:my-3">
+            <span className="text-xl sm:text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
           </div>
         )}
-        <div className="mb-3 p-3 rounded-lg bg-accent/8 border border-accent/30">
+        <div className="mb-2 sm:mb-3 p-2 sm:p-3 rounded-lg bg-accent/8 border border-accent/30">
           {plan.category === "dedicated" ? (
-            <span className="text-2xl font-bold text-accent">{t("Call for Price", "মূল্যের জন্য কল করুন")}</span>
+            <span className="text-lg sm:text-2xl font-bold text-accent">{t("Call for Price", "মূল্যের জন্য কল করুন")}</span>
           ) : (
             <>
-              <span className="text-2xl font-bold text-accent">৳{plan.price}</span>
-              <span className="text-muted-foreground text-sm">/{t("month", "মাস")}</span>
+              <span className="text-lg sm:text-2xl font-bold text-accent">৳{plan.price}</span>
+              <span className="text-muted-foreground text-xs sm:text-sm">/{t("month", "মাস")}</span>
             </>
           )}
         </div>
