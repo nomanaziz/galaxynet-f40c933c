@@ -1,40 +1,56 @@
 
 
-## Coverage Page: Sorting & Decorative Area Cards
+## Redesign Payment Page Like Exord Pay-Bill (Galaxy Net Branded)
 
-### Problem
-1. Coverage area boxes display in flat alphabetical order — not organized by Division > District > Thana hierarchy
-2. Area boxes look plain — just a pin icon and text, no visual identity
+### Overview
+Replace the current Payment page with a rich, structured layout matching the Exord pay-bill page design — rebranded as Galaxy Net with dummy data.
 
-### Changes
+### Page Sections (Top to Bottom)
 
-**1. Hierarchical Sorting (`src/pages/Coverage.tsx`)**
-- Sort the `filtered` array by: Division sort_order → District sort_order → Thana sort_order
-- Walk up each area's `location_id` ancestor chain to get division/district/thana sort values
-- Dhaka Division will naturally come first (sort_order=1 from seed data), then Chattogram, Rajshahi, etc.
-- Within each division, districts sorted alphabetically/by sort_order, then thanas within each district
-- Add visual **Division group headers** between groups (e.g., "ঢাকা বিভাগ", "চট্টগ্রাম বিভাগ") so users can scan quickly
+**1. Quick Pay Hero Banner**
+- Card with subtle background pattern, "Quick Pay" heading in accent color
+- Description text + "PAY NOW" button linking to `https://portal.galaxynetbd.com/quickpay`
+- No client code input needed — just a direct button like Exord
 
-**2. Decorative Area Cards (`src/pages/Coverage.tsx`)**
-- Create a mapping of ~64 district-level decorative icons/patterns using emoji or simple SVG motifs representing famous landmarks:
-  - Dhaka: mosque/monument, Chattogram: hill/ship, Sylhet: tea leaf, Rajshahi: mango, Khulna: sundarbans/tiger, Barisal: river/boat, Rangpur: tobacco/temple, Mymensingh: bridge
-  - Each district gets a unique subtle icon
-- Each area card gets a **faded background icon** in the bottom-right corner (opacity ~8-12%, large size) based on its parent district
-- The icon creates a watermark-like decoration without interfering with readability
-- Cards also get a subtle **left border color** per division (8 distinct colors) for visual grouping
+**2. "How to pay?" Section**
+- Section heading with left accent border
+- 3 category cards with icons: Mobile Banking, Online Payment, Bank Transfer
+- Clicking each scrolls/shows the relevant section below
 
-**3. Card Layout Enhancement**
-- Slightly increase card padding
-- Show district name as a small colored chip below the area name
-- The breadcrumb stays but becomes more compact
+**3. Pay bill with Mobile Banking (Tabs: bKash / Nagad)**
+- Tab buttons (bKash, Nagad) — styled as pill buttons
+- **bKash tab**: 5 step-by-step instructions (rebranded "Galaxy Net" instead of "Exord Online", "Galaxy Net ID" instead of "Exord ID")
+- **Nagad tab**: 4 step-by-step instructions similarly rebranded
+- No embedded videos (skip the Facebook video embeds)
+
+**4. Portal Payment Options**
+- Section heading with accent border
+- Grid of payment gateway logos (Visa, Mastercard, Amex, bKash, Nagad, Rocket, etc.) — using emoji/text placeholders or small colored boxes since we don't have actual logo files
+- Checkbox for terms agreement + "Pay Now" button
+
+**5. Direct Bank Transfer**
+- Section heading with accent border
+- Grid of 5 bank cards (3 columns), each with:
+  - Bank name header area (colored)
+  - Account Name: Galaxy Net
+  - Account No: 00000000000 (dummy)
+  - Branch name: 00000000
+  - Routing No: 000000000
+- Banks: BRAC Bank, Eastern Bank, City Bank, ONE Bank, Dutch-Bangla Bank
+
+**6. USSD Warning Notice**
+- Yellow warning box at bottom
+- "You must need to contact with our helpline to update your payment if you use USSD, Bank Payment or Mobile Banking App to pay the bill."
+- Helpline: 00000000000
+- Email: accounts@galaxynetbd.com
 
 ### Files to Modify
-1. `src/pages/Coverage.tsx` — sorting logic, grouped rendering, decorative cards
-2. `src/lib/coverageHierarchy.ts` — add helper to get ancestor at a specific level (e.g., get division for an area)
+- `src/pages/Payment.tsx` — Complete rewrite with new sections (keeps TopBar/Navbar/Footer, removes old card grid and modal)
 
 ### Technical Details
-- District icon mapping: a static object mapping district names to emoji characters (🕌 🏔️ 🍵 🥭 🐅 🚣 🌾 🌉 etc.)
-- Division color mapping: 8 CSS colors for left-border accent per division
-- Sorting uses a composite key built from ancestor chain sort_orders
-- No database changes needed
+- All data is hardcoded/static (no DB changes needed)
+- Existing `payment_methods` table data still exists but won't be used on this page anymore
+- Bengali translations included via existing `t()` helper
+- Responsive grid layout using Tailwind
+- Smooth scroll navigation from "How to pay" category cards to respective sections
 
