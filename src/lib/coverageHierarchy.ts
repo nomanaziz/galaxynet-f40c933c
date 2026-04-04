@@ -84,3 +84,34 @@ export function getDescendantIds(parentId: string, locations: CoverageLocation[]
   }
   return ids;
 }
+
+/** Get ancestor of a specific type for a location */
+export function getAncestorOfType(
+  locId: string | null,
+  targetType: CoverageLocation["type"],
+  locationMap: Map<string, CoverageLocation>
+): CoverageLocation | null {
+  if (!locId) return null;
+  const loc = locationMap.get(locId);
+  if (!loc) return null;
+  if (loc.type === targetType) return loc;
+  return getAncestorOfType(loc.parent_id, targetType, locationMap);
+}
+
+/** Build a sort key for an area based on its ancestor chain sort_orders */
+export function buildAreaSortKey(
+  area: CoverageArea,
+  locationMap: Map<string, CoverageLocation>
+): [number, number, number, number, string] {
+  const div = getAncestorOfType(area.location_id, "division", locationMap);
+  const dist = getAncestorOfType(area.location_id, "district", locationMap);
+  const thana = getAncestorOfType(area.location_id, "thana", locationMap);
+  const zone = getAncestorOfType(area.location_id, "zone", locationMap);
+  return [
+    div?.sort_order ?? 9999,
+    dist?.sort_order ?? 9999,
+    thana?.sort_order ?? 9999,
+    zone?.sort_order ?? 9999,
+    area.name,
+  ];
+}
