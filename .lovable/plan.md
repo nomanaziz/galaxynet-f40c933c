@@ -1,42 +1,56 @@
 
 
-## BTRC Approved Tariff PDF Download Feature
+## Import Bangladesh Location Data & Add Enable/Disable System
 
-### Overview
-Add a "BTRC Approved Tariff" link in both the TopBar and Footer. Admin can upload a PDF file via the admin panel, and users can download it by clicking the link.
+### What This Does
+Load the full Bangladesh Division > District > Thana hierarchy (8 divisions, 64 districts, 622 thanas) from the uploaded Excel into the coverage system. Each thana also becomes a coverage area. Admin can disable any location level (e.g., disable a whole district) and all areas underneath automatically hide from the public coverage page.
 
-### Changes
+### Current State
+- Hierarchy: district > thana > zone (3 levels, enum `coverage_location_type`)
+- Existing data: 1 district, 2 thanas, 8 zones, 2 coverage areas
+- No enable/disable toggle on locations
 
-**1. Admin Settings — Add BTRC Tariff Upload Section**
+### Plan
 
-**File**: `src/pages/admin/SettingsPage.tsx`
-- Add a new "BTRC Tariff" card section with a file upload input (accept PDF only)
-- On upload, store the PDF in the existing `media` Supabase storage bucket with a fixed name like `btrc-tariff.pdf`
-- Save the public URL to `site_settings` table with key `btrc_tariff_url`
-- Show the current file link if one exists, with a replace/delete option
+**1. Database Migration**
+- Add `division` to the `coverage_location_type` enum (new top level)
+- Add `enabled` boolean column to `coverage_locations` (default `true`)
+- This makes the hierarchy: division > district > thana > zone
 
-**2. TopBar — Add BTRC Tariff Link**
+**2. Seed Data via Edge Function**
+- Create an edge function `seed-bangladesh-locations` that:
+  - Clears existing coverage_locations and coverage_areas (fresh start since only test data exists)
+  - Inserts 8 Divisions (Dhaka, Chattogram, Rajshahi, Khulna, Barisal, Sylhet, Rangpur, Mymensingh)
+  - Inserts 64 Districts under their divisions
+  - Inserts 622 Thanas under their districts (with Bangla names from the Excel)
+  - Creates a coverage_area for each thana (622 areas), linked to the thana's location_id, with `available = true`
 
-**File**: `src/components/TopBar.tsx`
-- Read `btrc_tariff_url` from the settings already fetched
-- Add a small download link icon (FileText or Download icon) next to the hotline, labeled "BTRC Tariff"
-- Link opens the PDF URL in a new tab (target="_blank")
-- Only show if `btrc_tariff_url` has a value
+**3. Update CoverageManager (Admin)**
+- Add an enable/disable toggle (Switch) on each location in the Locations tab
+- When a district is disabled, visually indicate it (dimmed/strikethrough)
+- Update the hierarchy display to support the new "division" level (division > district > thana > zone)
+- Update the Areas tab cascading dropdowns to include division as the first level
 
-**3. Footer — Add BTRC Tariff Link**
+**4. Update Coverage Page (Public)**
+- When fetching coverage areas, also fetch locations with `enabled` status
+- Filter out areas whose parent chain contains any disabled location
+- For example: if "Dhaka" district is disabled, all thanas under Dhaka won't appear in the coverage list
+- The cascading filters (Division > District > Thana > Zone) will also exclude disabled locations
 
-**File**: `src/components/Footer.tsx`
-- Add "BTRC Approved Tariff" to the Resources links list
-- Instead of a React Router `<Link>`, use an `<a>` tag with `target="_blank"` pointing to the PDF URL from `site_settings`
-- Read `btrc_tariff_url` from the already-fetched settings
+**5. Update Coverage.tsx Filters**
+- Add Division as the first cascading dropdown
+- Adjust the existing District > Thana > Zone filters to work under Division
 
-### No Database Migration Needed
-- Uses existing `site_settings` table (key: `btrc_tariff_url`)
-- Uses existing `media` storage bucket for the PDF file
+### Files to Modify
+1. **Migration SQL** -- add `division` enum value, add `enabled` column
+2. **New edge function** `supabase/functions/seed-bangladesh-locations/index.ts` -- seed all data
+3. **`src/pages/admin/CoverageManager.tsx`** -- division level, enable/disable toggle
+4. **`src/pages/Coverage.tsx`** -- division filter, respect `enabled` flag
+5. **`src/integrations/supabase/types.ts`** -- will auto-update after migration
 
 ### Technical Details
-- PDF uploaded to `media` bucket as `btrc-tariff.pdf` (overwrites on re-upload)
-- Public URL stored in `site_settings` with key `btrc_tariff_url`
-- TopBar and Footer both already fetch `site_settings` on mount — just read the new key
-- Admin upload uses `supabase.storage.from("media").upload()` with `upsert: true`
+- The Excel has 622 thanas across 64 districts and 8 divisions
+- Each thana becomes both a `coverage_location` (type=thana) AND a `coverage_area`
+- The `enabled` column on `coverage_locations` cascades logically: if a division is disabled, all districts/thanas/zones underneath are treated as disabled on the public page
+- No changes to RLS policies needed -- the filtering is done client-side based on the `enabled` boolean
 
