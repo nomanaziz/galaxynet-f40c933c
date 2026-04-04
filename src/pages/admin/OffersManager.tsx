@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Upload, X, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 
 const defaultForm = { title: "", title_bn: "", description: "", description_bn: "", image_url: "", expiry_date: "", active: true, type: "offer" as "offer" | "referral" | "coupon" };
 
@@ -25,6 +26,12 @@ const sanitize = (form: typeof defaultForm) => ({
   type: form.type,
 });
 
+const typeBadge: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
+  offer: { label: "Offer", variant: "default" },
+  referral: { label: "Referral", variant: "secondary" },
+  coupon: { label: "Coupon", variant: "outline" },
+};
+
 const OffersManager = () => {
   const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,12 +39,13 @@ const OffersManager = () => {
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState(defaultForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const fetchOffers = async () => {
     const { data, error } = await supabase.from("offers").select("*").order("created_at", { ascending: false });
     if (error) {
-      console.error("fetchOffers error:", error);
       toast({ title: "Failed to load offers", description: error.message, variant: "destructive" });
     }
     setOffers(data ?? []);
@@ -47,7 +55,45 @@ const OffersManager = () => {
   useEffect(() => { fetchOffers(); }, []);
 
   const openAdd = () => { setEditing(null); setForm(defaultForm); setDialogOpen(true); };
-  const openEdit = (o: any) => { setEditing(o); setForm({ title: o.title, title_bn: o.title_bn || "", description: o.description || "", description_bn: o.description_bn || "", image_url: o.image_url || "", expiry_date: o.expiry_date || "", active: o.active, type: o.type }); setDialogOpen(true); };
+  const openEdit = (o: any) => {
+    setEditing(o);
+    setForm({
+      title: o.title, title_bn: o.title_bn || "", description: o.description || "",
+      description_bn: o.description_bn || "", image_url: o.image_url || "",
+      expiry_date: o.expiry_date || "", active: o.active, type: o.type
+    });
+    setDialogOpen(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file", description: "Please upload an image file", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max 5MB allowed", variant: "destructive" });
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `offers/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+    const { error } = await supabase.storage.from("media").upload(path, file, { contentType: file.type });
+    if (error) {
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+    setForm(f => ({ ...f, image_url: urlData.publicUrl }));
+    setUploading(false);
+    toast({ title: "Image uploaded" });
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -81,7 +127,10 @@ const OffersManager = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Offers Management</h2>
+        <div>
+          <h2 className="text-2xl font-bold">Offers Management</h2>
+          <p className="text-sm text-muted-foreground mt-1">{offers.length} total offers · {offers.filter(o => o.active).length} active</p>
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild><Button onClick={openAdd}><Plus className="mr-2 h-4 w-4" /> Add Offer</Button></DialogTrigger>
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -90,10 +139,10 @@ const OffersManager = () => {
               <DialogDescription>Fill in the offer details below.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div><Label>Title (EN)</Label><Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} /></div>
-              <div><Label>Title (BN)</Label><Input value={form.title_bn} onChange={e => setForm({...form, title_bn: e.target.value})} /></div>
-              <div><Label>Description (EN)</Label><Textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} /></div>
-              <div><Label>Description (BN)</Label><Textarea value={form.description_bn} onChange={e => setForm({...form, description_bn: e.target.value})} /></div>
+              <div><Label>Title (EN) *</Label><Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="e.g. 500 BDT Discount" /></div>
+              <div><Label>Title (BN)</Label><Input value={form.title_bn} onChange={e => setForm({...form, title_bn: e.target.value})} placeholder="বাংলা শিরোনাম" /></div>
+              <div><Label>Description (EN)</Label><Textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={3} /></div>
+              <div><Label>Description (BN)</Label><Textarea value={form.description_bn} onChange={e => setForm({...form, description_bn: e.target.value})} rows={3} /></div>
               <div><Label>Type</Label>
                 <Select value={form.type} onValueChange={v => setForm({...form, type: v as "offer" | "referral" | "coupon"})}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -104,7 +153,46 @@ const OffersManager = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div><Label>Image URL</Label><Input value={form.image_url} onChange={e => setForm({...form, image_url: e.target.value})} /></div>
+
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <Label>Banner Image</Label>
+                {form.image_url ? (
+                  <div className="relative rounded-lg overflow-hidden border">
+                    <img src={form.image_url} alt="Preview" className="w-full h-40 object-cover" />
+                    <Button
+                      variant="destructive" size="icon"
+                      className="absolute top-2 right-2 h-7 w-7"
+                      onClick={() => setForm(f => ({ ...f, image_url: "" }))}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                  >
+                    {uploading ? (
+                      <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground">Click to upload image (max 5MB)</p>
+                      </>
+                    )}
+                  </div>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">or paste URL:</span>
+                  <Input
+                    value={form.image_url} onChange={e => setForm({...form, image_url: e.target.value})}
+                    placeholder="https://..." className="text-xs h-8"
+                  />
+                </div>
+              </div>
+
               <div><Label>Expiry Date</Label><Input type="date" value={form.expiry_date} onChange={e => setForm({...form, expiry_date: e.target.value})} /></div>
               <div className="flex items-center gap-2"><Switch checked={form.active} onCheckedChange={v => setForm({...form, active: v})} /><Label>Active</Label></div>
               <Button onClick={handleSave} disabled={saving || !form.title} className="w-full">
@@ -117,27 +205,47 @@ const OffersManager = () => {
 
       <Table>
         <TableHeader><TableRow>
-          <TableHead>Title</TableHead><TableHead>Type</TableHead><TableHead>Expiry</TableHead><TableHead>Active</TableHead><TableHead className="text-right">Actions</TableHead>
+          <TableHead className="w-16">Image</TableHead>
+          <TableHead>Title</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Expiry</TableHead>
+          <TableHead>Active</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow></TableHeader>
         <TableBody>
-          {offers.map(o => (
-            <TableRow key={o.id}>
-              <TableCell className="font-medium">{o.title}</TableCell>
-              <TableCell>{o.type}</TableCell>
-              <TableCell>{o.expiry_date || "—"}</TableCell>
-              <TableCell><Switch checked={o.active} onCheckedChange={() => toggleActive(o)} /></TableCell>
-              <TableCell className="text-right space-x-1">
-                <Button variant="ghost" size="icon" onClick={() => openEdit(o)}><Pencil className="h-4 w-4" /></Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button></AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader><AlertDialogTitle>Delete offer?</AlertDialogTitle><AlertDialogDescription>This cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-                    <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(o.id)}>Delete</AlertDialogAction></AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </TableCell>
-            </TableRow>
-          ))}
+          {offers.map(o => {
+            const badge = typeBadge[o.type] || typeBadge.offer;
+            return (
+              <TableRow key={o.id}>
+                <TableCell>
+                  {o.image_url ? (
+                    <img src={o.image_url} alt="" className="h-10 w-14 object-cover rounded" />
+                  ) : (
+                    <div className="h-10 w-14 rounded bg-muted flex items-center justify-center">
+                      <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <div className="font-medium">{o.title}</div>
+                  {o.title_bn && <div className="text-xs text-muted-foreground">{o.title_bn}</div>}
+                </TableCell>
+                <TableCell><Badge variant={badge.variant}>{badge.label}</Badge></TableCell>
+                <TableCell>{o.expiry_date || "—"}</TableCell>
+                <TableCell><Switch checked={o.active} onCheckedChange={() => toggleActive(o)} /></TableCell>
+                <TableCell className="text-right space-x-1">
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(o)}><Pencil className="h-4 w-4" /></Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild><Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button></AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader><AlertDialogTitle>Delete offer?</AlertDialogTitle><AlertDialogDescription>This cannot be undone.</AlertDialogDescription></AlertDialogHeader>
+                      <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(o.id)}>Delete</AlertDialogAction></AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
       {offers.length === 0 && <p className="text-center text-muted-foreground py-8">No offers yet.</p>}
