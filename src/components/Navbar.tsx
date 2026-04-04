@@ -104,7 +104,11 @@ const Navbar = () => {
 
         {/* Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-1">
-          {menuItems.map((item) => (
+          {menuItems.length === 0 ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-5 w-16 rounded bg-muted animate-pulse" />
+            ))
+          ) : menuItems.map((item) => (
             <Link
               key={item.id}
               to={item.url}
