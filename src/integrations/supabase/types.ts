@@ -111,6 +111,7 @@ export type Database = {
       coverage_locations: {
         Row: {
           created_at: string
+          enabled: boolean
           id: string
           name: string
           name_bn: string | null
@@ -120,6 +121,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          enabled?: boolean
           id?: string
           name: string
           name_bn?: string | null
@@ -129,6 +131,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          enabled?: boolean
           id?: string
           name?: string
           name_bn?: string | null
@@ -779,7 +782,7 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "admin" | "staff"
-      coverage_location_type: "district" | "thana" | "zone"
+      coverage_location_type: "division" | "district" | "thana" | "zone"
       notice_category: "maintenance" | "offer" | "alert"
       offer_type: "offer" | "referral" | "coupon"
       order_status:
@@ -918,7 +921,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "staff"],
-      coverage_location_type: ["district", "thana", "zone"],
+      coverage_location_type: ["division", "district", "thana", "zone"],
       notice_category: ["maintenance", "offer", "alert"],
       offer_type: ["offer", "referral", "coupon"],
       order_status: [

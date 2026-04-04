@@ -12,16 +12,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, Pencil, Trash2, Loader2, ChevronRight, ChevronDown, MapPin, CheckSquare, XSquare, Trash } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, ChevronRight, ChevronDown, MapPin, CheckSquare, XSquare, Trash, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Location {
   id: string;
   name: string;
   name_bn: string | null;
-  type: "district" | "thana" | "zone";
+  type: "division" | "district" | "thana" | "zone";
   parent_id: string | null;
   sort_order: number;
+  enabled: boolean;
 }
 
 interface Area {
@@ -42,21 +43,24 @@ const LocationsTab = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editing, setEditing] = useState<Location | null>(null);
-  const [form, setForm] = useState({ name: "", name_bn: "", type: "district" as Location["type"], parent_id: null as string | null });
+  const [form, setForm] = useState({ name: "", name_bn: "", type: "division" as Location["type"], parent_id: null as string | null });
   const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+  const [openDivisions, setOpenDivisions] = useState<Set<string>>(new Set());
   const [openDistricts, setOpenDistricts] = useState<Set<string>>(new Set());
   const [openThanas, setOpenThanas] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
-  const fetch = async () => {
+  const fetchLocations = async () => {
     const { data } = await supabase.from("coverage_locations").select("*").order("sort_order");
     setLocations((data ?? []) as Location[]);
     setLoading(false);
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { fetchLocations(); }, []);
 
-  const districts = useMemo(() => locations.filter(l => l.type === "district"), [locations]);
+  const divisions = useMemo(() => locations.filter(l => l.type === "division"), [locations]);
+  const districtsOf = (divId: string) => locations.filter(l => l.type === "district" && l.parent_id === divId);
   const thanasOf = (distId: string) => locations.filter(l => l.type === "thana" && l.parent_id === distId);
   const zonesOf = (thanaId: string) => locations.filter(l => l.type === "zone" && l.parent_id === thanaId);
 
@@ -86,7 +90,7 @@ const LocationsTab = () => {
     }
     setSaving(false);
     setDialogOpen(false);
-    fetch();
+    fetchLocations();
   };
 
   const handleDelete = async () => {
@@ -95,14 +99,34 @@ const LocationsTab = () => {
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     else toast({ title: "Location deleted" });
     setDeleteId(null);
-    fetch();
+    fetchLocations();
   };
 
-  const toggleDistrict = (id: string) => setOpenDistricts(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+  const toggleEnabled = async (loc: Location) => {
+    const { error } = await supabase.from("coverage_locations").update({ enabled: !loc.enabled }).eq("id", loc.id);
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    fetchLocations();
+  };
+
+  const handleSeedData = async () => {
+    setSeeding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("seed-bangladesh-locations");
+      if (error) throw error;
+      toast({ title: "Data seeded successfully", description: `${data.divisions} divisions, ${data.districts} districts, ${data.thanas} thanas` });
+      fetchLocations();
+    } catch (e: any) {
+      toast({ title: "Seed failed", description: e.message, variant: "destructive" });
+    }
+    setSeeding(false);
+  };
+
+  const toggleDiv = (id: string) => setOpenDivisions(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+  const toggleDist = (id: string) => setOpenDistricts(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
   const toggleThana = (id: string) => setOpenThanas(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
 
   const typeBadge = (type: string) => {
-    const colors: Record<string, string> = { district: "bg-primary/10 text-primary", thana: "bg-accent/10 text-accent", zone: "bg-muted text-muted-foreground" };
+    const colors: Record<string, string> = { division: "bg-blue-100 text-blue-700", district: "bg-primary/10 text-primary", thana: "bg-accent/10 text-accent", zone: "bg-muted text-muted-foreground" };
     return <Badge className={colors[type] ?? ""}>{type}</Badge>;
   };
 
@@ -110,55 +134,85 @@ const LocationsTab = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-muted-foreground">Manage Districts → Thanas → Zones hierarchy</p>
-        <Button onClick={() => openAdd("district", null)} size="sm"><Plus className="mr-1 h-4 w-4" />Add District</Button>
+      <div className="flex justify-between items-center flex-wrap gap-2">
+        <p className="text-sm text-muted-foreground">Manage Divisions → Districts → Thanas → Zones hierarchy</p>
+        <div className="flex gap-2">
+          <Button onClick={handleSeedData} size="sm" variant="outline" disabled={seeding}>
+            {seeding ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Upload className="mr-1 h-4 w-4" />}
+            Seed Bangladesh Data
+          </Button>
+          <Button onClick={() => openAdd("division", null)} size="sm"><Plus className="mr-1 h-4 w-4" />Add Division</Button>
+        </div>
       </div>
 
-      {districts.length === 0 && <p className="text-center text-muted-foreground py-8">No locations yet. Add a district to get started.</p>}
+      {divisions.length === 0 && <p className="text-center text-muted-foreground py-8">No locations yet. Click "Seed Bangladesh Data" to load all divisions, districts & thanas.</p>}
 
       <div className="space-y-2">
-        {districts.map(dist => (
-          <Collapsible key={dist.id} open={openDistricts.has(dist.id)} onOpenChange={() => toggleDistrict(dist.id)}>
-            <div className="flex items-center gap-2 p-3 bg-card border rounded-lg">
+        {divisions.map(div => (
+          <Collapsible key={div.id} open={openDivisions.has(div.id)} onOpenChange={() => toggleDiv(div.id)}>
+            <div className={`flex items-center gap-2 p-3 bg-card border rounded-lg ${!div.enabled ? "opacity-50" : ""}`}>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-6 w-6">
-                  {openDistricts.has(dist.id) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  {openDivisions.has(div.id) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </Button>
               </CollapsibleTrigger>
-              <MapPin className="h-4 w-4 text-primary" />
-              <span className="font-medium flex-1">{dist.name}</span>
-              {dist.name_bn && <span className="text-sm text-muted-foreground">{dist.name_bn}</span>}
-              {typeBadge(dist.type)}
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(dist)}><Pencil className="h-3.5 w-3.5" /></Button>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteId(dist.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
-              <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => openAdd("thana", dist.id)}><Plus className="h-3 w-3 mr-1" />Thana</Button>
+              <MapPin className="h-4 w-4 text-blue-600" />
+              <span className={`font-semibold flex-1 ${!div.enabled ? "line-through" : ""}`}>{div.name}</span>
+              {div.name_bn && <span className="text-sm text-muted-foreground">{div.name_bn}</span>}
+              {typeBadge(div.type)}
+              <Switch checked={div.enabled} onCheckedChange={() => toggleEnabled(div)} />
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(div)}><Pencil className="h-3.5 w-3.5" /></Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteId(div.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+              <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => openAdd("district", div.id)}><Plus className="h-3 w-3 mr-1" />District</Button>
             </div>
-            <CollapsibleContent className="ml-8 mt-1 space-y-1">
-              {thanasOf(dist.id).map(thana => (
-                <Collapsible key={thana.id} open={openThanas.has(thana.id)} onOpenChange={() => toggleThana(thana.id)}>
-                  <div className="flex items-center gap-2 p-2.5 bg-secondary/50 border rounded-md">
+            <CollapsibleContent className="ml-6 mt-1 space-y-1">
+              {districtsOf(div.id).map(dist => (
+                <Collapsible key={dist.id} open={openDistricts.has(dist.id)} onOpenChange={() => toggleDist(dist.id)}>
+                  <div className={`flex items-center gap-2 p-3 bg-card border rounded-lg ${!dist.enabled ? "opacity-50" : ""}`}>
                     <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-5 w-5">
-                        {openThanas.has(thana.id) ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        {openDistricts.has(dist.id) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                       </Button>
                     </CollapsibleTrigger>
-                    <span className="font-medium text-sm flex-1">{thana.name}</span>
-                    {thana.name_bn && <span className="text-xs text-muted-foreground">{thana.name_bn}</span>}
-                    {typeBadge(thana.type)}
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEdit(thana)}><Pencil className="h-3 w-3" /></Button>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setDeleteId(thana.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
-                    <Button variant="outline" size="sm" className="text-xs h-6" onClick={() => openAdd("zone", thana.id)}><Plus className="h-3 w-3 mr-1" />Zone</Button>
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <span className={`font-medium flex-1 ${!dist.enabled ? "line-through" : ""}`}>{dist.name}</span>
+                    {dist.name_bn && <span className="text-sm text-muted-foreground">{dist.name_bn}</span>}
+                    {typeBadge(dist.type)}
+                    <Switch checked={dist.enabled} onCheckedChange={() => toggleEnabled(dist)} />
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(dist)}><Pencil className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteId(dist.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+                    <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => openAdd("thana", dist.id)}><Plus className="h-3 w-3 mr-1" />Thana</Button>
                   </div>
                   <CollapsibleContent className="ml-8 mt-1 space-y-1">
-                    {zonesOf(thana.id).map(zone => (
-                      <div key={zone.id} className="flex items-center gap-2 p-2 bg-background border rounded-sm">
-                        <span className="text-sm flex-1">{zone.name}</span>
-                        {zone.name_bn && <span className="text-xs text-muted-foreground">{zone.name_bn}</span>}
-                        {typeBadge(zone.type)}
-                        <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => openEdit(zone)}><Pencil className="h-3 w-3" /></Button>
-                        <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setDeleteId(zone.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
-                      </div>
+                    {thanasOf(dist.id).map(thana => (
+                      <Collapsible key={thana.id} open={openThanas.has(thana.id)} onOpenChange={() => toggleThana(thana.id)}>
+                        <div className={`flex items-center gap-2 p-2.5 bg-secondary/50 border rounded-md ${!thana.enabled ? "opacity-50" : ""}`}>
+                          <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-5 w-5">
+                              {openThanas.has(thana.id) ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                            </Button>
+                          </CollapsibleTrigger>
+                          <span className={`font-medium text-sm flex-1 ${!thana.enabled ? "line-through" : ""}`}>{thana.name}</span>
+                          {thana.name_bn && <span className="text-xs text-muted-foreground">{thana.name_bn}</span>}
+                          {typeBadge(thana.type)}
+                          <Switch checked={thana.enabled} onCheckedChange={() => toggleEnabled(thana)} />
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEdit(thana)}><Pencil className="h-3 w-3" /></Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setDeleteId(thana.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                          <Button variant="outline" size="sm" className="text-xs h-6" onClick={() => openAdd("zone", thana.id)}><Plus className="h-3 w-3 mr-1" />Zone</Button>
+                        </div>
+                        <CollapsibleContent className="ml-8 mt-1 space-y-1">
+                          {zonesOf(thana.id).map(zone => (
+                            <div key={zone.id} className={`flex items-center gap-2 p-2 bg-background border rounded-sm ${!zone.enabled ? "opacity-50" : ""}`}>
+                              <span className={`text-sm flex-1 ${!zone.enabled ? "line-through" : ""}`}>{zone.name}</span>
+                              {zone.name_bn && <span className="text-xs text-muted-foreground">{zone.name_bn}</span>}
+                              {typeBadge(zone.type)}
+                              <Switch checked={zone.enabled} onCheckedChange={() => toggleEnabled(zone)} />
+                              <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => openEdit(zone)}><Pencil className="h-3 w-3" /></Button>
+                              <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setDeleteId(zone.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                            </div>
+                          ))}
+                        </CollapsibleContent>
+                      </Collapsible>
                     ))}
                   </CollapsibleContent>
                 </Collapsible>
@@ -168,7 +222,6 @@ const LocationsTab = () => {
         ))}
       </div>
 
-      {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -189,7 +242,6 @@ const LocationsTab = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirm */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -221,6 +273,7 @@ const AreasTab = () => {
   const [saving, setSaving] = useState(false);
 
   // Cascading dropdown state
+  const [selDivision, setSelDivision] = useState<string>("");
   const [selDistrict, setSelDistrict] = useState<string>("");
   const [selThana, setSelThana] = useState<string>("");
   const [selZone, setSelZone] = useState<string>("");
@@ -239,10 +292,12 @@ const AreasTab = () => {
 
   useEffect(() => { fetchAll(); }, []);
 
+  const divisionsList = useMemo(() => locations.filter(l => l.type === "division"), [locations]);
   const districts = useMemo(() => locations.filter(l => l.type === "district"), [locations]);
   const thanas = useMemo(() => locations.filter(l => l.type === "thana"), [locations]);
   const zones = useMemo(() => locations.filter(l => l.type === "zone"), [locations]);
 
+  const districtsForDivision = selDivision ? districts.filter(d => d.parent_id === selDivision) : [];
   const thanasForDistrict = selDistrict ? thanas.filter(t => t.parent_id === selDistrict) : [];
   const zonesForThana = selThana ? zones.filter(z => z.parent_id === selThana) : [];
 
@@ -266,33 +321,45 @@ const AreasTab = () => {
   const openNew = () => {
     setEditing(null);
     setForm({ name: "", name_bn: "", available: true, location_id: null });
-    setSelDistrict(""); setSelThana(""); setSelZone("");
+    setSelDivision(""); setSelDistrict(""); setSelThana(""); setSelZone("");
     setDialogOpen(true);
   };
 
   const openEdit = (a: Area) => {
     setEditing(a);
     setForm({ name: a.name, name_bn: a.name_bn ?? "", available: a.available, location_id: a.location_id });
-    // Resolve cascading selections
     if (a.location_id) {
-      const zone = locationMap.get(a.location_id);
-      if (zone) {
-        setSelZone(zone.id);
-        const thana = zone.parent_id ? locationMap.get(zone.parent_id) : undefined;
+      let loc = locationMap.get(a.location_id);
+      if (loc?.type === "zone") {
+        setSelZone(loc.id);
+        const thana = loc.parent_id ? locationMap.get(loc.parent_id) : undefined;
         if (thana) {
           setSelThana(thana.id);
-          setSelDistrict(thana.parent_id ?? "");
+          const dist = thana.parent_id ? locationMap.get(thana.parent_id) : undefined;
+          if (dist) {
+            setSelDistrict(dist.id);
+            setSelDivision(dist.parent_id ?? "");
+          }
+        }
+      } else if (loc?.type === "thana") {
+        setSelZone("");
+        setSelThana(loc.id);
+        const dist = loc.parent_id ? locationMap.get(loc.parent_id) : undefined;
+        if (dist) {
+          setSelDistrict(dist.id);
+          setSelDivision(dist.parent_id ?? "");
         }
       }
     } else {
-      setSelDistrict(""); setSelThana(""); setSelZone("");
+      setSelDivision(""); setSelDistrict(""); setSelThana(""); setSelZone("");
     }
     setDialogOpen(true);
   };
 
   const handleSave = async () => {
     setSaving(true);
-    const payload = { name: form.name, name_bn: form.name_bn || null, available: form.available, location_id: selZone || null };
+    const locationId = selZone || selThana || null;
+    const payload = { name: form.name, name_bn: form.name_bn || null, available: form.available, location_id: locationId };
     if (editing) {
       const { error } = await supabase.from("coverage_areas").update(payload).eq("id", editing.id);
       if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -315,7 +382,6 @@ const AreasTab = () => {
     fetchAll();
   };
 
-  // Bulk actions
   const toggleSelect = (id: string) => setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
   const toggleAll = () => setSelected(prev => prev.size === areas.length ? new Set() : new Set(areas.map(a => a.id)));
 
@@ -346,7 +412,6 @@ const AreasTab = () => {
         <Button onClick={openNew} size="sm"><Plus className="mr-1 h-4 w-4" />Add Area</Button>
       </div>
 
-      {/* Bulk action bar */}
       {selected.size > 0 && (
         <div className="flex items-center gap-2 p-3 bg-accent/10 border border-accent/20 rounded-lg">
           <span className="text-sm font-medium">{selected.size} selected</span>
@@ -389,7 +454,6 @@ const AreasTab = () => {
         </TableBody>
       </Table>
 
-      {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>{editing ? "Edit Area" : "Add Area"}</DialogTitle></DialogHeader>
@@ -398,14 +462,22 @@ const AreasTab = () => {
               <div className="space-y-2"><Label>Name (EN)</Label><Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
               <div className="space-y-2"><Label>Name (BN)</Label><Input value={form.name_bn} onChange={e => setForm(f => ({ ...f, name_bn: e.target.value }))} /></div>
             </div>
-            {/* Cascading dropdowns */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="space-y-2">
-                <Label>District</Label>
-                <Select value={selDistrict} onValueChange={(v) => { setSelDistrict(v); setSelThana(""); setSelZone(""); }}>
+                <Label>Division</Label>
+                <Select value={selDivision} onValueChange={(v) => { setSelDivision(v); setSelDistrict(""); setSelThana(""); setSelZone(""); }}>
                   <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
                   <SelectContent>
-                    {districts.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                    {divisionsList.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>District</Label>
+                <Select value={selDistrict} onValueChange={(v) => { setSelDistrict(v); setSelThana(""); setSelZone(""); }} disabled={!selDivision}>
+                  <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                  <SelectContent>
+                    {districtsForDivision.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -442,7 +514,6 @@ const AreasTab = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Single delete */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader><AlertDialogTitle>Delete Area?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
@@ -450,7 +521,6 @@ const AreasTab = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Bulk delete */}
       <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader><AlertDialogTitle>Delete {selected.size} Areas?</AlertDialogTitle><AlertDialogDescription>This will permanently delete all selected areas.</AlertDialogDescription></AlertDialogHeader>
