@@ -1,32 +1,32 @@
 
 
-## Galaxy-Themed Footer Background
+## Fix: Scroll to Top on Route Change + Scroll-to-Top Button
 
-### What Changes
-Add a deep space / galaxy-inspired background to the footer using CSS-only techniques — stars (tiny radial gradients), nebula glows, and subtle animated twinkling dots. No images needed.
+### Problem
+1. When navigating between pages, the scroll position stays where it was instead of resetting to the top.
+2. No way to quickly scroll back to the top when far down a page.
 
 ### Changes
 
-**File: `src/components/Footer.tsx`**
-1. Replace the plain `bg-primary` footer wrapper with a `relative overflow-hidden` container that uses a dark navy gradient background (`gradient-navy-dark`)
-2. Add an absolutely positioned decorative layer inside the footer with:
-   - Scattered "star" dots using small `<span>` elements with `animate-twinkle` (already defined in CSS)
-   - Two radial gradient nebula glows (blue and orange, matching brand colors) as pseudo-elements via a dedicated wrapper div
+**New file: `src/components/ScrollToTop.tsx`**
+- Uses `useLocation` from react-router-dom to detect route changes
+- Calls `window.scrollTo({ top: 0, left: 0 })` on every pathname change
+- Renders nothing (returns `null`)
 
-**File: `src/index.css`**
-1. Add a new `.footer-galaxy` utility class with:
-   - Deep navy-to-dark-blue gradient background
-   - CSS `::before` pseudo-element with radial gradient nebula spots (subtle blue and orange glows)
-   - CSS `::after` pseudo-element with a repeating radial-gradient pattern for tiny star dots
-2. Add a `@keyframes star-flicker` animation for subtle star brightness variation
+**New file: `src/components/ScrollToTopButton.tsx`**
+- Small fixed button in bottom-right corner (above the WhatsApp button)
+- Shows only when scrolled down more than 300px
+- Uses `ChevronUp` icon from lucide-react
+- Smooth scroll to top on click
+- Small circular button with brand styling (galaxy-blue background, white icon)
+- Fade in/out animation with transition
 
-### Visual Result
-- Dark navy/space background with subtle blue and orange nebula glows
-- Tiny scattered star-like dots with gentle twinkling
-- Content remains fully readable with existing white text
-- Matches "Galaxy Net" brand identity perfectly
+**File: `src/App.tsx`**
+- Add `<ScrollToTop />` right after `<BrowserRouter>`
+- Add `<ScrollToTopButton />` alongside `<FloatingWhatsApp />`
 
-### Files to modify
-- `src/components/Footer.tsx`
-- `src/index.css`
+### Files to create/modify
+- Create `src/components/ScrollToTop.tsx`
+- Create `src/components/ScrollToTopButton.tsx`
+- Modify `src/App.tsx`
 
