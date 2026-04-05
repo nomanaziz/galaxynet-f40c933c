@@ -19,6 +19,8 @@ import Selfcare from "./pages/Selfcare";
 
 import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
+import ScrollToTop from "./components/ScrollToTop";
+import ScrollToTopButton from "./components/ScrollToTopButton";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NewConnection from "./pages/NewConnection";
