@@ -1,0 +1,1 @@
+ALTER TABLE public.payment_methods ADD COLUMN category text NOT NULL DEFAULT 'mobile_banking';
