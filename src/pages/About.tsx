@@ -57,6 +57,7 @@ const About = () => {
   const [stats, setStats] = useState(defaultStats);
   const [timeline, setTimeline] = useState(defaultTimeline);
   const [team, setTeam] = useState<TeamMember[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
   const [journeyTitle, setJourneyTitle] = useState({ en: "Our Journey", bn: "আমাদের পথচলা" });
   const [journeySub, setJourneySub] = useState({ en: "From a small local ISP to serving 10,000+ customers across Bangladesh.", bn: "একটি ছোট স্থানীয় ISP থেকে বাংলাদেশজুড়ে ১০,০০০+ গ্রাহকে সেবা প্রদান।" });
