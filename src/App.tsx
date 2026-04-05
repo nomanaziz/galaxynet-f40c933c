@@ -19,6 +19,8 @@ import Selfcare from "./pages/Selfcare";
 
 import NotFound from "./pages/NotFound";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
+import ScrollToTop from "./components/ScrollToTop";
+import ScrollToTopButton from "./components/ScrollToTopButton";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NewConnection from "./pages/NewConnection";
@@ -58,6 +60,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/packages" element={<Packages />} />
@@ -106,6 +109,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           <FloatingWhatsApp />
+          <ScrollToTopButton />
         </BrowserRouter>
       </LanguageProvider>
     </TooltipProvider>
