@@ -171,27 +171,68 @@ const About = () => {
       <section className="py-16 bg-secondary/50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-foreground text-center mb-10">{t("Our Team", "আমাদের দল")}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-4xl mx-auto">
-            {team.map((member) => (
-              <Card key={member.id} className="border hover:border-accent/40 transition-all">
-                <CardContent className="p-6 text-center">
-                  {member.photo_url ? (
-                    <img src={member.photo_url} alt={member.name} className="h-16 w-16 rounded-full object-cover mx-auto mb-4" />
-                  ) : (
-                    <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                      <Users className="h-8 w-8 text-accent" />
-                    </div>
-                  )}
-                  <h3 className="font-bold text-foreground">{t(member.name, member.name_bn || member.name)}</h3>
-                  {member.designations && (
-                    <p className="text-sm text-accent font-medium mt-1">{t(member.designations.name, member.designations.name_bn || member.designations.name)}</p>
-                  )}
-                  {member.departments && (
-                    <p className="text-xs text-muted-foreground mt-1">{t(member.departments.name, member.departments.name_bn || member.departments.name)}</p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+          <div className="space-y-12 max-w-5xl mx-auto">
+            {departments.map((dept) => {
+              const members = team.filter((m) => m.department_id === dept.id);
+              if (members.length === 0) return null;
+              return (
+                <div key={dept.id}>
+                  <h3 className="text-xl font-semibold text-foreground text-center mb-6 flex items-center gap-3 justify-center">
+                    <span className="h-px w-12 bg-border" />
+                    {t(dept.name, dept.name_bn || dept.name)}
+                    <span className="h-px w-12 bg-border" />
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    {members.map((member) => (
+                      <Card key={member.id} className="border hover:border-accent/40 transition-all">
+                        <CardContent className="p-6 text-center">
+                          {member.photo_url ? (
+                            <img src={member.photo_url} alt={member.name} className="h-16 w-16 rounded-full object-cover mx-auto mb-4" />
+                          ) : (
+                            <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                              <Users className="h-8 w-8 text-accent" />
+                            </div>
+                          )}
+                          <h3 className="font-bold text-foreground">{t(member.name, member.name_bn || member.name)}</h3>
+                          {member.designations && (
+                            <p className="text-sm text-accent font-medium mt-1">{t(member.designations.name, member.designations.name_bn || member.designations.name)}</p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {/* Members without department */}
+            {team.filter((m) => !m.department_id).length > 0 && (
+              <div>
+                <h3 className="text-xl font-semibold text-foreground text-center mb-6 flex items-center gap-3 justify-center">
+                  <span className="h-px w-12 bg-border" />
+                  {t("Other", "অন্যান্য")}
+                  <span className="h-px w-12 bg-border" />
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                  {team.filter((m) => !m.department_id).map((member) => (
+                    <Card key={member.id} className="border hover:border-accent/40 transition-all">
+                      <CardContent className="p-6 text-center">
+                        {member.photo_url ? (
+                          <img src={member.photo_url} alt={member.name} className="h-16 w-16 rounded-full object-cover mx-auto mb-4" />
+                        ) : (
+                          <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                            <Users className="h-8 w-8 text-accent" />
+                          </div>
+                        )}
+                        <h3 className="font-bold text-foreground">{t(member.name, member.name_bn || member.name)}</h3>
+                        {member.designations && (
+                          <p className="text-sm text-accent font-medium mt-1">{t(member.designations.name, member.designations.name_bn || member.designations.name)}</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
