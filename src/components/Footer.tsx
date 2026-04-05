@@ -48,7 +48,7 @@ const Footer = () => {
     { href: "/order", label: t("New Connection", "নতুন সংযোগ") },
     { href: "/speed-test", label: t("Speed Test", "স্পিড টেস্ট") },
     { href: "/notices", label: t("Notices", "নোটিশ") },
-    { href: "/payment", label: t("Pay Bill", "বিল পরিশোধ") },
+    { href: "/pay-bill", label: t("Pay Bill", "বিল পরিশোধ") },
     { href: "/offers", label: t("Offers", "অফার") },
   ];
 

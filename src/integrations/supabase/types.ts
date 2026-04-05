@@ -590,6 +590,7 @@ export type Database = {
           button_text: string | null
           button_text_bn: string | null
           button_url: string | null
+          category: string
           created_at: string
           id: string
           instructions: string | null
@@ -607,6 +608,7 @@ export type Database = {
           button_text?: string | null
           button_text_bn?: string | null
           button_url?: string | null
+          category?: string
           created_at?: string
           id?: string
           instructions?: string | null
@@ -624,6 +626,7 @@ export type Database = {
           button_text?: string | null
           button_text_bn?: string | null
           button_url?: string | null
+          category?: string
           created_at?: string
           id?: string
           instructions?: string | null
