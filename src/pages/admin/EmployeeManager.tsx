@@ -202,7 +202,28 @@ const EmployeeManager = () => {
             </div>
             <div><Label>Phone</Label><Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} /></div>
             <div><Label>Email</Label><Input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
-            <div><Label>Photo URL</Label><Input value={form.photo_url} onChange={e => setForm(f => ({ ...f, photo_url: e.target.value }))} placeholder="https://..." /></div>
+            <div>
+              <Label>Photo</Label>
+              {form.photo_url ? (
+                <div className="relative w-32 h-32 mt-2">
+                  <img src={form.photo_url} alt="Preview" className="w-full h-full object-cover rounded-lg border" />
+                  <button type="button" onClick={() => setForm(f => ({ ...f, photo_url: "" }))} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 hover:opacity-80">
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors"
+                >
+                  {uploading ? <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /> : <Upload className="h-8 w-8 text-muted-foreground" />}
+                  <span className="text-sm text-muted-foreground mt-2">{uploading ? "Uploading..." : "Click to upload photo"}</span>
+                  <span className="text-xs text-muted-foreground">Max 5MB</span>
+                </div>
+              )}
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+              <Input className="mt-2" value={form.photo_url} onChange={e => setForm(f => ({ ...f, photo_url: e.target.value }))} placeholder="Or paste image URL..." />
+            </div>
             <div><Label>Sort Order</Label><Input type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: +e.target.value }))} /></div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2"><Switch checked={form.visible} onCheckedChange={v => setForm(f => ({ ...f, visible: v }))} /><Label>Visible</Label></div>
