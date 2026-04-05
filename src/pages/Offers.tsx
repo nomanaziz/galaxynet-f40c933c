@@ -1,60 +1,50 @@
 import { useEffect, useState } from "react";
-import { Gift, Calendar, Tag, Loader2 } from "lucide-react";
+import { Gift, Loader2, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
-import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import breadcrumbImg from "@/assets/breadcrumb-offers.jpg";
-import offerReferFriend from "@/assets/offer-refer-friend.jpg";
-import offer500Discount from "@/assets/offer-500-discount.jpg";
-import offerFreeConnection from "@/assets/offer-free-connection.jpg";
-import offer1000Discount from "@/assets/offer-1000-discount.jpg";
-
-const FALLBACK_IMAGES: Record<string, string> = {
-  "Make a Referral and Earn BDT 500!": offerReferFriend,
-  "500 BDT Discount on Connection Charge": offer500Discount,
-  "Free Connection Charge on 4 Months Advance Payment": offerFreeConnection,
-  "1000 BDT Discount on Connection Charge": offer1000Discount,
-};
-
-const typeConfig: Record<string, { label: string; labelBn: string; color: string }> = {
-  offer: { label: "Offer", labelBn: "অফার", color: "bg-green-100 text-green-700" },
-  referral: { label: "Referral", labelBn: "রেফারেল", color: "bg-blue-100 text-blue-700" },
-  coupon: { label: "Coupon", labelBn: "কুপন", color: "bg-purple-100 text-purple-700" },
-};
 
 const Offers = () => {
   const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useLanguage();
+  const [settings, setSettings] = useState<Record<string, string>>({});
+  const { t, language } = useLanguage();
 
   useEffect(() => {
-    supabase.from("offers").select("*").eq("active", true).order("created_at", { ascending: false }).then(({ data }) => {
+    Promise.all([
+      supabase.from("offers").select("*").eq("active", true).order("created_at", { ascending: false }),
+      supabase.from("site_settings").select("key, value"),
+    ]).then(([offersRes, settingsRes]) => {
       const now = new Date();
-      const active = (data ?? []).filter(o => !o.expiry_date || new Date(o.expiry_date) >= now);
+      const active = (offersRes.data ?? []).filter(o => !o.expiry_date || new Date(o.expiry_date) >= now);
       setOffers(active);
+      const map: Record<string, string> = {};
+      (settingsRes.data ?? []).forEach((s: any) => { map[s.key] = s.value ?? ""; });
+      setSettings(map);
       setLoading(false);
     });
   }, []);
+
+  const phone = settings.phone || "+880 1700-000000";
+  const email = settings.email || "info@galaxynet.com.bd";
 
   return (
     <div className="min-h-screen flex flex-col">
       <TopBar /><Navbar />
 
-      <PageHeroDark
-        title="Offers & Promotions"
-        titleBn="অফার ও প্রমোশন"
-        subtitle="Don't miss our latest deals and promotions!"
-        subtitleBn="আমাদের সর্বশেষ ডিল ও প্রমোশন মিস করবেন না!"
-        bgImage={breadcrumbImg}
-      />
-
       <section className="py-12 md:py-16 bg-background flex-1">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4">
+          {/* Section Header */}
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-1 h-10 bg-accent rounded-full" />
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              {t("Latest", "সর্বশেষ")} <span className="text-accent">{t("offers", "অফার")}</span>
+            </h1>
+          </div>
+
           {loading ? (
             <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
           ) : offers.length === 0 ? (
@@ -63,38 +53,54 @@ const Offers = () => {
               <p className="text-muted-foreground text-lg">{t("No offers at this time. Check back soon!", "এই মুহূর্তে কোনো অফার নেই। শীঘ্রই আবার দেখুন!")}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {offers.map((offer) => {
-                const cfg = typeConfig[offer.type] || typeConfig.offer;
-                const expired = offer.expiry_date && new Date(offer.expiry_date) < new Date();
-                return (
-                  <Card key={offer.id} className="border hover:border-accent/40 transition-all">
-                    {(offer.image_url || FALLBACK_IMAGES[offer.title]) && (
-                      <img src={offer.image_url || FALLBACK_IMAGES[offer.title]} alt={offer.title} className="w-full h-48 object-cover rounded-t-lg" loading="lazy" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {offers.map((offer) => (
+                <Card key={offer.id} className="overflow-hidden border hover:shadow-lg transition-all group">
+                  {offer.image_url && (
+                    <img
+                      src={offer.image_url}
+                      alt={offer.title}
+                      className="w-full h-48 object-cover"
+                      loading="lazy"
+                    />
+                  )}
+                  <CardContent className="p-5">
+                    <h3 className="text-base font-bold text-foreground mb-2 line-clamp-2">
+                      {language === "bn" && offer.title_bn ? offer.title_bn : offer.title}
+                    </h3>
+                    {offer.description && (
+                      <p className="text-muted-foreground text-sm line-clamp-4">
+                        {language === "bn" && offer.description_bn ? offer.description_bn : offer.description}
+                      </p>
                     )}
-
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Badge className={`${cfg.color} border-0`}>
-                          <Tag className="h-3 w-3 mr-1" /> {t(cfg.label, cfg.labelBn)}
-                        </Badge>
-                        {offer.expiry_date && (
-                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Calendar className="h-3 w-3" />
-                            {expired ? t("Expired", "মেয়াদ শেষ") : `${t("Until", "পর্যন্ত")} ${new Date(offer.expiry_date).toLocaleDateString()}`}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-lg font-bold text-foreground">{t(offer.title, offer.title_bn || offer.title)}</h3>
-                      {offer.description && (
-                        <p className="text-muted-foreground text-sm mt-2">{t(offer.description, offer.description_bn || offer.description)}</p>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
+
+          {/* Disclaimer Section */}
+          <div className="mt-16 flex flex-col md:flex-row items-center gap-6 bg-accent/10 rounded-xl p-6 md:p-8">
+            <div className="shrink-0">
+              <div className="h-20 w-20 md:h-24 md:w-24 rounded-xl bg-accent/20 flex items-center justify-center">
+                <AlertTriangle className="h-10 w-10 md:h-12 md:w-12 text-accent" />
+              </div>
+            </div>
+            <div>
+              <p className="text-foreground font-semibold text-base md:text-lg mb-2">
+                {t(
+                  "The type of the offer and the validity can be changed anytime based on the situation.",
+                  "অফারের ধরন এবং মেয়াদ পরিস্থিতি অনুযায়ী যেকোনো সময় পরিবর্তন হতে পারে।"
+                )}
+              </p>
+              <p className="text-foreground font-bold">
+                {t("Helpline number:", "হেল্পলাইন নম্বর:")} {phone}
+              </p>
+              <p className="text-foreground font-bold">
+                {t("E-Mail:", "ই-মেইল:")} {email}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
