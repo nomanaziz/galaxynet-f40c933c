@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Pencil, Trash2, User, Upload, X } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, User, Upload, X, ArrowUp, ArrowDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Employee {
@@ -28,7 +28,7 @@ interface Employee {
   designations?: { name: string } | null;
 }
 
-interface Dept { id: string; name: string; }
+interface Dept { id: string; name: string; sort_order: number; }
 interface Desig { id: string; name: string; }
 
 const EmployeeManager = () => {
@@ -75,7 +75,7 @@ const EmployeeManager = () => {
   const fetchAll = async () => {
     const [empRes, deptRes, desigRes] = await Promise.all([
       supabase.from("employees").select("*, departments(name), designations(name)").order("sort_order"),
-      supabase.from("departments").select("id, name").order("sort_order"),
+      supabase.from("departments").select("id, name, sort_order").order("sort_order"),
       supabase.from("designations").select("id, name").order("sort_order"),
     ]);
     setItems((empRes.data as Employee[]) ?? []);
@@ -131,7 +131,49 @@ const EmployeeManager = () => {
     fetchAll();
   };
 
+  const handleMove = async (deptId: string | null, index: number, direction: "up" | "down") => {
+    const membersInDept = items
+      .filter(m => m.department_id === deptId)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= membersInDept.length) return;
+    const current = membersInDept[index];
+    const target = membersInDept[targetIndex];
+    await Promise.all([
+      supabase.from("employees").update({ sort_order: target.sort_order }).eq("id", current.id),
+      supabase.from("employees").update({ sort_order: current.sort_order }).eq("id", target.id),
+    ]);
+    fetchAll();
+  };
+
+  // Group employees by department
+  const getGroupedEmployees = () => {
+    const groups: { deptId: string | null; deptName: string; members: Employee[] }[] = [];
+    
+    // Add department groups in sort order
+    for (const dept of depts) {
+      const members = items
+        .filter(e => e.department_id === dept.id)
+        .sort((a, b) => a.sort_order - b.sort_order);
+      if (members.length > 0) {
+        groups.push({ deptId: dept.id, deptName: dept.name, members });
+      }
+    }
+    
+    // Add ungrouped employees
+    const ungrouped = items
+      .filter(e => !e.department_id)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    if (ungrouped.length > 0) {
+      groups.push({ deptId: null, deptName: "No Department", members: ungrouped });
+    }
+    
+    return groups;
+  };
+
   if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin" /></div>;
+
+  const groups = getGroupedEmployees();
 
   return (
     <div className="space-y-6">
@@ -140,45 +182,52 @@ const EmployeeManager = () => {
         <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" />Add Employee</Button>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Photo</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Designation</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>About Page</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map((e) => (
-                <TableRow key={e.id}>
-                  <TableCell>
-                    {e.photo_url ? (
-                      <img src={e.photo_url} alt={e.name} className="h-10 w-10 rounded-full object-cover" />
-                    ) : (
-                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center"><User className="h-5 w-5 text-muted-foreground" /></div>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">{e.name}</TableCell>
-                  <TableCell>{e.departments?.name && <Badge variant="secondary">{e.departments.name}</Badge>}</TableCell>
-                  <TableCell>{e.designations?.name ?? "—"}</TableCell>
-                  <TableCell>{e.phone ?? "—"}</TableCell>
-                  <TableCell><Switch checked={e.show_on_about} onCheckedChange={() => toggleAbout(e)} /></TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button size="icon" variant="ghost" onClick={() => openEdit(e)}><Pencil className="h-4 w-4" /></Button>
-                    <Button size="icon" variant="ghost" className="text-destructive" onClick={() => handleDelete(e.id)}><Trash2 className="h-4 w-4" /></Button>
-                  </TableCell>
+      {groups.map((group) => (
+        <Card key={group.deptId ?? "none"}>
+          <CardContent className="p-0">
+            <div className="px-4 py-3 border-b bg-muted/50">
+              <h3 className="font-semibold text-sm">{group.deptName}</h3>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">#</TableHead>
+                  <TableHead>Photo</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Designation</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>About Page</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {group.members.map((e, idx) => (
+                  <TableRow key={e.id}>
+                    <TableCell className="text-muted-foreground text-xs">{e.sort_order}</TableCell>
+                    <TableCell>
+                      {e.photo_url ? (
+                        <img src={e.photo_url} alt={e.name} className="h-10 w-10 rounded-full object-cover" />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center"><User className="h-5 w-5 text-muted-foreground" /></div>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium">{e.name}</TableCell>
+                    <TableCell>{e.designations?.name ?? "—"}</TableCell>
+                    <TableCell>{e.phone ?? "—"}</TableCell>
+                    <TableCell><Switch checked={e.show_on_about} onCheckedChange={() => toggleAbout(e)} /></TableCell>
+                    <TableCell className="text-right space-x-1">
+                      <Button size="icon" variant="ghost" disabled={idx === 0} onClick={() => handleMove(group.deptId, idx, "up")}><ArrowUp className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" disabled={idx === group.members.length - 1} onClick={() => handleMove(group.deptId, idx, "down")}><ArrowDown className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => openEdit(e)}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" className="text-destructive" onClick={() => handleDelete(e.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      ))}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
