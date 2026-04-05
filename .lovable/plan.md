@@ -1,37 +1,40 @@
 
 
-## Show Team Members Grouped by Department
+## Employee Ordering — Move Up/Down Buttons per Department
 
 ### Problem
-Currently the About page shows all team members in a flat grid without any department grouping. The user wants members organized by department, displayed in department sort order.
+Employees have a `sort_order` field but the admin has no easy way to reorder them. The About page shows members grouped by department, so ordering should be within each department.
 
 ### Changes
 
-**File: `src/pages/About.tsx`**
+**File: `src/pages/admin/EmployeeManager.tsx`**
 
-1. Update the `TeamMember` interface to include `department_id`
-2. Fetch departments separately: `supabase.from("departments").select("*").eq("visible", true).order("sort_order")`
-3. Replace the flat team grid with a department-grouped layout:
-   - Loop through departments (sorted by `sort_order`)
-   - For each department, show a department name heading (EN/BN)
-   - Below each heading, show a grid of members belonging to that department
-   - Members without a department go into an "Other" section at the end
-4. Keep the existing card design for each member
+1. **Group the table by department**: Instead of a flat table, show employees grouped under department headings (similar to About page layout). Ungrouped employees go under "No Department".
 
-**Resulting layout:**
-```text
-Our Team / আমাদের দল
+2. **Add Move Up / Move Down buttons** to each row:
+   - `ArrowUp` and `ArrowDown` icon buttons in the Actions column
+   - On click, swap `sort_order` with the adjacent employee in the same department group
+   - Disable Up on the first item, Down on the last item within each group
+   - Persist both swapped `sort_order` values to Supabase immediately
 
-── Management / ম্যানেজমেন্ট ──
-[Member] [Member] [Member] [Member]
+3. **Add a "Sort Order" column** to the table to show current order visually.
 
-── Technical / টেকনিক্যাল ──
-[Member] [Member] [Member]
+4. **Sort items by department then sort_order** when displaying:
+   - Group `items` by `department_id`
+   - Within each group, sort by `sort_order` ascending
 
-── Support / সাপোর্ট ──
-[Member] [Member]
-```
+5. **Add `handleMoveUp` / `handleMoveDown` functions**:
+   ```
+   - Get filtered list of employees in same department
+   - Find current index
+   - Swap sort_order with previous/next item
+   - Update both rows in Supabase
+   - Refetch
+   ```
 
 ### No database changes needed
-The `employees` table already has `department_id` and the `departments` table has `sort_order`. The query already joins `departments(name, name_bn)`.
+The `sort_order` column already exists on the `employees` table.
+
+### Files to modify
+- `src/pages/admin/EmployeeManager.tsx` — Add up/down reorder buttons grouped by department
 
