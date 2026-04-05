@@ -76,11 +76,14 @@ const About = () => {
     });
     // Fetch team from employees table
     supabase.from("employees")
-      .select("id, name, name_bn, photo_url, departments(name, name_bn), designations(name, name_bn)")
+      .select("id, name, name_bn, photo_url, department_id, departments(name, name_bn), designations(name, name_bn)")
       .eq("show_on_about", true)
       .eq("visible", true)
       .order("sort_order")
       .then(({ data }) => { setTeam((data as TeamMember[]) ?? []); });
+    // Fetch departments
+    supabase.from("departments").select("id, name, name_bn, sort_order").eq("visible", true).order("sort_order")
+      .then(({ data }) => { setDepartments((data as Department[]) ?? []); });
     // Fetch partners
     supabase.from("partners").select("*").eq("visible", true).order("sort_order")
       .then(({ data }) => { setPartners(data ?? []); });
