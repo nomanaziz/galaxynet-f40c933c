@@ -1,40 +1,32 @@
 
 
-## Employee Ordering — Move Up/Down Buttons per Department
+## Galaxy-Themed Footer Background
 
-### Problem
-Employees have a `sort_order` field but the admin has no easy way to reorder them. The About page shows members grouped by department, so ordering should be within each department.
+### What Changes
+Add a deep space / galaxy-inspired background to the footer using CSS-only techniques — stars (tiny radial gradients), nebula glows, and subtle animated twinkling dots. No images needed.
 
 ### Changes
 
-**File: `src/pages/admin/EmployeeManager.tsx`**
+**File: `src/components/Footer.tsx`**
+1. Replace the plain `bg-primary` footer wrapper with a `relative overflow-hidden` container that uses a dark navy gradient background (`gradient-navy-dark`)
+2. Add an absolutely positioned decorative layer inside the footer with:
+   - Scattered "star" dots using small `<span>` elements with `animate-twinkle` (already defined in CSS)
+   - Two radial gradient nebula glows (blue and orange, matching brand colors) as pseudo-elements via a dedicated wrapper div
 
-1. **Group the table by department**: Instead of a flat table, show employees grouped under department headings (similar to About page layout). Ungrouped employees go under "No Department".
+**File: `src/index.css`**
+1. Add a new `.footer-galaxy` utility class with:
+   - Deep navy-to-dark-blue gradient background
+   - CSS `::before` pseudo-element with radial gradient nebula spots (subtle blue and orange glows)
+   - CSS `::after` pseudo-element with a repeating radial-gradient pattern for tiny star dots
+2. Add a `@keyframes star-flicker` animation for subtle star brightness variation
 
-2. **Add Move Up / Move Down buttons** to each row:
-   - `ArrowUp` and `ArrowDown` icon buttons in the Actions column
-   - On click, swap `sort_order` with the adjacent employee in the same department group
-   - Disable Up on the first item, Down on the last item within each group
-   - Persist both swapped `sort_order` values to Supabase immediately
-
-3. **Add a "Sort Order" column** to the table to show current order visually.
-
-4. **Sort items by department then sort_order** when displaying:
-   - Group `items` by `department_id`
-   - Within each group, sort by `sort_order` ascending
-
-5. **Add `handleMoveUp` / `handleMoveDown` functions**:
-   ```
-   - Get filtered list of employees in same department
-   - Find current index
-   - Swap sort_order with previous/next item
-   - Update both rows in Supabase
-   - Refetch
-   ```
-
-### No database changes needed
-The `sort_order` column already exists on the `employees` table.
+### Visual Result
+- Dark navy/space background with subtle blue and orange nebula glows
+- Tiny scattered star-like dots with gentle twinkling
+- Content remains fully readable with existing white text
+- Matches "Galaxy Net" brand identity perfectly
 
 ### Files to modify
-- `src/pages/admin/EmployeeManager.tsx` — Add up/down reorder buttons grouped by department
+- `src/components/Footer.tsx`
+- `src/index.css`
 
