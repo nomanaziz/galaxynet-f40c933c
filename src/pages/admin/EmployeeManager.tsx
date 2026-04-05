@@ -229,7 +229,7 @@ const EmployeeManager = () => {
               <div className="flex items-center gap-2"><Switch checked={form.visible} onCheckedChange={v => setForm(f => ({ ...f, visible: v }))} /><Label>Visible</Label></div>
               <div className="flex items-center gap-2"><Switch checked={form.show_on_about} onCheckedChange={v => setForm(f => ({ ...f, show_on_about: v }))} /><Label>Show on About</Label></div>
             </div>
-            <Button onClick={handleSave} className="w-full">Save</Button>
+            <Button onClick={handleSave} className="w-full" disabled={uploading}>{uploading ? "Uploading..." : "Save"}</Button>
           </div>
         </DialogContent>
       </Dialog>
