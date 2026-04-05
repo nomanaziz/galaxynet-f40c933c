@@ -1,40 +1,66 @@
 
 
-## Coverage Page: Sorting & Decorative Area Cards
+## Offers ও Pay Bill পেজ — Exord-style Redesign + Full Admin Control
 
-### Problem
-1. Coverage area boxes display in flat alphabetical order — not organized by Division > District > Thana hierarchy
-2. Area boxes look plain — just a pin icon and text, no visual identity
+### Reference Design (exord.bd)
+- **Offers**: 4-column card grid with image, title, description. Bottom disclaimer section with helpline info.
+- **Pay Bill**: Quick Pay hero banner → "How to pay?" category icons (Mobile Banking, Online Payment, Bank Transfer) → Tabbed payment instructions (bKash/Nagad with step-by-step) → Portal payment section → Direct bank transfer cards → Helpline disclaimer.
 
-### Changes
+---
 
-**1. Hierarchical Sorting (`src/pages/Coverage.tsx`)**
-- Sort the `filtered` array by: Division sort_order → District sort_order → Thana sort_order
-- Walk up each area's `location_id` ancestor chain to get division/district/thana sort values
-- Dhaka Division will naturally come first (sort_order=1 from seed data), then Chattogram, Rajshahi, etc.
-- Within each division, districts sorted alphabetically/by sort_order, then thanas within each district
-- Add visual **Division group headers** between groups (e.g., "ঢাকা বিভাগ", "চট্টগ্রাম বিভাগ") so users can scan quickly
+### 1. Offers Page Redesign (`src/pages/Offers.tsx`)
 
-**2. Decorative Area Cards (`src/pages/Coverage.tsx`)**
-- Create a mapping of ~64 district-level decorative icons/patterns using emoji or simple SVG motifs representing famous landmarks:
-  - Dhaka: mosque/monument, Chattogram: hill/ship, Sylhet: tea leaf, Rajshahi: mango, Khulna: sundarbans/tiger, Barisal: river/boat, Rangpur: tobacco/temple, Mymensingh: bridge
-  - Each district gets a unique subtle icon
-- Each area card gets a **faded background icon** in the bottom-right corner (opacity ~8-12%, large size) based on its parent district
-- The icon creates a watermark-like decoration without interfering with readability
-- Cards also get a subtle **left border color** per division (8 distinct colors) for visual grouping
+**Layout (matching exord.bd):**
+- Section header: "Latest **offers**" with left orange border accent
+- 4-column responsive grid (1 col mobile, 2 col tablet, 4 col desktop)
+- Each card: full-width image top → title → description text (no badges/tags — cleaner look)
+- Bottom disclaimer section with warning icon + helpline info (fetched from `site_settings`)
+- Remove the current badge/type chip system from public view (keep in admin)
 
-**3. Card Layout Enhancement**
-- Slightly increase card padding
-- Show district name as a small colored chip below the area name
-- The breadcrumb stays but becomes more compact
+**Admin already works** — OffersManager has full CRUD + image upload. No changes needed there.
+
+### 2. Pay Bill Page Redesign (`src/pages/Payment.tsx`)
+
+**Layout (matching exord.bd):**
+- **Quick Pay Banner**: Gradient/decorated card with description text + "PAY NOW" button (URL from `site_settings`)
+- **"How to pay?" Section**: Section header with accent border → 3-4 category icon cards (Mobile Banking, Online Payment, Bank Transfer, USSD Code) — these are visual navigation, not clickable
+- **"Pay bill with mobile banking" Section**: Tabbed interface showing payment methods that have `instructions` — each tab shows step-by-step text instructions (from `payment_methods` table)
+- **Portal Payment Section**: Shows online payment options with screenshot/image
+- **Direct Bank Transfer Section**: Grid of bank cards showing account details (from `payment_methods` where type could be "bank")
+- **Bottom Disclaimer**: Warning icon + helpline info
+
+**Route change**: `/payment` → `/pay-bill` (update App.tsx + Footer.tsx)
+
+### 3. Admin: Pay Bill Page Settings
+
+Add a **Settings tab** to `PaymentManager.tsx`:
+- `payment_portal_url` — Quick Pay button URL
+- `payment_hero_title` / `payment_hero_title_bn`
+- `payment_hero_subtitle` / `payment_hero_subtitle_bn`
+- `payment_helpline_text` / `payment_helpline_text_bn`
+- Uses `site_settings` table (upsert pattern), no migration needed
+
+### 4. Payment Methods Table Enhancement
+
+**DB Migration**: Add a `category` column to `payment_methods`:
+```sql
+ALTER TABLE payment_methods ADD COLUMN category text NOT NULL DEFAULT 'mobile_banking';
+```
+Categories: `mobile_banking`, `online_payment`, `bank_transfer`, `ussd`
+
+This lets the Pay Bill page group methods into the correct sections automatically.
+
+**Update PaymentManager.tsx**: Add category dropdown to the form.
+
+---
 
 ### Files to Modify
-1. `src/pages/Coverage.tsx` — sorting logic, grouped rendering, decorative cards
-2. `src/lib/coverageHierarchy.ts` — add helper to get ancestor at a specific level (e.g., get division for an area)
+1. `src/pages/Offers.tsx` — Exord-style 4-col grid, accent header, disclaimer section
+2. `src/pages/Payment.tsx` — Full redesign with sections (Quick Pay, How to Pay, Mobile Banking tabs, Bank Transfer cards, disclaimer)
+3. `src/pages/admin/PaymentManager.tsx` — Add Settings tab + category field
+4. `src/App.tsx` — Route `/payment` → `/pay-bill`
+5. `src/components/Footer.tsx` — Link update to `/pay-bill`
 
-### Technical Details
-- District icon mapping: a static object mapping district names to emoji characters (🕌 🏔️ 🍵 🥭 🐅 🚣 🌾 🌉 etc.)
-- Division color mapping: 8 CSS colors for left-border accent per division
-- Sorting uses a composite key built from ancestor chain sort_orders
-- No database changes needed
+### DB Migration
+- Add `category` column to `payment_methods` table
 
