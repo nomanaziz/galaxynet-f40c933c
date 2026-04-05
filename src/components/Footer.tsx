@@ -54,8 +54,8 @@ const Footer = () => {
 
   return (
     <>
-      <footer className="bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 py-12">
+      <footer className="footer-galaxy text-primary-foreground">
+        <div className="container mx-auto px-4 py-12 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10">
             {/* Brand */}
             <div className="col-span-2 lg:col-span-1">
@@ -146,7 +146,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/10">
-          <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-primary-foreground/80 text-xs">
+          <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-primary-foreground/80 text-xs relative z-10">
             <span>© {new Date().getFullYear()} {siteName}. {t("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}</span>
             <span>Developed by: <a href="https://finehost.net" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">FineHost.net</a></span>
           </div>

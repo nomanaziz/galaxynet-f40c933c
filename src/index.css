@@ -229,4 +229,54 @@
     animation: soft-glow 4s ease-in-out infinite;
     will-change: opacity;
   }
+
+  .footer-galaxy {
+    background: linear-gradient(160deg, hsl(215 60% 8%) 0%, hsl(220 50% 6%) 40%, hsl(215 55% 10%) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .footer-galaxy::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 15% 30%, hsl(195 75% 37% / 0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 500px 350px at 85% 70%, hsl(25 100% 50% / 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 300px 300px at 50% 90%, hsl(195 75% 50% / 0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .footer-galaxy::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, hsl(0 0% 100% / 0.5) 50%, transparent 50%),
+      radial-gradient(1px 1px at 25% 45%, hsl(0 0% 100% / 0.4) 50%, transparent 50%),
+      radial-gradient(1px 1px at 40% 20%, hsl(0 0% 100% / 0.6) 50%, transparent 50%),
+      radial-gradient(1px 1px at 55% 80%, hsl(0 0% 100% / 0.3) 50%, transparent 50%),
+      radial-gradient(1px 1px at 70% 35%, hsl(0 0% 100% / 0.5) 50%, transparent 50%),
+      radial-gradient(1px 1px at 85% 60%, hsl(0 0% 100% / 0.4) 50%, transparent 50%),
+      radial-gradient(1px 1px at 95% 10%, hsl(0 0% 100% / 0.6) 50%, transparent 50%),
+      radial-gradient(1px 1px at 5% 75%, hsl(0 0% 100% / 0.3) 50%, transparent 50%),
+      radial-gradient(1.5px 1.5px at 30% 65%, hsl(0 0% 100% / 0.5) 50%, transparent 50%),
+      radial-gradient(1.5px 1.5px at 60% 50%, hsl(0 0% 100% / 0.4) 50%, transparent 50%),
+      radial-gradient(1px 1px at 15% 90%, hsl(0 0% 100% / 0.35) 50%, transparent 50%),
+      radial-gradient(1px 1px at 75% 15%, hsl(0 0% 100% / 0.45) 50%, transparent 50%),
+      radial-gradient(1px 1px at 45% 40%, hsl(0 0% 100% / 0.3) 50%, transparent 50%),
+      radial-gradient(1.5px 1.5px at 90% 85%, hsl(0 0% 100% / 0.5) 50%, transparent 50%),
+      radial-gradient(1px 1px at 20% 55%, hsl(195 75% 60% / 0.4) 50%, transparent 50%),
+      radial-gradient(1px 1px at 80% 40%, hsl(25 100% 60% / 0.3) 50%, transparent 50%);
+    animation: star-flicker 4s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes star-flicker {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+  }
 }
