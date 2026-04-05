@@ -1,0 +1,1 @@
+UPDATE menu_items SET url = '/pay-bill' WHERE id = 'c7758040-4ed4-4516-b8d9-c5aebbb2e645';
