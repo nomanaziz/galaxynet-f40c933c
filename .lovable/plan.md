@@ -1,38 +1,37 @@
 
 
-## Employee Manager — Image Upload Instead of Photo URL
+## Show Team Members Grouped by Department
 
 ### Problem
-Currently the Employee form uses a plain text input for "Photo URL", requiring admins to manually paste a URL. It should have a proper file upload with preview, like the Offers Manager already does.
+Currently the About page shows all team members in a flat grid without any department grouping. The user wants members organized by department, displayed in department sort order.
 
 ### Changes
 
-**File: `src/pages/admin/EmployeeManager.tsx`**
+**File: `src/pages/About.tsx`**
 
-1. Replace the "Photo URL" text input with an image upload zone:
-   - Click-to-browse file input (accepts image/*)
-   - Upload to Supabase `media` bucket under `employees/` prefix
-   - Show image preview with remove button when uploaded
-   - Keep a "Paste URL" fallback input below the upload zone
-   - Add `uploading` state to disable save while upload is in progress
+1. Update the `TeamMember` interface to include `department_id`
+2. Fetch departments separately: `supabase.from("departments").select("*").eq("visible", true).order("sort_order")`
+3. Replace the flat team grid with a department-grouped layout:
+   - Loop through departments (sorted by `sort_order`)
+   - For each department, show a department name heading (EN/BN)
+   - Below each heading, show a grid of members belonging to that department
+   - Members without a department go into an "Other" section at the end
+4. Keep the existing card design for each member
 
-2. Add `handleImageUpload` function:
-   - Validate file type (image/*) and size (max 5MB)
-   - Generate unique path: `employees/{timestamp}-{random}.{ext}`
-   - Upload via `supabase.storage.from("media").upload()`
-   - Get public URL and set it to `form.photo_url`
-   - Show toast on error
+**Resulting layout:**
+```text
+Our Team / আমাদের দল
 
-3. Update the dialog form section (replace the Photo URL input ~line 160):
-   - Upload area with dashed border, camera/upload icon, "Click to upload" text
-   - If `form.photo_url` is set, show preview image with X button to clear
-   - Small text input below for manual URL paste
+── Management / ম্যানেজমেন্ট ──
+[Member] [Member] [Member] [Member]
+
+── Technical / টেকনিক্যাল ──
+[Member] [Member] [Member]
+
+── Support / সাপোর্ট ──
+[Member] [Member]
+```
 
 ### No database changes needed
-The `media` storage bucket already exists and is public.
-
-### Technical Details
-- Reuses the same upload pattern already established in `OffersManager.tsx`
-- File path format: `employees/{Date.now()}-{random}.{ext}`
-- Max file size: 5MB with client-side validation
+The `employees` table already has `department_id` and the `departments` table has `sort_order`. The query already joins `departments(name, name_bn)`.
 
