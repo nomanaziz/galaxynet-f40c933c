@@ -33,8 +33,16 @@ interface TeamMember {
   name: string;
   name_bn: string | null;
   photo_url: string | null;
+  department_id: string | null;
   departments: { name: string; name_bn: string | null } | null;
   designations: { name: string; name_bn: string | null } | null;
+}
+
+interface Department {
+  id: string;
+  name: string;
+  name_bn: string | null;
+  sort_order: number;
 }
 
 function safeParse<T>(json: string | undefined, fallback: T): T {
