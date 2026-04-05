@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Pencil, Trash2, User } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, User, Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Employee {
@@ -38,11 +38,39 @@ const EmployeeManager = () => {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Employee | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     name: "", name_bn: "", department_id: "", designation_id: "",
     phone: "", email: "", photo_url: "", sort_order: 0, visible: true, show_on_about: false,
   });
   const { toast } = useToast();
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file type", description: "Please upload an image file", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max file size is 5MB", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `employees/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await supabase.storage.from("media").upload(path, file);
+    if (error) {
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+      setUploading(false);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+    setForm(f => ({ ...f, photo_url: urlData.publicUrl }));
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const fetchAll = async () => {
     const [empRes, deptRes, desigRes] = await Promise.all([
@@ -174,13 +202,34 @@ const EmployeeManager = () => {
             </div>
             <div><Label>Phone</Label><Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} /></div>
             <div><Label>Email</Label><Input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
-            <div><Label>Photo URL</Label><Input value={form.photo_url} onChange={e => setForm(f => ({ ...f, photo_url: e.target.value }))} placeholder="https://..." /></div>
+            <div>
+              <Label>Photo</Label>
+              {form.photo_url ? (
+                <div className="relative w-32 h-32 mt-2">
+                  <img src={form.photo_url} alt="Preview" className="w-full h-full object-cover rounded-lg border" />
+                  <button type="button" onClick={() => setForm(f => ({ ...f, photo_url: "" }))} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 hover:opacity-80">
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors"
+                >
+                  {uploading ? <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /> : <Upload className="h-8 w-8 text-muted-foreground" />}
+                  <span className="text-sm text-muted-foreground mt-2">{uploading ? "Uploading..." : "Click to upload photo"}</span>
+                  <span className="text-xs text-muted-foreground">Max 5MB</span>
+                </div>
+              )}
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+              <Input className="mt-2" value={form.photo_url} onChange={e => setForm(f => ({ ...f, photo_url: e.target.value }))} placeholder="Or paste image URL..." />
+            </div>
             <div><Label>Sort Order</Label><Input type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: +e.target.value }))} /></div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2"><Switch checked={form.visible} onCheckedChange={v => setForm(f => ({ ...f, visible: v }))} /><Label>Visible</Label></div>
               <div className="flex items-center gap-2"><Switch checked={form.show_on_about} onCheckedChange={v => setForm(f => ({ ...f, show_on_about: v }))} /><Label>Show on About</Label></div>
             </div>
-            <Button onClick={handleSave} className="w-full">Save</Button>
+            <Button onClick={handleSave} className="w-full" disabled={uploading}>{uploading ? "Uploading..." : "Save"}</Button>
           </div>
         </DialogContent>
       </Dialog>
