@@ -600,6 +600,7 @@ export type Database = {
           name_bn: string | null
           screenshot_url: string | null
           sort_order: number
+          video_url: string | null
           visible: boolean
         }
         Insert: {
@@ -618,6 +619,7 @@ export type Database = {
           name_bn?: string | null
           screenshot_url?: string | null
           sort_order?: number
+          video_url?: string | null
           visible?: boolean
         }
         Update: {
@@ -636,6 +638,7 @@ export type Database = {
           name_bn?: string | null
           screenshot_url?: string | null
           sort_order?: number
+          video_url?: string | null
           visible?: boolean
         }
         Relationships: []

@@ -24,6 +24,7 @@ const emptyForm = {
   name: "", name_bn: "", account_number: "", instructions: "", instructions_bn: "",
   logo_url: "", sort_order: 0, visible: true, button_text: "", button_text_bn: "",
   button_url: "", bg_color: "#3B82F6", screenshot_url: "", category: "mobile_banking",
+  video_url: "",
 };
 
 const SETTINGS_KEYS = [
@@ -82,6 +83,7 @@ const PaymentManager = () => {
     button_url: item.button_url || null,
     bg_color: item.bg_color || null,
     screenshot_url: item.screenshot_url || null,
+    video_url: item.video_url || null,
   });
 
   const saveMutation = useMutation({
@@ -126,6 +128,7 @@ const PaymentManager = () => {
       button_text: item.button_text || "", button_text_bn: item.button_text_bn || "",
       button_url: item.button_url || "", bg_color: item.bg_color || "#3B82F6",
       screenshot_url: item.screenshot_url || "", category: item.category || "mobile_banking",
+      video_url: item.video_url || "",
     });
     setDialogOpen(true);
   };
@@ -239,6 +242,7 @@ const PaymentManager = () => {
                   <div><Label>Button Text (EN)</Label><Input value={form.button_text} onChange={(e) => setForm({ ...form, button_text: e.target.value })} className="mt-1" /></div>
                   <div><Label>Button Text (BN)</Label><Input value={form.button_text_bn} onChange={(e) => setForm({ ...form, button_text_bn: e.target.value })} className="mt-1" /></div>
                   <div><Label>Button URL</Label><Input value={form.button_url} onChange={(e) => setForm({ ...form, button_url: e.target.value })} className="mt-1" placeholder="https://..." /></div>
+                  <div><Label>Video URL (YouTube)</Label><Input value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} className="mt-1" placeholder="https://www.youtube.com/watch?v=..." /></div>
                   <div className="flex items-center gap-2"><Switch checked={form.visible} onCheckedChange={(v) => setForm({ ...form, visible: v })} /><Label>Visible</Label></div>
                 </div>
                 <Button className="w-full mt-4" onClick={() => saveMutation.mutate(editing ? { ...form, id: editing.id } : form)} disabled={saveMutation.isPending}>

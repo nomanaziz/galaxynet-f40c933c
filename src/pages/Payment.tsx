@@ -176,13 +176,35 @@ const Payment = () => {
                         <p className="text-lg font-mono font-bold text-foreground">{activeMethod.account_number}</p>
                       </div>
                     )}
-                  </div>
+              </div>
                   {activeMethod.screenshot_url && (
                     <div className="md:w-80 shrink-0">
                       <img src={activeMethod.screenshot_url} alt="" className="w-full rounded-lg border" />
                     </div>
                   )}
                 </div>
+                {activeMethod.video_url && (() => {
+                  const url = activeMethod.video_url;
+                  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\s]+)/);
+                  const videoId = match?.[1];
+                  if (!videoId) return null;
+                  return (
+                    <div className="mt-6">
+                      <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                        ▶ {t("Watch Tutorial Video", "টিউটোরিয়াল ভিডিও দেখুন")}
+                      </h3>
+                      <div className="relative w-full aspect-video rounded-lg overflow-hidden border">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${videoId}`}
+                          title="Tutorial"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="absolute inset-0 w-full h-full"
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </div>
