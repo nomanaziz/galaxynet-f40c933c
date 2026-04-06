@@ -1,32 +1,40 @@
 
 
-## Fix: Scroll to Top on Route Change + Scroll-to-Top Button
+## Add Video Link for Mobile Banking Payment Methods
 
-### Problem
-1. When navigating between pages, the scroll position stays where it was instead of resetting to the top.
-2. No way to quickly scroll back to the top when far down a page.
+### What Changes
+Add a `video_url` column to the `payment_methods` table so each mobile banking method can have an optional tutorial video. Display it as an embedded YouTube video (or link) in the mobile banking tab content on the Payment page. Allow admins to set the video URL in PaymentManager.
 
-### Changes
+### Database Migration
+- Add `video_url text` column to `payment_methods` table
 
-**New file: `src/components/ScrollToTop.tsx`**
-- Uses `useLocation` from react-router-dom to detect route changes
-- Calls `window.scrollTo({ top: 0, left: 0 })` on every pathname change
-- Renders nothing (returns `null`)
+### File Changes
 
-**New file: `src/components/ScrollToTopButton.tsx`**
-- Small fixed button in bottom-right corner (above the WhatsApp button)
-- Shows only when scrolled down more than 300px
-- Uses `ChevronUp` icon from lucide-react
-- Smooth scroll to top on click
-- Small circular button with brand styling (galaxy-blue background, white icon)
-- Fade in/out animation with transition
+**`src/pages/Payment.tsx`**
+- In the mobile banking tab content (after instructions/screenshot), render an embedded YouTube video if `activeMethod.video_url` is set
+- Extract YouTube video ID from URL and render in a 16:9 aspect ratio iframe
+- Show a "Watch Tutorial" label above the video
 
-**File: `src/App.tsx`**
-- Add `<ScrollToTop />` right after `<BrowserRouter>`
-- Add `<ScrollToTopButton />` alongside `<FloatingWhatsApp />`
+**`src/pages/admin/PaymentManager.tsx`**
+- Add `video_url` field to `emptyForm`
+- Add a "Video URL (YouTube)" input field in the payment method form dialog
 
-### Files to create/modify
-- Create `src/components/ScrollToTop.tsx`
-- Create `src/components/ScrollToTopButton.tsx`
-- Modify `src/App.tsx`
+### Layout
+```text
+Mobile Banking Tab Content:
+┌──────────────────────────────────────────┐
+│  Instructions text    │  Screenshot      │
+│  Account number       │                  │
+├───────────────────────┴──────────────────┤
+│  ▶ Watch Tutorial Video                  │
+│  ┌──────────────────────────────────┐    │
+│  │  YouTube Embed (16:9)            │    │
+│  └──────────────────────────────────┘    │
+└──────────────────────────────────────────┘
+```
+
+### Files to modify
+- Create migration: add `video_url` to `payment_methods`
+- `src/pages/Payment.tsx`
+- `src/pages/admin/PaymentManager.tsx`
 
