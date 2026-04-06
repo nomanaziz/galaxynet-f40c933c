@@ -127,6 +127,7 @@ const PaymentManager = () => {
       button_text: item.button_text || "", button_text_bn: item.button_text_bn || "",
       button_url: item.button_url || "", bg_color: item.bg_color || "#3B82F6",
       screenshot_url: item.screenshot_url || "", category: item.category || "mobile_banking",
+      video_url: item.video_url || "",
     });
     setDialogOpen(true);
   };
