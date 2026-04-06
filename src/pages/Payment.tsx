@@ -9,6 +9,33 @@ import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
+const getYouTubeId = (url: string) => {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\s]+)/);
+  return match?.[1] || null;
+};
+
+const VideoEmbed = ({ url }: { url: string }) => {
+  const { t } = useLanguage();
+  const videoId = getYouTubeId(url);
+  if (!videoId) return null;
+  return (
+    <div className="mt-6">
+      <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+        ▶ {t("Watch Tutorial Video", "টিউটোরিয়াল ভিডিও দেখুন")}
+      </h3>
+      <div className="relative w-full aspect-video rounded-lg overflow-hidden border">
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title="Tutorial"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 w-full h-full"
+        />
+      </div>
+    </div>
+  );
+};
+
 const categoryIcons: Record<string, { icon: any; label: string; labelBn: string }> = {
   mobile_banking: { icon: Smartphone, label: "Mobile Banking", labelBn: "মোবাইল ব্যাংকিং" },
   online_payment: { icon: Globe, label: "Online Payment", labelBn: "অনলাইন পেমেন্ট" },
@@ -183,28 +210,7 @@ const Payment = () => {
                     </div>
                   )}
                 </div>
-                {activeMethod.video_url && (() => {
-                  const url = activeMethod.video_url;
-                  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\s]+)/);
-                  const videoId = match?.[1];
-                  if (!videoId) return null;
-                  return (
-                    <div className="mt-6">
-                      <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-                        ▶ {t("Watch Tutorial Video", "টিউটোরিয়াল ভিডিও দেখুন")}
-                      </h3>
-                      <div className="relative w-full aspect-video rounded-lg overflow-hidden border">
-                        <iframe
-                          src={`https://www.youtube.com/embed/${videoId}`}
-                          title="Tutorial"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="absolute inset-0 w-full h-full"
-                        />
-                      </div>
-                    </div>
-                  );
-                })()}
+                {activeMethod.video_url && <VideoEmbed url={activeMethod.video_url} />}
               </div>
             )}
           </div>
@@ -280,6 +286,7 @@ const Payment = () => {
                         {language === "bn" && m.instructions_bn ? m.instructions_bn : m.instructions}
                       </p>
                     )}
+                    {m.video_url && <VideoEmbed url={m.video_url} />}
                   </CardContent>
                 </Card>
               ))}
@@ -341,6 +348,7 @@ const Payment = () => {
                 {language === "bn" && selectedMethod?.instructions_bn ? selectedMethod.instructions_bn : selectedMethod.instructions}
               </p>
             )}
+            {selectedMethod?.video_url && <VideoEmbed url={selectedMethod.video_url} />}
             {selectedMethod?.button_url && (
               <Button className="w-full" onClick={() => window.open(selectedMethod.button_url, "_blank")}>
                 {language === "bn" && selectedMethod?.button_text_bn ? selectedMethod.button_text_bn : selectedMethod?.button_text || t("Pay Now", "পে করুন")}
