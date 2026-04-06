@@ -24,6 +24,7 @@ const emptyForm = {
   name: "", name_bn: "", account_number: "", instructions: "", instructions_bn: "",
   logo_url: "", sort_order: 0, visible: true, button_text: "", button_text_bn: "",
   button_url: "", bg_color: "#3B82F6", screenshot_url: "", category: "mobile_banking",
+  video_url: "",
 };
 
 const SETTINGS_KEYS = [
