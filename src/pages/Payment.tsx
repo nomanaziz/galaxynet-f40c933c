@@ -295,6 +295,57 @@ const Payment = () => {
         </section>
       )}
 
+      {/* USSD Code */}
+      {ussdMethods.length > 0 && (
+        <section className="py-12 md:py-16 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-1 h-10 bg-accent rounded-full" />
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                {t("USSD Code", "ইউএসএসডি কোড")} <span className="text-accent">{t("payment", "পেমেন্ট")}</span>
+              </h2>
+            </div>
+            <p className="text-muted-foreground mb-8 ml-4">
+              {t("Pay your bill using USSD codes from your phone", "আপনার ফোন থেকে USSD কোড ব্যবহার করে বিল পরিশোধ করুন")}
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {ussdMethods.map((m) => (
+                <Card key={m.id} className="overflow-hidden border">
+                  <div className="h-20 flex items-center justify-center p-4" style={{ backgroundColor: m.bg_color || "hsl(var(--primary))" }}>
+                    {m.logo_url ? (
+                      <img src={m.logo_url} alt={m.name} className="max-h-10 max-w-full object-contain" />
+                    ) : (
+                      <Hash className="h-8 w-8 text-white" />
+                    )}
+                  </div>
+                  <CardContent className="p-5 space-y-3">
+                    <h3 className="font-bold text-foreground text-lg">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
+                    {m.account_number && (
+                      <div className="flex justify-between items-center border-b border-border pb-2">
+                        <span className="text-sm text-muted-foreground">{t("Code:", "কোড:")}</span>
+                        <span className="font-mono font-bold text-foreground">{m.account_number}</span>
+                      </div>
+                    )}
+                    {m.instructions && (
+                      <p className="text-sm text-muted-foreground whitespace-pre-line">
+                        {language === "bn" && m.instructions_bn ? m.instructions_bn : m.instructions}
+                      </p>
+                    )}
+                    {m.video_url && <VideoEmbed url={m.video_url} />}
+                    {m.button_url && (
+                      <Button className="w-full mt-2" variant="outline" onClick={() => window.open(m.button_url!, "_blank")}>
+                        {language === "bn" && m.button_text_bn ? m.button_text_bn : m.button_text || t("Learn More", "বিস্তারিত")}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Disclaimer */}
       <section className="py-10 bg-background">
         <div className="container mx-auto px-4">
