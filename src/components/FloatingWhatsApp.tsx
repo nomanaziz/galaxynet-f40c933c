@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { MessageCircle } from "lucide-react";
 
 const FloatingWhatsApp = () => {
   const [number, setNumber] = useState("8801646078000");
@@ -20,12 +21,19 @@ const FloatingWhatsApp = () => {
       href={`https://wa.me/${number}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-20 left-4 md:bottom-6 md:left-6 z-50 h-14 w-14 rounded-full bg-[#25D366] hover:bg-[#128C7E] text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
+      className="fixed bottom-20 left-4 md:bottom-6 md:left-6 z-50 group"
       aria-label="Chat on WhatsApp"
     >
-      <svg viewBox="0 0 32 32" className="h-8 w-8 fill-white">
-        <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16c0 3.5 1.128 6.744 3.046 9.378L1.054 31.29l6.118-1.96A15.89 15.89 0 0016.004 32C24.826 32 32 24.822 32 16S24.826 0 16.004 0zm9.335 22.594c-.39 1.1-1.932 2.014-3.164 2.28-.844.18-1.946.324-5.66-1.216-4.752-1.97-7.81-6.79-8.046-7.104-.228-.314-1.864-2.482-1.864-4.734 0-2.252 1.18-3.36 1.6-3.82.42-.46.916-.574 1.22-.574.304 0 .608.002.874.016.28.014.656-.106.026 1.544-.63 1.65-1.086 2.846-1.086 2.846-.228.39-.468.338-.228.052.24-.286 1.164-1.364 1.698-1.93.534-.566 1.068-.468 1.432-.28.364.188 2.34 1.1 2.74 1.3.4.2.666.3.764.468.098.168.098.968-.292 1.902z" />
-      </svg>
+      {/* Pulse ring */}
+      <span className="absolute inset-0 rounded-full bg-[#25D366]/40 animate-ping" />
+      {/* Glow ring */}
+      <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[#25D366] to-[#128C7E] opacity-30 blur-md group-hover:opacity-50 transition-opacity" />
+      {/* Button */}
+      <span className="relative h-14 w-14 rounded-full bg-gradient-to-br from-[#25D366] to-[#128C7E] text-white flex items-center justify-center shadow-[0_4px_20px_rgba(37,211,102,0.4)] transition-all group-hover:scale-110 group-hover:shadow-[0_6px_28px_rgba(37,211,102,0.55)]">
+        <svg viewBox="0 0 24 24" className="h-7 w-7 fill-white drop-shadow-sm">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+      </span>
     </a>
   );
 };
