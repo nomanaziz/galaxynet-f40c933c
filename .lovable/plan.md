@@ -1,40 +1,57 @@
 
 
-## Add Video Link for Mobile Banking Payment Methods
+## Two Changes: WhatsApp Button Repositioning + Area Selection Hierarchy
 
-### What Changes
-Add a `video_url` column to the `payment_methods` table so each mobile banking method can have an optional tutorial video. Display it as an embedded YouTube video (or link) in the mobile banking tab content on the Payment page. Allow admins to set the video URL in PaymentManager.
+### 1. WhatsApp Floating Button — Move to Left Side
 
-### Database Migration
-- Add `video_url text` column to `payment_methods` table
+**File: `src/components/FloatingWhatsApp.tsx`**
+- Change position classes from `right-4 md:right-6` to `left-4 md:left-6`
+- Keep the same bottom positioning
 
-### File Changes
+**File: `src/components/ScrollToTopButton.tsx`**
+- Adjust position to avoid overlap — keep on right side (already there), no conflict
 
-**`src/pages/Payment.tsx`**
-- In the mobile banking tab content (after instructions/screenshot), render an embedded YouTube video if `activeMethod.video_url` is set
-- Extract YouTube video ID from URL and render in a 16:9 aspect ratio iframe
-- Show a "Watch Tutorial" label above the video
+### 2. New Connection Area Selector — Hierarchical with Search
 
-**`src/pages/admin/PaymentManager.tsx`**
-- Add `video_url` field to `emptyForm`
-- Add a "Video URL (YouTube)" input field in the payment method form dialog
+Currently the form loads ALL `coverage_locations` (694 records including disabled ones) into a flat dropdown. This needs to become a cascading hierarchy that only shows enabled locations.
 
-### Layout
+**File: `src/pages/NewConnection.tsx`**
+
+Replace the single area `<Select>` with a cascading set of selects + search:
+
+- **Data fetch**: Load all `coverage_locations` with `enabled = true`, ordered by `sort_order, name`. Also use the `coverageHierarchy.ts` utilities to filter out locations whose ancestors are disabled.
+- **State**: Add `selectedDivision`, `selectedDistrict`, `selectedThana` states. The final `area` value sent to the form will be the name of the most specific selection (thana name, or district if no thana).
+- **UI flow**:
+  1. **Division select** — pre-selected to "Dhaka" (the only enabled division). Shows only enabled divisions.
+  2. **District select** — shows enabled districts under selected division. Includes a search/filter input above the list.
+  3. **Thana select** — shows enabled thanas under selected district. Includes a search/filter input.
+- **Search**: Use the shadcn `Command` (combobox) pattern or a simple text input filter above `SelectContent` to let users type and filter the list. A simpler approach: add a search `Input` that filters the dropdown items inline.
+- **Area value**: When submitting, store the selected thana (or district) name as the `area` field, matching current behavior.
+
+**Layout of the new area section:**
 ```text
-Mobile Banking Tab Content:
-┌──────────────────────────────────────────┐
-│  Instructions text    │  Screenshot      │
-│  Account number       │                  │
-├───────────────────────┴──────────────────┤
-│  ▶ Watch Tutorial Video                  │
-│  ┌──────────────────────────────────┐    │
-│  │  YouTube Embed (16:9)            │    │
-│  └──────────────────────────────────┘    │
-└──────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│ বিভাগ (Division)                    │
+│ [Dhaka ▼]  (pre-selected, only 1)  │
+├─────────────────────────────────────┤
+│ জেলা (District)                     │
+│ [🔍 Search...]                      │
+│ [Select district ▼]                │
+├─────────────────────────────────────┤
+│ থানা/উপজেলা (Thana)                │
+│ [🔍 Search...]                      │
+│ [Select thana ▼]                   │
+└─────────────────────────────────────┘
 ```
 
+**Key details:**
+- Use existing `buildLocationMap`, `isAncestorDisabled` from `src/lib/coverageHierarchy.ts` to compute effective visibility
+- Only enabled divisions/districts/thanas appear in dropdowns
+- Search is a controlled text input that filters the Select items by name/name_bn
+- Pre-select Dhaka division since it's the only enabled one
+- When division changes, reset district and thana; when district changes, reset thana
+
 ### Files to modify
-- Create migration: add `video_url` to `payment_methods`
-- `src/pages/Payment.tsx`
-- `src/pages/admin/PaymentManager.tsx`
+- `src/components/FloatingWhatsApp.tsx` — move to left
+- `src/pages/NewConnection.tsx` — hierarchical area selector with search
 
