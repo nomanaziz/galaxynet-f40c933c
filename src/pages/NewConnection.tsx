@@ -1,38 +1,99 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, Wifi, Zap, Shield, BadgeCheck, Home } from "lucide-react";
+import { CheckCircle, Wifi, Zap, Shield, BadgeCheck, Home, Search } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
+import { buildLocationMap, isAncestorDisabled, type CoverageLocation } from "@/lib/coverageHierarchy";
 
 const NewConnection = () => {
-  const [areas, setAreas] = useState<any[]>([]);
+  const [locations, setLocations] = useState<CoverageLocation[]>([]);
   const [packages, setPackages] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const { toast } = useToast();
 
   const [name, setName] = useState("");
-  const [area, setArea] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [packageId, setPackageId] = useState("");
   const [activeCategory, setActiveCategory] = useState("home");
   const [dedicatedMbps, setDedicatedMbps] = useState("");
 
+  // Hierarchical area states
+  const [selectedDivision, setSelectedDivision] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedThana, setSelectedThana] = useState("");
+  const [districtSearch, setDistrictSearch] = useState("");
+  const [thanaSearch, setThanaSearch] = useState("");
+
   useEffect(() => {
-    supabase.from("coverage_locations").select("id, name, name_bn").order("name").then(({ data }) => setAreas(data ?? []));
+    supabase.from("coverage_locations").select("*").order("sort_order").order("name").then(({ data }) => {
+      setLocations((data as CoverageLocation[]) ?? []);
+    });
     supabase.from("packages").select("*").eq("visible", true).order("sort_order").then(({ data }) => setPackages(data ?? []));
   }, []);
 
+  const locationMap = useMemo(() => buildLocationMap(locations), [locations]);
+
+  // Filter to only effectively enabled locations
+  const enabledLocations = useMemo(() => {
+    return locations.filter(l => l.enabled && !isAncestorDisabled(l.id, locationMap));
+  }, [locations, locationMap]);
+
+  const divisions = useMemo(() => enabledLocations.filter(l => l.type === "division"), [enabledLocations]);
+  
+  const districts = useMemo(() => {
+    if (!selectedDivision) return [];
+    return enabledLocations
+      .filter(l => l.type === "district" && l.parent_id === selectedDivision)
+      .filter(l => {
+        if (!districtSearch) return true;
+        const s = districtSearch.toLowerCase();
+        return l.name.toLowerCase().includes(s) || (l.name_bn || "").includes(s);
+      });
+  }, [enabledLocations, selectedDivision, districtSearch]);
+
+  const thanas = useMemo(() => {
+    if (!selectedDistrict) return [];
+    return enabledLocations
+      .filter(l => l.type === "thana" && l.parent_id === selectedDistrict)
+      .filter(l => {
+        if (!thanaSearch) return true;
+        const s = thanaSearch.toLowerCase();
+        return l.name.toLowerCase().includes(s) || (l.name_bn || "").includes(s);
+      });
+  }, [enabledLocations, selectedDistrict, thanaSearch]);
+
+  // Auto-select if only one division
+  useEffect(() => {
+    if (divisions.length === 1 && !selectedDivision) {
+      setSelectedDivision(divisions[0].id);
+    }
+  }, [divisions, selectedDivision]);
+
+  // Get the area name for submission
+  const getAreaName = () => {
+    if (selectedThana) {
+      const t = locationMap.get(selectedThana);
+      return t?.name || "";
+    }
+    if (selectedDistrict) {
+      const d = locationMap.get(selectedDistrict);
+      return d?.name || "";
+    }
+    return "";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim() || !area) {
+    const areaName = getAreaName();
+    if (!name.trim() || !phone.trim() || !areaName) {
       toast({ title: "অনুগ্রহ করে প্রয়োজনীয় তথ্য পূরণ করুন", variant: "destructive" });
       return;
     }
@@ -50,7 +111,7 @@ const NewConnection = () => {
       name: name.trim(),
       phone: phone.trim(),
       address: address.trim() || "N/A",
-      area,
+      area: areaName,
       package_id: activeCategory !== "dedicated" ? (packageId || null) : null,
       notes: JSON.stringify(notesData),
     });
@@ -125,16 +186,77 @@ const NewConnection = () => {
               <Input placeholder="সম্পূর্ণ নাম লিখুন" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
 
-            <div className="space-y-1.5">
+            {/* Hierarchical Area Selection */}
+            <div className="space-y-3">
               <Label className="text-sm font-semibold">এলাকা নির্বাচন করুন <span className="text-red-500">*</span></Label>
-              <Select value={area} onValueChange={setArea}>
-                <SelectTrigger><SelectValue placeholder="এলাকা বাছাই করুন" /></SelectTrigger>
+              
+              {/* Division */}
+              <Select value={selectedDivision} onValueChange={(v) => { setSelectedDivision(v); setSelectedDistrict(""); setSelectedThana(""); setDistrictSearch(""); setThanaSearch(""); }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="বিভাগ বাছাই করুন" />
+                </SelectTrigger>
                 <SelectContent>
-                  {areas.map((a) => (
-                    <SelectItem key={a.id} value={a.name}>{a.name_bn || a.name}</SelectItem>
+                  {divisions.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>{d.name_bn || d.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+
+              {/* District with search */}
+              {selectedDivision && (
+                <div className="space-y-1.5">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="জেলা খুঁজুন..."
+                      value={districtSearch}
+                      onChange={(e) => setDistrictSearch(e.target.value)}
+                      className="pl-9 h-9 text-sm"
+                    />
+                  </div>
+                  <Select value={selectedDistrict} onValueChange={(v) => { setSelectedDistrict(v); setSelectedThana(""); setThanaSearch(""); }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="জেলা বাছাই করুন" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {districts.map((d) => (
+                        <SelectItem key={d.id} value={d.id}>{d.name_bn || d.name}</SelectItem>
+                      ))}
+                      {districts.length === 0 && (
+                        <div className="py-2 px-3 text-sm text-muted-foreground text-center">কোনো জেলা পাওয়া যায়নি</div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Thana with search */}
+              {selectedDistrict && thanas.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="থানা/উপজেলা খুঁজুন..."
+                      value={thanaSearch}
+                      onChange={(e) => setThanaSearch(e.target.value)}
+                      className="pl-9 h-9 text-sm"
+                    />
+                  </div>
+                  <Select value={selectedThana} onValueChange={setSelectedThana}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="থানা/উপজেলা বাছাই করুন" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {thanas.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>{t.name_bn || t.name}</SelectItem>
+                      ))}
+                      {thanas.length === 0 && (
+                        <div className="py-2 px-3 text-sm text-muted-foreground text-center">কোনো থানা পাওয়া যায়নি</div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             <div className="space-y-1.5">
