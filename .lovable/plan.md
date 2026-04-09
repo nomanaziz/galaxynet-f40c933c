@@ -1,57 +1,40 @@
 
 
-## Two Changes: WhatsApp Button Repositioning + Area Selection Hierarchy
+## Fix Page Navigation Blinking/Jumping
 
-### 1. WhatsApp Floating Button — Move to Left Side
+### Problem
+When navigating between pages, there's a visible "blink" or "jump." This happens because:
+1. Each page includes its own `<TopBar>`, `<Navbar>`, and `<Footer>` — these unmount and remount on every route change, causing a flash.
+2. Pages fetch data from Supabase on mount, briefly showing empty/loading states before content appears.
 
-**File: `src/components/FloatingWhatsApp.tsx`**
-- Change position classes from `right-4 md:right-6` to `left-4 md:left-6`
-- Keep the same bottom positioning
+### Solution
+**Move shared layout components out of individual pages into a shared Layout wrapper**, so Navbar/TopBar/Footer persist across navigations and never re-render. Only the page content area changes.
 
-**File: `src/components/ScrollToTopButton.tsx`**
-- Adjust position to avoid overlap — keep on right side (already there), no conflict
+### Changes
 
-### 2. New Connection Area Selector — Hierarchical with Search
+**1. Create `src/components/Layout.tsx`** (new file)
+- Wrap `<TopBar>`, `<Navbar>`, `<Outlet />`, and `<Footer>` in a single layout component.
+- Navbar and Footer stay mounted across route changes — no unmount/remount blink.
 
-Currently the form loads ALL `coverage_locations` (694 records including disabled ones) into a flat dropdown. This needs to become a cascading hierarchy that only shows enabled locations.
-
-**File: `src/pages/NewConnection.tsx`**
-
-Replace the single area `<Select>` with a cascading set of selects + search:
-
-- **Data fetch**: Load all `coverage_locations` with `enabled = true`, ordered by `sort_order, name`. Also use the `coverageHierarchy.ts` utilities to filter out locations whose ancestors are disabled.
-- **State**: Add `selectedDivision`, `selectedDistrict`, `selectedThana` states. The final `area` value sent to the form will be the name of the most specific selection (thana name, or district if no thana).
-- **UI flow**:
-  1. **Division select** — pre-selected to "Dhaka" (the only enabled division). Shows only enabled divisions.
-  2. **District select** — shows enabled districts under selected division. Includes a search/filter input above the list.
-  3. **Thana select** — shows enabled thanas under selected district. Includes a search/filter input.
-- **Search**: Use the shadcn `Command` (combobox) pattern or a simple text input filter above `SelectContent` to let users type and filter the list. A simpler approach: add a search `Input` that filters the dropdown items inline.
-- **Area value**: When submitting, store the selected thana (or district) name as the `area` field, matching current behavior.
-
-**Layout of the new area section:**
 ```text
-┌─────────────────────────────────────┐
-│ বিভাগ (Division)                    │
-│ [Dhaka ▼]  (pre-selected, only 1)  │
-├─────────────────────────────────────┤
-│ জেলা (District)                     │
-│ [🔍 Search...]                      │
-│ [Select district ▼]                │
-├─────────────────────────────────────┤
-│ থানা/উপজেলা (Thana)                │
-│ [🔍 Search...]                      │
-│ [Select thana ▼]                   │
-└─────────────────────────────────────┘
+Layout.tsx
+├── TopBar       (persistent)
+├── Navbar       (persistent)
+├── <Outlet />   (only this changes per route)
+└── Footer       (persistent)
 ```
 
-**Key details:**
-- Use existing `buildLocationMap`, `isAncestorDisabled` from `src/lib/coverageHierarchy.ts` to compute effective visibility
-- Only enabled divisions/districts/thanas appear in dropdowns
-- Search is a controlled text input that filters the Select items by name/name_bn
-- Pre-select Dhaka division since it's the only enabled one
-- When division changes, reset district and thana; when district changes, reset thana
+**2. Update `src/App.tsx`**
+- Wrap public routes in a parent `<Route element={<Layout />}>` with nested child routes.
+- Each page route becomes a child route rendered inside the Layout's `<Outlet>`.
 
-### Files to modify
-- `src/components/FloatingWhatsApp.tsx` — move to left
-- `src/pages/NewConnection.tsx` — hierarchical area selector with search
+**3. Update all public page files** (Index, Packages, Coverage, Contact, About, Services, Order, SpeedTest, Notices, Offers, Payment, Selfcare, Login, Register, NewConnection, NotFound)
+- Remove `<TopBar>`, `<Navbar>`, and `<Footer>` imports and JSX from each page.
+- Pages now only render their own unique content.
+
+### Technical Details
+- Roughly 16 page files will have their TopBar/Navbar/Footer removed (3 lines of imports + 3 lines of JSX each).
+- The Layout component is simple — just TopBar + Navbar + Outlet + Footer with no state.
+- This approach is standard React Router nested layout pattern and eliminates the re-mount flash entirely.
+- Data-fetching flashes within page content will still exist but will be much less noticeable since the chrome (header/footer) stays stable.
 
