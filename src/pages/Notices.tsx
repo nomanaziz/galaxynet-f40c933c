@@ -39,7 +39,7 @@ const Notices = () => {
       <section className="py-12 md:py-16 bg-background flex-1">
         <div className="container mx-auto px-4 max-w-3xl">
           {loading ? (
-            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></>
+            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
           ) : notices.length === 0 ? (
             <p className="text-center text-muted-foreground py-12">{t("No notices at this time.", "এই মুহূর্তে কোনো নোটিশ নেই।")}</p>
           ) : (
@@ -58,19 +58,19 @@ const Notices = () => {
                           <Calendar className="h-3 w-3" />
                           {new Date(n.created_at).toLocaleDateString()}
                         </span>
-                      </>
+                      </div>
                       <h3 className="text-lg font-bold text-foreground">{t(n.title, n.title_bn || n.title)}</h3>
                       {n.content && <p className="text-muted-foreground text-sm mt-2">{n.content}</p>}
                     </CardContent>
                   </Card>
                 );
               })}
-            </>
+            </div>
           )}
-        </>
+        </div>
       </section>
 
-    </>
+    </div>
   );
 };
 

@@ -28,7 +28,7 @@ const Selfcare = () => {
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             {t("Manage your account, check bills, and more.", "আপনার অ্যাকাউন্ট পরিচালনা করুন, বিল দেখুন এবং আরও অনেক কিছু।")}
           </p>
-        </>
+        </div>
       </section>
 
       <section className="py-20 bg-background flex-1">
@@ -39,7 +39,7 @@ const Selfcare = () => {
             <>
               <div className="h-20 w-20 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-6">
                 <Monitor className="h-10 w-10 text-accent" />
-              </>
+              </div>
               <h2 className="text-2xl font-bold text-foreground mb-2">{t("Access Your Account", "আপনার অ্যাকাউন্টে প্রবেশ করুন")}</h2>
               <p className="text-muted-foreground mb-6">{t("Click the button below to open the selfcare portal.", "সেলফকেয়ার পোর্টাল খুলতে নিচের বোতামে ক্লিক করুন।")}</p>
               <a href={url} target="_blank" rel="noopener noreferrer">
@@ -47,14 +47,14 @@ const Selfcare = () => {
                   {t("Open Portal", "পোর্টাল খুলুন")} <ExternalLink className="ml-2 h-4 w-4" />
                 </Button>
               </a>
-            </>
+            </div>
           ) : (
             <p className="text-muted-foreground">{t("Selfcare portal is currently unavailable.", "সেলফকেয়ার পোর্টাল বর্তমানে উপলব্ধ নেই।")}</p>
           )}
-        </>
+        </div>
       </section>
 
-    </>
+    </div>
   );
 };
 
