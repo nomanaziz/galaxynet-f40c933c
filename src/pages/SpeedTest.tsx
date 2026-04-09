@@ -10,8 +10,7 @@ const tips = [
 
 const SpeedTest = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <>
 
       {/* Hero */}
       <section className="hero-gradient text-white py-12 md:py-16 relative overflow-hidden">
@@ -22,12 +21,12 @@ const SpeedTest = () => {
             Check your internet speed right now — powered by Ookla Speedtest.
           </p>
           <p className="text-blue-300 text-sm mt-2">এখনই আপনার ইন্টারনেট স্পিড পরীক্ষা করুন।</p>
-        </div>
+        </>
         <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
           <svg viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg" className="fill-background w-full h-12 md:h-16">
             <path d="M0,40 C300,80 900,0 1200,40 L1200,80 L0,80 Z" />
           </svg>
-        </div>
+        </>
       </section>
 
       {/* Speed Test Embed */}
@@ -42,7 +41,7 @@ const SpeedTest = () => {
                   title="Speed Test"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
                 />
-              </div>
+              </>
             </CardContent>
           </Card>
           <div className="text-center mt-4">
@@ -55,8 +54,8 @@ const SpeedTest = () => {
                 <ExternalLink className="ml-2 h-4 w-4" />
               </Button>
             </a>
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Tips */}
@@ -65,7 +64,7 @@ const SpeedTest = () => {
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-galaxy-blue mb-2">Tips for Accurate Results</h2>
             <p className="text-xl font-semibold text-galaxy-orange">সঠিক ফলাফলের জন্য পরামর্শ</p>
-          </div>
+          </>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {tips.map((t) => (
               <Card key={t.title} className="border-2 hover:border-galaxy-orange transition-all">
@@ -77,8 +76,8 @@ const SpeedTest = () => {
                 </CardContent>
               </Card>
             ))}
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* CTA */}
@@ -93,11 +92,10 @@ const SpeedTest = () => {
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </a>
-        </div>
+        </>
       </section>
 
-      <Footer />
-    </div>
+    </>
   );
 };
 

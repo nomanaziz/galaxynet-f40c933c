@@ -28,8 +28,8 @@ const VideoEmbed = ({ url }: { url: string }) => {
           allowFullScreen
           className="absolute inset-0 w-full h-full"
         />
-      </div>
-    </div>
+      </>
+    </>
   );
 };
 
@@ -85,17 +85,16 @@ const Payment = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <TopBar /><Navbar />
-        <div className="flex-1 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
-        <Footer />
-      </div>
+      <>
+        
+        <div className="flex-1 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent" /></>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar /><Navbar />
+    <>
+      
 
       {/* Quick Pay Banner */}
       <section className="relative overflow-hidden">
@@ -106,7 +105,7 @@ const Payment = () => {
               <div className="flex-1">
                 <h1 className="text-2xl md:text-3xl font-bold text-accent mb-3">{heroTitle}</h1>
                 <p className="text-muted-foreground text-sm md:text-base leading-relaxed">{heroSubtitle}</p>
-              </div>
+              </>
               <Button
                 size="lg"
                 onClick={() => window.open(portalUrl, "_blank")}
@@ -117,7 +116,7 @@ const Payment = () => {
               </Button>
             </CardContent>
           </Card>
-        </div>
+        </>
       </section>
 
       {/* How to Pay? */}
@@ -128,7 +127,7 @@ const Payment = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-foreground">
               {t("How to", "কিভাবে")} <span className="text-accent">{t("pay?", "পে করবেন?")}</span>
             </h2>
-          </div>
+          </>
           <p className="text-muted-foreground mb-8 ml-4">
             {t("Step-by-step guide to making an online payment", "অনলাইন পেমেন্ট করার ধাপে ধাপে গাইড")}
           </p>
@@ -141,15 +140,15 @@ const Payment = () => {
                 <div key={cat} className="flex items-center gap-3 p-4 rounded-xl border border-accent/20 bg-accent/5 hover:border-accent/40 transition-colors">
                   <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
                     <Icon className="h-6 w-6 text-accent" />
-                  </div>
+                  </>
                   <span className="font-semibold text-foreground text-sm">
                     {t(cfg.label, cfg.labelBn)}
                   </span>
-                </div>
+                </>
               );
             })}
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Pay bill with mobile banking */}
@@ -161,7 +160,7 @@ const Payment = () => {
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                 {t("Pay bill with", "বিল পরিশোধ করুন")} <span className="text-accent">{t("mobile banking", "মোবাইল ব্যাংকিং দিয়ে")}</span>
               </h2>
-            </div>
+            </>
             <p className="text-muted-foreground mb-8 ml-4">
               {t("You can pay with Mobile banking by following these instructions", "এই নির্দেশনা অনুসরণ করে মোবাইল ব্যাংকিং দিয়ে পেমেন্ট করতে পারবেন")}
             </p>
@@ -182,7 +181,7 @@ const Payment = () => {
                   {language === "bn" && m.name_bn ? m.name_bn : m.name}
                 </button>
               ))}
-            </div>
+            </>
 
             {/* Tab Content */}
             {activeMethod && (
@@ -192,25 +191,25 @@ const Payment = () => {
                     {activeMethod.instructions && (
                       <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-line">
                         {language === "bn" && activeMethod.instructions_bn ? activeMethod.instructions_bn : activeMethod.instructions}
-                      </div>
+                      </>
                     )}
                     {activeMethod.account_number && (
                       <div className="mt-4 bg-muted rounded-lg p-4">
                         <p className="text-sm text-muted-foreground mb-1">{t("Account/Merchant Number", "অ্যাকাউন্ট/মার্চেন্ট নম্বর")}</p>
                         <p className="text-lg font-mono font-bold text-foreground">{activeMethod.account_number}</p>
-                      </div>
+                      </>
                     )}
-              </div>
+              </>
                   {activeMethod.screenshot_url && (
                     <div className="md:w-80 shrink-0">
                       <img src={activeMethod.screenshot_url} alt="" className="w-full rounded-lg border" />
-                    </div>
+                    </>
                   )}
-                </div>
+                </>
                 {activeMethod.video_url && <VideoEmbed url={activeMethod.video_url} />}
-              </div>
+              </>
             )}
-          </div>
+          </>
         </section>
       )}
 
@@ -223,7 +222,7 @@ const Payment = () => {
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                 {t("Portal payment", "পোর্টাল পেমেন্ট")} <span className="text-accent">{t("options", "অপশন")}</span>
               </h2>
-            </div>
+            </>
             <p className="text-muted-foreground mb-6">
               {t("You can pay online with other suitable payment methods", "অন্যান্য উপযুক্ত পদ্ধতিতে অনলাইনে পেমেন্ট করতে পারবেন")}
             </p>
@@ -236,14 +235,14 @@ const Payment = () => {
                     ) : (
                       <Globe className="h-12 w-12 text-white" />
                     )}
-                  </div>
+                  </>
                   <CardContent className="p-4 text-center">
                     <h3 className="font-bold text-foreground">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
                   </CardContent>
                 </Card>
               ))}
-            </div>
-          </div>
+            </>
+          </>
         </section>
       )}
 
@@ -256,7 +255,7 @@ const Payment = () => {
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                 {t("Direct bank", "সরাসরি ব্যাংক")} <span className="text-accent">{t("transfer", "ট্রান্সফার")}</span>
               </h2>
-            </div>
+            </>
             <p className="text-muted-foreground mb-8 ml-4">
               {t("You can pay us with direct bank transfer", "সরাসরি ব্যাংক ট্রান্সফারের মাধ্যমে পেমেন্ট করতে পারবেন")}
             </p>
@@ -269,14 +268,14 @@ const Payment = () => {
                     ) : (
                       <Building2 className="h-8 w-8 text-white" />
                     )}
-                  </div>
+                  </>
                   <CardContent className="p-5 space-y-3">
                     <h3 className="font-bold text-foreground text-lg">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
                     {m.account_number && (
                       <div className="flex justify-between items-center border-b border-border pb-2">
                         <span className="text-sm text-muted-foreground">{t("Account No:", "অ্যাকাউন্ট নং:")}</span>
                         <span className="font-mono font-bold text-foreground">{m.account_number}</span>
-                      </div>
+                      </>
                     )}
                     {m.instructions && (
                       <p className="text-sm text-muted-foreground whitespace-pre-line">
@@ -287,8 +286,8 @@ const Payment = () => {
                   </CardContent>
                 </Card>
               ))}
-            </div>
-          </div>
+            </>
+          </>
         </section>
       )}
 
@@ -301,7 +300,7 @@ const Payment = () => {
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                 {t("USSD Code", "ইউএসএসডি কোড")} <span className="text-accent">{t("payment", "পেমেন্ট")}</span>
               </h2>
-            </div>
+            </>
             <p className="text-muted-foreground mb-8 ml-4">
               {t("Pay your bill using USSD codes from your phone", "আপনার ফোন থেকে USSD কোড ব্যবহার করে বিল পরিশোধ করুন")}
             </p>
@@ -314,14 +313,14 @@ const Payment = () => {
                     ) : (
                       <Hash className="h-8 w-8 text-white" />
                     )}
-                  </div>
+                  </>
                   <CardContent className="p-5 space-y-3">
                     <h3 className="font-bold text-foreground text-lg">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
                     {m.account_number && (
                       <div className="flex justify-between items-center border-b border-border pb-2">
                         <span className="text-sm text-muted-foreground">{t("Code:", "কোড:")}</span>
                         <span className="font-mono font-bold text-foreground">{m.account_number}</span>
-                      </div>
+                      </>
                     )}
                     {m.instructions && (
                       <p className="text-sm text-muted-foreground whitespace-pre-line">
@@ -338,8 +337,8 @@ const Payment = () => {
                   </CardContent>
                 </Card>
               ))}
-            </div>
-          </div>
+            </>
+          </>
         </section>
       )}
 
@@ -350,8 +349,8 @@ const Payment = () => {
             <div className="shrink-0">
               <div className="h-20 w-20 md:h-24 md:w-24 rounded-xl bg-accent/20 flex items-center justify-center">
                 <AlertTriangle className="h-10 w-10 md:h-12 md:w-12 text-accent" />
-              </div>
-            </div>
+              </>
+            </>
             <div>
               <p className="text-foreground font-semibold text-base md:text-lg mb-2">
                 {t(
@@ -365,9 +364,9 @@ const Payment = () => {
               <p className="text-foreground font-bold">
                 {t("E-Mail:", "ই-মেইল:")} {email}
               </p>
-            </div>
-          </div>
-        </div>
+            </>
+          </>
+        </>
       </section>
 
       {/* Detail Modal */}
@@ -386,7 +385,7 @@ const Payment = () => {
               <div className="bg-muted rounded-lg p-4">
                 <p className="text-sm text-muted-foreground mb-1">{t("Account Number", "অ্যাকাউন্ট নম্বর")}</p>
                 <p className="text-lg font-mono font-bold text-foreground">{selectedMethod.account_number}</p>
-              </div>
+              </>
             )}
             {selectedMethod?.screenshot_url && (
               <img src={selectedMethod.screenshot_url} alt="Payment instructions" className="w-full rounded-lg border" />
@@ -403,12 +402,11 @@ const Payment = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             )}
-          </div>
+          </>
         </DialogContent>
       </Dialog>
 
-      <Footer />
-    </div>
+    </>
   );
 };
 
