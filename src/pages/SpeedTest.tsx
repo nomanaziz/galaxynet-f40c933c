@@ -1,9 +1,6 @@
 import { ExternalLink, Wifi, ArrowRight, Zap, Monitor, Router } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-
 const tips = [
   { icon: Router, title: "Use Wired Connection", titleBn: "তারযুক্ত সংযোগ ব্যবহার করুন", desc: "Connect via ethernet cable for most accurate results." },
   { icon: Monitor, title: "Close Other Apps", titleBn: "অন্যান্য অ্যাপ বন্ধ করুন", desc: "Background downloads can affect speed test results." },
