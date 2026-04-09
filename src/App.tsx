@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Packages from "./pages/Packages";
 import Coverage from "./pages/Coverage";
@@ -24,7 +25,6 @@ import ScrollToTopButton from "./components/ScrollToTopButton";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NewConnection from "./pages/NewConnection";
-
 // Admin
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -62,23 +62,24 @@ const App = () => (
         <BrowserRouter>
           <ScrollToTop />
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/packages" element={<Packages />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/coverage" element={<Coverage />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/order" element={<Order />} />
-            <Route path="/speed-test" element={<SpeedTest />} />
-            <Route path="/notices" element={<Notices />} />
-            <Route path="/offers" element={<Offers />} />
-            <Route path="/pay-bill" element={<Payment />} />
-            <Route path="/selfcare" element={<Selfcare />} />
-            
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/packages" element={<Packages />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/coverage" element={<Coverage />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/order" element={<Order />} />
+              <Route path="/speed-test" element={<SpeedTest />} />
+              <Route path="/notices" element={<Notices />} />
+              <Route path="/offers" element={<Offers />} />
+              <Route path="/pay-bill" element={<Payment />} />
+              <Route path="/selfcare" element={<Selfcare />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
             <Route path="/new-connection" element={<NewConnection />} />
-
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminLayout />}>
