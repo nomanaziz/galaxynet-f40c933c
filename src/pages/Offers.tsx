@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { Gift, Loader2, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import Navbar from "@/components/Navbar";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -32,8 +29,8 @@ const Offers = () => {
   const email = settings.email || "info@galaxynet.com.bd";
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar /><Navbar />
+    <>
+      
 
       <section className="py-12 md:py-16 bg-background flex-1">
         <div className="container mx-auto px-4">
@@ -43,15 +40,15 @@ const Offers = () => {
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">
               {t("Latest", "সর্বশেষ")} <span className="text-accent">{t("offers", "অফার")}</span>
             </h1>
-          </div>
+          </>
 
           {loading ? (
-            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
+            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></>
           ) : offers.length === 0 ? (
             <div className="text-center py-16">
               <Gift className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground text-lg">{t("No offers at this time. Check back soon!", "এই মুহূর্তে কোনো অফার নেই। শীঘ্রই আবার দেখুন!")}</p>
-            </div>
+            </>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {offers.map((offer) => (
@@ -76,7 +73,7 @@ const Offers = () => {
                   </CardContent>
                 </Card>
               ))}
-            </div>
+            </>
           )}
 
           {/* Disclaimer Section */}
@@ -84,8 +81,8 @@ const Offers = () => {
             <div className="shrink-0">
               <div className="h-20 w-20 md:h-24 md:w-24 rounded-xl bg-accent/20 flex items-center justify-center">
                 <AlertTriangle className="h-10 w-10 md:h-12 md:w-12 text-accent" />
-              </div>
-            </div>
+              </>
+            </>
             <div>
               <p className="text-foreground font-semibold text-base md:text-lg mb-2">
                 {t(
@@ -99,13 +96,12 @@ const Offers = () => {
               <p className="text-foreground font-bold">
                 {t("E-Mail:", "ই-মেইল:")} {email}
               </p>
-            </div>
-          </div>
-        </div>
+            </>
+          </>
+        </>
       </section>
 
-      <Footer />
-    </div>
+    </>
   );
 };
 

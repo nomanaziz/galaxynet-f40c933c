@@ -5,9 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
 import PageHeroDark from "@/components/PageHeroDark";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,9 +27,7 @@ const Services = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar />
-      <Navbar />
+    <>
 
       <PageHeroDark
         title="Our Services"
@@ -54,17 +49,17 @@ const Services = () => {
             ].map((h) => (
               <div key={h.label} className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <h.icon className="h-4 w-4 text-accent" /> {h.label}
-              </div>
+              </>
             ))}
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Services */}
       <section className="py-16 bg-background flex-1">
         <div className="container mx-auto px-4">
           {loading ? (
-            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
+            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {services.map((s) => {
@@ -76,19 +71,19 @@ const Services = () => {
                     {badge && (
                       <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
                         {badge}
-                      </div>
+                      </>
                     )}
                     <CardContent className="p-6">
                       <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent transition-colors">
                         <Icon className="h-6 w-6 text-accent group-hover:text-accent-foreground transition-colors" />
-                      </div>
+                      </>
                       <h3 className="text-lg font-bold text-foreground">{t(s.title, s.title_bn)}</h3>
                       <p className="text-muted-foreground text-sm mt-2 mb-4">{t(s.description, s.description_bn)}</p>
                       <div className="flex flex-wrap gap-1.5 mb-5">
                         {features.map((f, i) => (
                           <Badge key={i} variant="secondary" className="text-xs">{t(f.en, f.bn)}</Badge>
                         ))}
-                      </div>
+                      </>
                       <Link to={s.link || "/contact"}>
                         <Button variant="outline" className="w-full font-semibold">
                           {t("Learn More", "বিস্তারিত")} <ArrowRight className="ml-2 h-4 w-4" />
@@ -98,9 +93,9 @@ const Services = () => {
                   </Card>
                 );
               })}
-            </div>
+            </>
           )}
-        </div>
+        </>
       </section>
 
       {/* CTA */}
@@ -115,11 +110,10 @@ const Services = () => {
               {t("Contact Us", "যোগাযোগ করুন")} <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-        </div>
+        </>
       </section>
 
-      <Footer />
-    </div>
+    </>
   );
 };
 

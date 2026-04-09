@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import { Users, Award, Wifi, Shield, Zap, HeadphonesIcon, Clock, Server } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Navbar from "@/components/Navbar";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
 import PageHeroDark from "@/components/PageHeroDark";
 import PartnersSection from "@/components/home/PartnersSection";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -90,9 +87,7 @@ const About = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar />
-      <Navbar />
+    <>
 
       <PageHeroDark
         title="About Galaxy Net"
@@ -112,14 +107,14 @@ const About = () => {
                 <Card key={s.label} className="border hover:border-accent/40 transition-all">
                   <CardContent className="p-6 text-center">
                     <Icon className="h-7 w-7 text-accent mx-auto mb-3" />
-                    <div className="text-2xl font-bold text-foreground">{s.num}</div>
+                    <div className="text-2xl font-bold text-foreground">{s.num}</>
                     <p className="text-sm text-muted-foreground">{t(s.label, s.label_bn || s.label)}</p>
                   </CardContent>
                 </Card>
               );
             })}
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Trust Badges */}
@@ -136,8 +131,8 @@ const About = () => {
                 <b.icon className="h-4 w-4" /> {b.label}
               </Badge>
             ))}
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Journey */}
@@ -154,17 +149,17 @@ const About = () => {
                 <div key={item.year} className={`relative flex items-start gap-6 ${i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}>
                   <div className="absolute left-4 md:left-1/2 -translate-x-1/2 h-8 w-8 rounded-full bg-accent flex items-center justify-center z-10">
                     <Award className="h-4 w-4 text-accent-foreground" />
-                  </div>
+                  </>
                   <div className={`ml-14 md:ml-0 md:w-1/2 ${i % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"}`}>
                     <Badge className="bg-accent text-accent-foreground border-0 mb-2">{item.year}</Badge>
                     <h3 className="font-bold text-foreground">{t(item.title, item.title_bn || item.title)}</h3>
                     <p className="text-muted-foreground text-sm mt-1">{t(item.desc, item.desc_bn || item.desc)}</p>
-                  </div>
-                </div>
+                  </>
+                </>
               ))}
-            </div>
-          </div>
-        </div>
+            </>
+          </>
+        </>
       </section>
 
       {/* Team */}
@@ -191,7 +186,7 @@ const About = () => {
                           ) : (
                             <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
                               <Users className="h-8 w-8 text-accent" />
-                            </div>
+                            </>
                           )}
                           <h3 className="font-bold text-foreground">{t(member.name, member.name_bn || member.name)}</h3>
                           {member.designations && (
@@ -200,8 +195,8 @@ const About = () => {
                         </CardContent>
                       </Card>
                     ))}
-                  </div>
-                </div>
+                  </>
+                </>
               );
             })}
             {/* Members without department */}
@@ -221,7 +216,7 @@ const About = () => {
                         ) : (
                           <div className="h-16 w-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
                             <Users className="h-8 w-8 text-accent" />
-                          </div>
+                          </>
                         )}
                         <h3 className="font-bold text-foreground">{t(member.name, member.name_bn || member.name)}</h3>
                         {member.designations && (
@@ -230,18 +225,17 @@ const About = () => {
                       </CardContent>
                     </Card>
                   ))}
-                </div>
-              </div>
+                </>
+              </>
             )}
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Partners */}
       <PartnersSection partners={partners} />
 
-      <Footer />
-    </div>
+    </>
   );
 };
 

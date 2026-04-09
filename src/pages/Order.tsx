@@ -10,9 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent } from "@/components/ui/card";
-import Navbar from "@/components/Navbar";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,27 +65,26 @@ const Order = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <TopBar /><Navbar />
+      <>
+        
         <section className="flex-1 flex items-center justify-center py-20 bg-background">
           <Card className="max-w-md w-full mx-4 border-2 border-accent/30">
             <CardContent className="p-8 text-center">
               <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="h-10 w-10 text-green-600" />
-              </div>
+              </>
               <h2 className="text-2xl font-bold text-foreground mb-2">{t("Order Received!", "অর্ডার গৃহীত হয়েছে!")}</h2>
               <p className="text-muted-foreground mb-2">{t(`Thank you, ${form.name}. We will contact you at ${form.mobile} within 24 hours.`, `ধন্যবাদ, ${form.name}। আমরা ২৪ ঘণ্টার মধ্যে ${form.mobile} নম্বরে যোগাযোগ করব।`)}</p>
             </CardContent>
           </Card>
         </section>
-        <Footer />
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar /><Navbar />
+    <>
+      
 
       <section className="page-hero">
         <div className="container mx-auto px-4 relative z-10">
@@ -96,7 +92,7 @@ const Order = () => {
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             {t("Fill out the form and we'll get you connected!", "ফর্ম পূরণ করুন, আমরা আপনাকে সংযুক্ত করব!")}
           </p>
-        </div>
+        </>
       </section>
 
       <section className="py-12 md:py-16 bg-background flex-1">
@@ -106,30 +102,30 @@ const Order = () => {
               <div key={s.label} className="flex flex-col items-center flex-1">
                 <div className={cn("h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold transition-all", i <= step ? "bg-accent text-accent-foreground" : "bg-secondary text-muted-foreground")}>
                   <s.icon className="h-5 w-5" />
-                </div>
+                </>
                 <p className={cn("text-xs mt-1 font-medium hidden sm:block", i <= step ? "text-accent" : "text-muted-foreground")}>
                   {t(s.label, s.labelBn)}
                 </p>
-              </div>
+              </>
             ))}
-          </div>
+          </>
 
           <Card className="border-2">
             <CardContent className="p-6 md:p-8">
               {step === 0 && (
                 <div className="space-y-5">
                   <h3 className="text-xl font-bold text-foreground">{t("Personal Information", "ব্যক্তিগত তথ্য")}</h3>
-                  <div><Label>{t("Full Name", "পূর্ণ নাম")} *</Label><Input placeholder={t("Your name...", "আপনার নাম...")} value={form.name} onChange={(e) => update("name", e.target.value)} className="mt-1" /></div>
-                  <div><Label>{t("Mobile Number", "মোবাইল নম্বর")} *</Label><Input type="tel" placeholder="01XXXXXXXXX" value={form.mobile} onChange={(e) => update("mobile", e.target.value)} className="mt-1" /></div>
-                  <div><Label>{t("Email (Optional)", "ইমেইল")}</Label><Input type="email" placeholder="email@example.com" value={form.email} onChange={(e) => update("email", e.target.value)} className="mt-1" /></div>
-                </div>
+                  <div><Label>{t("Full Name", "পূর্ণ নাম")} *</Label><Input placeholder={t("Your name...", "আপনার নাম...")} value={form.name} onChange={(e) => update("name", e.target.value)} className="mt-1" /></>
+                  <div><Label>{t("Mobile Number", "মোবাইল নম্বর")} *</Label><Input type="tel" placeholder="01XXXXXXXXX" value={form.mobile} onChange={(e) => update("mobile", e.target.value)} className="mt-1" /></>
+                  <div><Label>{t("Email (Optional)", "ইমেইল")}</Label><Input type="email" placeholder="email@example.com" value={form.email} onChange={(e) => update("email", e.target.value)} className="mt-1" /></>
+                </>
               )}
               {step === 1 && (
                 <div className="space-y-5">
                   <h3 className="text-xl font-bold text-foreground">{t("Address", "ঠিকানা")}</h3>
-                  <div><Label>{t("Full Address", "সম্পূর্ণ ঠিকানা")} *</Label><Textarea placeholder="House/Flat, Road..." value={form.address} onChange={(e) => update("address", e.target.value)} className="mt-1" /></div>
-                  <div><Label>{t("Area", "এলাকা")} *</Label><Input placeholder="e.g. Dhanmondi, Gulshan..." value={form.area} onChange={(e) => update("area", e.target.value)} className="mt-1" /></div>
-                </div>
+                  <div><Label>{t("Full Address", "সম্পূর্ণ ঠিকানা")} *</Label><Textarea placeholder="House/Flat, Road..." value={form.address} onChange={(e) => update("address", e.target.value)} className="mt-1" /></>
+                  <div><Label>{t("Area", "এলাকা")} *</Label><Input placeholder="e.g. Dhanmondi, Gulshan..." value={form.area} onChange={(e) => update("area", e.target.value)} className="mt-1" /></>
+                </>
               )}
               {step === 2 && (
                 <div className="space-y-5">
@@ -144,7 +140,7 @@ const Order = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                  </>
                   <div>
                     <Label>{t("Preferred Date", "পছন্দের তারিখ")}</Label>
                     <Popover>
@@ -158,9 +154,9 @@ const Order = () => {
                         <Calendar mode="single" selected={form.date} onSelect={(d) => update("date", d)} disabled={(d) => d < new Date()} initialFocus className="p-3 pointer-events-auto" />
                       </PopoverContent>
                     </Popover>
-                  </div>
-                  <div><Label>{t("Notes", "অতিরিক্ত তথ্য")}</Label><Textarea placeholder={t("Any special instructions...", "বিশেষ নির্দেশনা...")} value={form.notes} onChange={(e) => update("notes", e.target.value)} className="mt-1" /></div>
-                </div>
+                  </>
+                  <div><Label>{t("Notes", "অতিরিক্ত তথ্য")}</Label><Textarea placeholder={t("Any special instructions...", "বিশেষ নির্দেশনা...")} value={form.notes} onChange={(e) => update("notes", e.target.value)} className="mt-1" /></>
+                </>
               )}
               {step === 3 && (
                 <div className="space-y-4">
@@ -173,8 +169,8 @@ const Order = () => {
                     <p><strong>{t("Area", "এলাকা")}:</strong> {form.area}</p>
                     <p><strong>{t("Package", "প্যাকেজ")}:</strong> {form.package_label}</p>
                     {form.date && <p><strong>{t("Date", "তারিখ")}:</strong> {format(form.date, "PPP")}</p>}
-                  </div>
-                </div>
+                  </>
+                </>
               )}
 
               <div className="flex justify-between mt-8">
@@ -189,14 +185,13 @@ const Order = () => {
                     {t("Submit Order", "অর্ডার করুন")}
                   </Button>
                 )}
-              </div>
+              </>
             </CardContent>
           </Card>
-        </div>
+        </>
       </section>
 
-      <Footer />
-    </div>
+    </>
   );
 };
 

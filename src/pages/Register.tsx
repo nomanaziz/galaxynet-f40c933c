@@ -9,8 +9,6 @@ import { Loader2 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -47,14 +45,13 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
+    <>
       <main className="flex-1 flex items-center justify-center px-4 py-16">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <img src={logo} alt="Galaxy Net" className="h-12 w-auto" />
-            </div>
+            </>
             <CardTitle className="text-2xl">{t("Create Account", "অ্যাকাউন্ট তৈরি করুন")}</CardTitle>
             <CardDescription>{t("Sign up to get started with Galaxy Net", "Galaxy Net এ শুরু করতে সাইন আপ করুন")}</CardDescription>
           </CardHeader>
@@ -63,15 +60,15 @@ const Register = () => {
               <div className="space-y-2">
                 <Label htmlFor="email">{t("Email", "ইমেইল")}</Label>
                 <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
-              </div>
+              </>
               <div className="space-y-2">
                 <Label htmlFor="password">{t("Password", "পাসওয়ার্ড")}</Label>
                 <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
-              </div>
+              </>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">{t("Confirm Password", "পাসওয়ার্ড নিশ্চিত করুন")}</Label>
                 <Input id="confirmPassword" type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" />
-              </div>
+              </>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" className="w-full" disabled={loading}>
@@ -86,8 +83,7 @@ const Register = () => {
           </form>
         </Card>
       </main>
-      <Footer />
-    </div>
+    </>
   );
 };
 
