@@ -3,9 +3,6 @@ import { Shield, HeadphonesIcon, Star, CheckCircle, ArrowRight, Wifi, Server, Gl
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import Navbar from "@/components/Navbar";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
 import HowToSubscribe from "@/components/home/HowToSubscribe";
 import CacheMarquee from "@/components/home/CacheMarquee";
 import WhoWeAre from "@/components/home/WhoWeAre";

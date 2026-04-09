@@ -9,8 +9,6 @@ import { Loader2 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const Login = () => {
   const [email, setEmail] = useState("");

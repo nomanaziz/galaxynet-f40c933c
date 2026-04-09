@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { ExternalLink, Loader2, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Navbar from "@/components/Navbar";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 

@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { Gift, Loader2, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import Navbar from "@/components/Navbar";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 

@@ -3,9 +3,6 @@ import { CreditCard, Loader2, ArrowRight, AlertTriangle, Smartphone, Globe, Buil
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import Navbar from "@/components/Navbar";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
