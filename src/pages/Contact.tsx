@@ -51,9 +51,7 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar />
-      <Navbar />
+    <>
 
       <PageHeroDark
         title="Contact Us"
@@ -76,31 +74,31 @@ const Contact = () => {
                   <Button className="mt-6 bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => { setSubmitted(false); setForm({ name: "", phone: "", email: "", message: "" }); }}>
                     {t("Send Another", "আরেকটি পাঠান")}
                   </Button>
-                </div>
+                </>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1.5">{t("Full Name", "পূর্ণ নাম")} *</label>
                     <Input name="name" value={form.name} onChange={handleChange} placeholder={t("Your full name", "আপনার পূর্ণ নাম")} required />
-                  </div>
+                  </>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1.5">{t("Phone Number", "ফোন নম্বর")} *</label>
                     <Input name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+880 1XXX-XXXXXX" required />
-                  </div>
+                  </>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1.5">{t("Email", "ইমেইল")}</label>
                     <Input name="email" type="email" value={form.email} onChange={handleChange} placeholder="your@email.com" />
-                  </div>
+                  </>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1.5">{t("Message", "বার্তা")} *</label>
                     <Textarea name="message" value={form.message} onChange={handleChange} placeholder={t("Write your message...", "আপনার বার্তা লিখুন...")} required rows={5} className="resize-none" />
-                  </div>
+                  </>
                   <Button type="submit" size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold">
                     <Send className="mr-2 h-4 w-4" /> {t("Send Message", "বার্তা পাঠান")}
                   </Button>
                 </form>
               )}
-            </div>
+            </>
 
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-6">{t("Contact Details", "যোগাযোগের তথ্য")}</h2>
@@ -111,9 +109,9 @@ const Contact = () => {
                       <div className="flex items-center gap-3 mb-3">
                         <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
                           <detail.icon className="h-5 w-5 text-accent" />
-                        </div>
+                        </>
                         <p className="font-semibold text-foreground text-sm">{detail.title}</p>
-                      </div>
+                      </>
                       {detail.lines.map((line, i) => (
                         <p key={i} className="text-sm text-muted-foreground">{line}</p>
                       ))}
@@ -121,7 +119,7 @@ const Contact = () => {
                     </CardContent>
                   </Card>
                 ))}
-              </div>
+              </>
 
               <div className="rounded-2xl bg-primary p-6 text-primary-foreground text-center">
                 <p className="text-lg font-bold mb-1">{t("Call Us Now!", "এখনই কল করুন!")}</p>
@@ -130,14 +128,13 @@ const Contact = () => {
                     <Phone className="mr-2 h-5 w-5" /> {phone1}
                   </Button>
                 </a>
-              </div>
-            </div>
-          </div>
-        </div>
+              </>
+            </>
+          </>
+        </>
       </section>
 
-      <Footer />
-    </div>
+    </>
   );
 };
 

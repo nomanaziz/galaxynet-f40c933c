@@ -184,9 +184,7 @@ const Coverage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar />
-      <Navbar />
+    <>
 
       <PageHeroDark
         title="Coverage Area"
@@ -211,7 +209,7 @@ const Coverage = () => {
               <Button onClick={handleCheck} className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shrink-0">
                 <Search className="h-4 w-4 mr-1" /> {t("Check", "চেক")}
               </Button>
-            </div>
+            </>
             {checkResult !== null && (
               <div className={`mt-4 flex items-start gap-3 p-4 rounded-lg ${checkResult ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}>
                 {checkResult ? (
@@ -224,7 +222,7 @@ const Coverage = () => {
                           {t("Contact Us", "যোগাযোগ করুন")} <ArrowRight className="ml-1 h-3 w-3" />
                         </Button>
                       </Link>
-                    </div>
+                    </>
                   </>
                 ) : (
                   <>
@@ -236,13 +234,13 @@ const Coverage = () => {
                           {t("Request Connection", "সংযোগের আবেদন")}
                         </Button>
                       </Link>
-                    </div>
+                    </>
                   </>
                 )}
-              </div>
+              </>
             )}
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Areas listing */}
@@ -250,10 +248,10 @@ const Coverage = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-foreground">{t("Covered Areas", "আমাদের সেবা এলাকা")}</h2>
-          </div>
+          </>
 
           {loading ? (
-            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
+            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-accent" /></>
           ) : (
             <>
               {/* Cascading filters */}
@@ -267,7 +265,7 @@ const Coverage = () => {
                       {divisions.map(d => <SelectItem key={d.id} value={d.id}>{t(d.name, d.name_bn || d.name)}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                </div>
+                </>
                 <div className="w-full sm:w-auto">
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("District", "জেলা")}</label>
                   <Select value={filterDistrict} onValueChange={(v) => { setFilterDistrict(v === "all" ? "" : v); setFilterThana(""); setFilterZone(""); }} disabled={!filterDivision}>
@@ -277,7 +275,7 @@ const Coverage = () => {
                       {districts.map(d => <SelectItem key={d.id} value={d.id}>{t(d.name, d.name_bn || d.name)}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                </div>
+                </>
                 <div className="w-full sm:w-auto">
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("Thana", "থানা")}</label>
                   <Select value={filterThana} onValueChange={(v) => { setFilterThana(v === "all" ? "" : v); setFilterZone(""); }} disabled={!filterDistrict}>
@@ -287,7 +285,7 @@ const Coverage = () => {
                       {thanas.map(t2 => <SelectItem key={t2.id} value={t2.id}>{t(t2.name, t2.name_bn || t2.name)}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                </div>
+                </>
                 <div className="w-full sm:w-auto">
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("Zone", "জোন")}</label>
                   <Select value={filterZone} onValueChange={(v) => setFilterZone(v === "all" ? "" : v)} disabled={!filterThana}>
@@ -297,15 +295,15 @@ const Coverage = () => {
                       {zones.map(z => <SelectItem key={z.id} value={z.id}>{t(z.name, z.name_bn || z.name)}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                </div>
+                </>
                 <div className="relative w-full sm:w-auto">
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">{t("Search", "খুঁজুন")}</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input placeholder={t("Search...", "খুঁজুন...")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 w-full sm:w-48" />
-                  </div>
-                </div>
-              </div>
+                  </>
+                </>
+              </>
 
               {/* Grouped area cards */}
               {groupedByDivision.map((group, gi) => (
@@ -318,7 +316,7 @@ const Coverage = () => {
                       </h3>
                       <Badge variant="secondary" className="text-xs">{group.areas.length}</Badge>
                       <div className="h-px flex-1 bg-border" />
-                    </div>
+                    </>
                   )}
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {group.areas.map((area) => (
@@ -337,17 +335,17 @@ const Coverage = () => {
                             {getDistrictName(area)}
                           </span>
                         )}
-                      </div>
+                      </>
                     ))}
-                  </div>
-                </div>
+                  </>
+                </>
               ))}
 
               {sortedFiltered.length === 0 && (
                 <div className="text-center py-12">
                   <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                   <p className="text-muted-foreground">{t("No areas found", "কোনো এলাকা পাওয়া যায়নি")}</p>
-                </div>
+                </>
               )}
             </>
           )}
@@ -359,12 +357,11 @@ const Coverage = () => {
                 {t("Contact us", "যোগাযোগ করুন")}
               </Link>
             </p>
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
-      <Footer />
-    </div>
+    </>
   );
 };
 

@@ -57,9 +57,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <TopBar />
-      <Navbar />
+    <>
 
       {/* Hero - Dark navy with background image */}
       <section className="relative overflow-hidden">
@@ -97,7 +95,7 @@ const Index = () => {
             <div className="inline-flex items-center gap-2 bg-accent/20 border border-accent/30 rounded-full px-4 py-2 mb-6">
               <Banknote className="h-5 w-5 text-accent" />
               <span className="text-white text-sm font-medium">{t("Starting from", "শুরু")} <span className="text-accent font-bold text-lg">৳750</span>/{t("month", "মাস")}</span>
-            </div>
+            </>
             <div className="flex flex-wrap gap-3">
               <Link to={settings.hero_cta_url || "/coverage"}>
                 <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-7 text-base">
@@ -115,9 +113,9 @@ const Index = () => {
                   {t("New Connection", "নতুন সংযোগ")}
                 </Button>
               </Link>
-            </div>
-          </div>
-        </div>
+            </>
+          </>
+        </>
       </section>
 
       {/* Ramadan Panel */}
@@ -133,15 +131,15 @@ const Index = () => {
               <div key={s.label} className="flex items-center gap-3 justify-center p-3 rounded-xl bg-secondary/60">
                 <div className="h-11 w-11 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
                   <s.icon className="h-5 w-5 text-accent" />
-                </div>
+                </>
                 <div>
-                  <div className="text-xl font-bold text-foreground">{s.num}</div>
-                  <div className="text-xs text-muted-foreground">{s.label}</div>
-                </div>
-              </div>
+                  <div className="text-xl font-bold text-foreground">{s.num}</>
+                  <div className="text-xs text-muted-foreground">{s.label}</>
+                </>
+              </>
             ))}
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Fiber Banner Strip */}
@@ -152,7 +150,7 @@ const Index = () => {
           <p className="text-white font-bold text-lg md:text-2xl tracking-wide text-center px-4">
             {t("100% Fiber Optic Network — Ultra Fast & Reliable", "১০০% ফাইবার অপটিক নেটওয়ার্ক — আল্ট্রা ফাস্ট ও নির্ভরযোগ্য")}
           </p>
-        </div>
+        </>
       </section>
 
       {/* Why Choose Us — from DB */}
@@ -166,7 +164,7 @@ const Index = () => {
               <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">
                 {t("Everything you need for a seamless internet experience", "নিরবচ্ছিন্ন ইন্টারনেট অভিজ্ঞতার জন্য যা কিছু দরকার")}
               </p>
-            </div>
+            </>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
               {features.map((f) => {
                 const Icon = iconMap[f.icon_name] || Star;
@@ -175,15 +173,15 @@ const Index = () => {
                     <CardContent className="p-3 md:p-6">
                       <div className="h-9 w-9 md:h-12 md:w-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3 md:mb-4 group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
                         <Icon className="h-5 w-5 md:h-6 md:w-6 text-accent group-hover:text-accent-foreground transition-colors" />
-                      </div>
+                      </>
                       <h3 className="font-semibold text-foreground text-sm md:text-base mb-1">{t(f.title, f.title_bn || f.title)}</h3>
                       <p className="text-muted-foreground text-xs md:text-sm">{t(f.description, f.description_bn || f.description)}</p>
                     </CardContent>
                   </Card>
                 );
               })}
-            </div>
-          </div>
+            </>
+          </>
         </section>
       )}
 
@@ -192,7 +190,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-primary mb-2">{t("Our Services", "আমাদের সেবাসমূহ")}</h2>
-          </div>
+          </>
           <div className="flex gap-4 mb-8 overflow-x-auto pb-2 md:flex-wrap md:justify-center md:overflow-visible scrollbar-none">
             {services.map((s) => {
               const Icon = iconMap[s.icon_name] || Wifi;
@@ -200,18 +198,18 @@ const Index = () => {
                 <div key={s.id} className="flex flex-col items-center p-5 rounded-xl bg-background border hover:border-accent/40 transition-all min-w-[110px] hover:shadow-sm shrink-0">
                   <Icon className="h-7 w-7 text-accent mb-2" />
                   <p className="font-medium text-foreground text-sm text-center">{t(s.title, s.title_bn || s.title)}</p>
-                </div>
+                </>
               );
             })}
-          </div>
+          </>
           <div className="text-center">
             <Link to="/services">
               <Button variant="outline" className="font-semibold">
                 {t("All Services", "সব সেবা")} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Gaming & Cache Banner */}
@@ -225,7 +223,7 @@ const Index = () => {
           <p className="text-white/60 text-sm md:text-base max-w-lg">
             {t("Low latency, high speed — perfect for gamers and content lovers", "কম লেটেন্সি, হাই স্পিড — গেমার ও কন্টেন্ট প্রেমীদের জন্য পারফেক্ট")}
           </p>
-        </div>
+        </>
       </section>
 
       {/* Cache Server Marquee */}
@@ -237,7 +235,7 @@ const Index = () => {
           <div className="text-center mb-8 md:mb-12">
             <h2 className="text-2xl md:text-4xl font-bold text-primary mb-2">{t("Popular Packages", "জনপ্রিয় প্যাকেজ")}</h2>
             <p className="text-muted-foreground text-sm md:text-base">{t("Choose the perfect plan for you", "আপনার জন্য সেরা প্ল্যান বেছে নিন")}</p>
-          </div>
+          </>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 max-w-5xl mx-auto">
             {packages.map((pkg) => {
               const featureList = Array.isArray(pkg.features) ? pkg.features : [];
@@ -246,15 +244,15 @@ const Index = () => {
                   {pkg.popular && (
                     <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-[10px] md:text-xs font-bold px-2 md:px-3 py-0.5 md:py-1 rounded-bl-lg">
                       {t("POPULAR", "জনপ্রিয়")}
-                    </div>
+                    </>
                   )}
                   <CardContent className="p-3 md:p-6">
                     <h3 className="text-base md:text-xl font-bold text-foreground">{t(pkg.name, pkg.name_bn || pkg.name)}</h3>
-                    <div className="my-2 md:my-3"><span className="text-xl md:text-3xl font-bold text-foreground">{pkg.speed} Mbps</span></div>
+                    <div className="my-2 md:my-3"><span className="text-xl md:text-3xl font-bold text-foreground">{pkg.speed} Mbps</span></>
                     <div className="mb-3 md:mb-4 p-2 md:p-3 rounded-lg bg-accent/8 border border-accent/30">
                       <span className="text-lg md:text-2xl font-bold text-accent">৳{pkg.price}</span>
                       <span className="text-muted-foreground text-xs md:text-sm">/{t("month", "মাস")}</span>
-                    </div>
+                    </>
                     <ul className="space-y-1 md:space-y-2 mb-4 md:mb-6">
                       {featureList.map((f: string, i: number) => (
                         <li key={i} className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-muted-foreground">
@@ -271,7 +269,7 @@ const Index = () => {
                 </Card>
               );
             })}
-          </div>
+          </>
           {packages.length === 0 && (
             <p className="text-center text-muted-foreground">{t("No packages available.", "কোনো প্যাকেজ নেই।")}</p>
           )}
@@ -281,8 +279,8 @@ const Index = () => {
                 {t("See All Plans", "সব প্ল্যান দেখুন")} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* Speed Banner */}
@@ -294,7 +292,7 @@ const Index = () => {
             {t("Blazing Fast Speeds up to 1 Gbps", "১ Gbps পর্যন্ত অবিশ্বাস্য গতি")}
           </h3>
           <p className="text-white/60 text-sm">{t("Experience the difference with fiber optic technology", "ফাইবার অপটিক প্রযুক্তিতে পার্থক্য অনুভব করুন")}</p>
-        </div>
+        </>
       </section>
 
       {/* Coverage CTA */}
@@ -302,7 +300,7 @@ const Index = () => {
         <div className="container mx-auto px-4 max-w-xl text-center">
           <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <MapPin className="h-6 w-6 text-accent" />
-          </div>
+          </>
           <h2 className="text-2xl font-bold text-primary mb-2">{t("Check If We're In Your Area", "আপনার এলাকায় আমরা আছি কিনা দেখুন")}</h2>
           <div className="flex gap-3 mt-6">
             <Input placeholder={t("Enter your area...", "এলাকার নাম...")} value={coverageCheck} onChange={(e) => setCoverageCheck(e.target.value)} className="text-base" />
@@ -311,8 +309,8 @@ const Index = () => {
                 <Search className="h-4 w-4 mr-1" /> {t("Check", "চেক")}
               </Button>
             </Link>
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
       {/* How to Subscribe */}
@@ -324,7 +322,7 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">{t("Customer Reviews", "গ্রাহকদের মতামত")}</h2>
-            </div>
+            </>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {testimonials.map((item) => (
                 <Card key={item.id} className="border hover:border-accent/40 transition-all hover:shadow-md">
@@ -333,24 +331,24 @@ const Index = () => {
                       {Array.from({ length: item.rating || 5 }).map((_, i) => (
                         <Star key={i} className="h-4 w-4 fill-accent text-accent" />
                       ))}
-                    </div>
+                    </>
                     <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                       "{t(item.text || "", item.text_bn || item.text || "")}"
                     </p>
                     <div className="flex items-center gap-3">
                       <div className="h-9 w-9 rounded-full bg-accent/10 flex items-center justify-center">
                         <span className="text-accent font-bold text-sm">{(item.name || "?")[0]}</span>
-                      </div>
+                      </>
                       <div>
                         <p className="font-medium text-sm text-foreground">{t(item.name, item.name_bn || item.name)}</p>
                         <p className="text-xs text-muted-foreground">{t(item.location || "", item.location_bn || item.location || "")}</p>
-                      </div>
-                    </div>
+                      </>
+                    </>
                   </CardContent>
                 </Card>
               ))}
-            </div>
-          </div>
+            </>
+          </>
         </section>
       )}
 
@@ -376,12 +374,11 @@ const Index = () => {
                 {t("New Connection", "নতুন সংযোগ")}
               </Button>
             </Link>
-          </div>
-        </div>
+          </>
+        </>
       </section>
 
-      <Footer />
-    </div>
+    </>
   );
 };
 
