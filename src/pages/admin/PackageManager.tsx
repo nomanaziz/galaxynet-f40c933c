@@ -99,7 +99,7 @@ const PackageManager = () => {
   };
 
   const toggleField = async (id: string, field: "visible" | "featured" | "popular", val: boolean) => {
-    await supabase.from("packages").update({ [field]: val }).eq("id", id);
+    await supabase.from("packages").update({ [field]: val } as any).eq("id", id);
     fetchPackages();
   };
 
