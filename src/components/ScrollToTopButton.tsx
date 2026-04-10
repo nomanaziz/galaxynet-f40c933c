@@ -17,7 +17,7 @@ const ScrollToTopButton = () => {
       className="fixed bottom-20 right-4 md:bottom-8 md:right-6 z-50 transition-all hover:scale-125 animate-bounce"
       aria-label="Scroll to top"
     >
-      <img src="/images/rocket.svg" alt="Back to top" className="h-12 w-12 drop-shadow-lg" />
+      <img src="/images/rocket.svg" alt="Back to top" className="h-14 w-14 drop-shadow-lg" />
     </button>
   );
 };
