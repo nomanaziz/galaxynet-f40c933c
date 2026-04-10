@@ -1,87 +1,51 @@
 
 
-## Staff/Supervisor Management System with Permissions
+## Three Changes: Pay Bill Mobile Fix + Banners + Merge Order/NewConnection
 
-### Problem
-Current User Manager requires pasting raw UUIDs from Supabase dashboard -- not practical. Admin needs to create staff accounts directly and assign granular permissions.
+### 1. Pay Bill (`/pay-bill`) Mobile Fix and Enhancement
 
-### Solution
+**Problem**: Quick Pay banner drops to the bottom on mobile. bKash should be highlighted. Page needs better mobile layout.
 
-#### 1. New Database Table: `staff_permissions`
-Stores which admin sections each staff user can access.
+**Changes in `src/pages/Payment.tsx`**:
+- Add a `PageHeroDark` hero banner at the top (matching other pages)
+- Restructure Quick Pay banner for mobile: stack vertically with full-width PAY NOW button, ensure it stays at the top
+- Make the "How to Pay" grid `grid-cols-2` on mobile (already is), but reduce padding
+- Highlight bKash in mobile banking tabs: if bKash is present, auto-select it as default tab and give it a prominent style
+- Fix mobile banking tab overflow: make tabs horizontally scrollable on small screens
+- Reduce section padding on mobile (`py-8` instead of `py-12`)
 
-```text
-staff_permissions
-├── id (uuid, PK)
-├── user_id (uuid, references auth.users)
-├── permission (text) -- e.g. 'packages', 'orders', 'coverage', etc.
-└── created_at (timestamptz)
-```
+### 2. Add PageHeroDark Banner to `/pay-bill` and `/offers`
 
-RLS: Only super_admin/admin can manage permissions. Users can read their own.
+Both pages currently lack a proper hero banner like other pages have.
 
-#### 2. New Edge Function: `create-staff-user`
-Since client-side Supabase SDK cannot create users on behalf of others, an edge function using the **service role key** will:
-- Accept `{ email, password, name, role }` from admin
-- Call `supabase.auth.admin.createUser()` to create the account
-- Insert a row into `user_roles` with the chosen role
-- Return the new user's ID
+**`src/pages/Payment.tsx`**: Add `<PageHeroDark>` with title "Pay Bill" / "বিল পরিশোধ" and a suitable bg image
+**`src/pages/Offers.tsx`**: Add `<PageHeroDark>` with title "Offers" / "অফার সমূহ" and a suitable bg image
 
-Protected by checking the calling user is an admin.
+### 3. Replace `/order` with `/new-connection` (Merge Pages)
 
-#### 3. Rebuilt `UserManager.tsx` Page
-Replace the current raw-UUID interface with a proper management UI:
+**Goal**: Remove the separate Order page. The `/new-connection` page (currently a standalone landing page outside Layout) becomes the only connection form, but placed inside the Layout (with Navbar/Footer) at the route `/new-connection`.
 
-- **User list** showing: Name/Email, Role badge, Permission count, Actions
-- **"Add Staff" dialog** with fields: Name, Email, Password, Role (admin/staff/supervisor)
-- **"Manage Permissions" dialog** with checkboxes for each admin section:
-  - Packages, Coverage, Orders, Pages, Notices, Offers, Testimonials, Partners, Features, Menu, Payments, Homepage, Media, Services, Festivals, About, Departments, Designations, Employees
-- **Delete** button to remove a staff member's access
-
-#### 4. Permission-based Sidebar Filtering
-Update `AdminSidebar.tsx` to:
-- Fetch the current user's permissions from `staff_permissions`
-- **super_admin/admin**: sees everything (full access)
-- **staff/supervisor**: only sees sidebar items they have permission for
-
-#### 5. Permission-based Route Protection
-Update `AdminLayout.tsx` to check permissions on each route. If a staff user navigates to a section they don't have permission for, redirect to dashboard with a toast message.
-
-### Files to Create
-- `supabase/functions/create-staff-user/index.ts` -- edge function
-- Migration for `staff_permissions` table + new `supervisor` role enum value
+**Changes**:
+- **`src/App.tsx`**:
+  - Remove `Order` import and `/order` route
+  - Move `/new-connection` route inside `<Route element={<Layout />}>` so it gets Navbar/Footer
+  - Add redirect: `/order` → `/new-connection` using `<Navigate>`
+- **`src/pages/NewConnection.tsx`**:
+  - Remove the standalone header (logo + home link) since Layout provides Navbar
+  - Add `PageHeroDark` banner at the top
+  - Keep the dark-themed form card but adapt it to work within Layout (remove `min-h-screen` and the gradient background wrapper, use a section with the dark gradient instead)
+  - Keep all form functionality (hierarchical area selection, package tabs, dedicated Mbps)
+- **`src/pages/Order.tsx`**: Delete this file (no longer needed)
+- **`src/components/Footer.tsx`**: Update link from `/order` to `/new-connection`
+- **Admin sidebar/routes**: Keep `/admin/orders` as-is (it manages submitted orders, unaffected)
 
 ### Files to Modify
-- `src/pages/admin/UserManager.tsx` -- complete rewrite with proper UI
-- `src/components/admin/AdminSidebar.tsx` -- permission-based menu filtering
-- `src/pages/admin/AdminLayout.tsx` -- route-level permission check
-- `src/hooks/useAdminAuth.ts` -- add permissions array to the return value
+- `src/pages/Payment.tsx` — mobile fix, add hero banner, highlight bKash
+- `src/pages/Offers.tsx` — add hero banner
+- `src/pages/NewConnection.tsx` — adapt to work inside Layout
+- `src/App.tsx` — remove Order route, move NewConnection inside Layout, add redirect
+- `src/components/Footer.tsx` — update link
 
-### Visual Layout
-
-```text
-┌─────────────────────────────────────────────┐
-│  Staff Management                  [+ Add]  │
-├──────────┬──────────┬────────────┬──────────┤
-│ Email    │ Role     │ Permissions│ Actions  │
-├──────────┼──────────┼────────────┼──────────┤
-│ staff@.. │ Staff    │ 5 sections │ ✏️ 🗑️    │
-│ super@.. │ Admin    │ Full Access│ 🗑️       │
-└──────────┴──────────┴────────────┴──────────┘
-
-Add Staff Dialog:
-┌────────────────────────────┐
-│ Name:     [____________]   │
-│ Email:    [____________]   │
-│ Password: [____________]   │
-│ Role:     [Staff     ▼]   │
-│                            │
-│ Permissions:               │
-│ ☑ Packages  ☑ Orders      │
-│ ☑ Coverage  ☐ Pages       │
-│ ☐ Notices   ☐ Settings    │
-│ ...                        │
-│        [Cancel] [Create]   │
-└────────────────────────────┘
-```
+### File to Delete
+- `src/pages/Order.tsx`
 
