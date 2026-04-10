@@ -21,7 +21,7 @@ const FloatingWhatsApp = () => {
       href={`https://wa.me/${number}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-20 left-4 md:bottom-6 md:left-6 z-50 group"
+      className="fixed bottom-20 left-4 md:bottom-8 md:left-6 z-50 group"
       aria-label="Chat on WhatsApp"
     >
       {/* Pulse ring */}
