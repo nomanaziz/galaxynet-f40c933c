@@ -10,7 +10,7 @@ const FloatingCTA = () => {
   if (dismissed) return null;
 
   return (
-    <div className="fixed bottom-36 left-4 md:bottom-24 md:left-6 z-50 group">
+    <div className="fixed bottom-20 left-4 md:bottom-8 md:left-6 z-50 group">
       {/* Mobile close button */}
       <button
         onClick={(e) => { e.preventDefault(); setDismissed(true); }}
