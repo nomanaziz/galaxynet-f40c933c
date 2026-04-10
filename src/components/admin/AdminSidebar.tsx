@@ -5,7 +5,6 @@ import {
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import logo from "@/assets/logo.png";
-import { useLocation } from "react-router-dom";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
@@ -15,40 +14,46 @@ import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 const mainItems = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard, end: true },
-  { title: "Packages", url: "/admin/packages", icon: Package },
-  { title: "Coverage", url: "/admin/coverage", icon: MapPin },
-  { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
-  { title: "Pages", url: "/admin/pages", icon: FileText },
-  { title: "Notices", url: "/admin/notices", icon: Bell },
-  { title: "Offers", url: "/admin/offers", icon: Gift },
-  { title: "Testimonials", url: "/admin/testimonials", icon: Star },
-  { title: "Partners", url: "/admin/partners", icon: Handshake },
-  { title: "Features", url: "/admin/features", icon: Sparkles },
-  { title: "Menu", url: "/admin/menu", icon: Menu },
-  { title: "Payments", url: "/admin/payments", icon: CreditCard },
-  { title: "Homepage", url: "/admin/homepage", icon: Home },
-  { title: "Media", url: "/admin/media", icon: Image },
-  { title: "Services", url: "/admin/services", icon: Globe },
-  { title: "Festivals", url: "/admin/festivals", icon: Sparkles },
-  { title: "About Page", url: "/admin/about", icon: Info },
+  { title: "Dashboard", url: "/admin", icon: LayoutDashboard, end: true, permission: null },
+  { title: "Packages", url: "/admin/packages", icon: Package, permission: "packages" },
+  { title: "Coverage", url: "/admin/coverage", icon: MapPin, permission: "coverage" },
+  { title: "Orders", url: "/admin/orders", icon: ShoppingCart, permission: "orders" },
+  { title: "Pages", url: "/admin/pages", icon: FileText, permission: "pages" },
+  { title: "Notices", url: "/admin/notices", icon: Bell, permission: "notices" },
+  { title: "Offers", url: "/admin/offers", icon: Gift, permission: "offers" },
+  { title: "Testimonials", url: "/admin/testimonials", icon: Star, permission: "testimonials" },
+  { title: "Partners", url: "/admin/partners", icon: Handshake, permission: "partners" },
+  { title: "Features", url: "/admin/features", icon: Sparkles, permission: "features" },
+  { title: "Menu", url: "/admin/menu", icon: Menu, permission: "menu" },
+  { title: "Payments", url: "/admin/payments", icon: CreditCard, permission: "payments" },
+  { title: "Homepage", url: "/admin/homepage", icon: Home, permission: "homepage" },
+  { title: "Media", url: "/admin/media", icon: Image, permission: "media" },
+  { title: "Services", url: "/admin/services", icon: Globe, permission: "services" },
+  { title: "Festivals", url: "/admin/festivals", icon: Sparkles, permission: "festivals" },
+  { title: "About Page", url: "/admin/about", icon: Info, permission: "about" },
 ];
 
 const aboutItems = [
-  { title: "Departments", url: "/admin/departments", icon: Building2 },
-  { title: "Designations", url: "/admin/designations", icon: BadgeCheck },
-  { title: "Employees", url: "/admin/employees", icon: UserCog },
+  { title: "Departments", url: "/admin/departments", icon: Building2, permission: "departments" },
+  { title: "Designations", url: "/admin/designations", icon: BadgeCheck, permission: "designations" },
+  { title: "Employees", url: "/admin/employees", icon: UserCog, permission: "employees" },
 ];
 
 const systemItems = [
-  { title: "Settings", url: "/admin/settings", icon: Settings },
-  { title: "Users", url: "/admin/users", icon: Users },
+  { title: "Settings", url: "/admin/settings", icon: Settings, permission: null },
+  { title: "Users", url: "/admin/users", icon: Users, permission: null },
 ];
 
 export function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const { isSuperAdmin, signOut, user } = useAdminAuth();
+  const { isSuperAdmin, isAdmin, hasPermission, signOut, user } = useAdminAuth();
+
+  const filterItems = (items: typeof mainItems) =>
+    items.filter(item => !item.permission || hasPermission(item.permission));
+
+  const visibleMain = filterItems(mainItems);
+  const visibleAbout = filterItems(aboutItems);
 
   return (
     <Sidebar collapsible="icon">
@@ -70,7 +75,7 @@ export function AdminSidebar() {
           <SidebarGroupLabel>Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainItems.map((item) => (
+              {visibleMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end={item.end} className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
@@ -84,23 +89,25 @@ export function AdminSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>About Us / Team</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {aboutItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {visibleAbout.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>About Us / Team</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {visibleAbout.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink to={item.url} className="hover:bg-sidebar-accent/50" activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
+                        <item.icon className="mr-2 h-4 w-4" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {isSuperAdmin && (
           <SidebarGroup>

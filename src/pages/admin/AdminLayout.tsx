@@ -1,19 +1,37 @@
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { ROUTE_PERMISSION_MAP } from "@/lib/adminPermissions";
 import { Loader2, ExternalLink } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminLayout = () => {
-  const { user, loading, isAdmin, role } = useAdminAuth();
+  const { user, loading, role, hasPermission, isAdmin } = useAdminAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!loading && (!user || !role)) {
       navigate("/admin/login", { replace: true });
     }
   }, [loading, user, role, navigate]);
+
+  // Route-level permission check
+  useEffect(() => {
+    if (loading || !user || !role || isAdmin) return;
+
+    const segments = location.pathname.replace("/admin/", "").replace("/admin", "").split("/");
+    const segment = segments[0];
+    const requiredPerm = ROUTE_PERMISSION_MAP[segment];
+
+    if (requiredPerm && !hasPermission(requiredPerm)) {
+      toast({ title: "অ্যাক্সেস নেই", description: "আপনার এই সেকশনে প্রবেশের অনুমতি নেই", variant: "destructive" });
+      navigate("/admin", { replace: true });
+    }
+  }, [loading, user, role, isAdmin, location.pathname, hasPermission, navigate, toast]);
 
   if (loading) {
     return (

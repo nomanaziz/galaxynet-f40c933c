@@ -712,6 +712,27 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_permissions: {
+        Row: {
+          created_at: string
+          id: string
+          permission: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permission: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permission?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       testimonials: {
         Row: {
           created_at: string
@@ -787,7 +808,7 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "super_admin" | "admin" | "staff"
+      app_role: "super_admin" | "admin" | "staff" | "supervisor"
       coverage_location_type: "division" | "district" | "thana" | "zone"
       notice_category: "maintenance" | "offer" | "alert"
       offer_type: "offer" | "referral" | "coupon"
@@ -926,7 +947,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "admin", "staff"],
+      app_role: ["super_admin", "admin", "staff", "supervisor"],
       coverage_location_type: ["division", "district", "thana", "zone"],
       notice_category: ["maintenance", "offer", "alert"],
       offer_type: ["offer", "referral", "coupon"],
