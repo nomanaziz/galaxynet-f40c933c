@@ -1,51 +1,41 @@
 
 
-## Three Changes: Pay Bill Mobile Fix + Banners + Merge Order/NewConnection
+## Plan: Mobile Bottom Nav + Floating CTA Button
 
-### 1. Pay Bill (`/pay-bill`) Mobile Fix and Enhancement
+### 1. Mobile Bottom Navigation Bar
+Create a new `BottomNav.tsx` component — a fixed bottom navigation bar visible only on mobile screens. It will include quick-access links including **Services** and **About**, plus other key pages.
 
-**Problem**: Quick Pay banner drops to the bottom on mobile. bKash should be highlighted. Page needs better mobile layout.
+**Design**: Fixed at the bottom of the screen, 5 icons in a row (Home, Services, About, Packages, Contact), with labels underneath. Only visible on `md:hidden`.
 
-**Changes in `src/pages/Payment.tsx`**:
-- Add a `PageHeroDark` hero banner at the top (matching other pages)
-- Restructure Quick Pay banner for mobile: stack vertically with full-width PAY NOW button, ensure it stays at the top
-- Make the "How to Pay" grid `grid-cols-2` on mobile (already is), but reduce padding
-- Highlight bKash in mobile banking tabs: if bKash is present, auto-select it as default tab and give it a prominent style
-- Fix mobile banking tab overflow: make tabs horizontally scrollable on small screens
-- Reduce section padding on mobile (`py-8` instead of `py-12`)
+**File**: `src/components/BottomNav.tsx`
+- Fixed bottom bar with `z-40`, background blur
+- 5 nav items with icons and small labels (both EN/BN)
+- Active state highlighting based on current route
+- Hidden on desktop (`md:hidden`)
 
-### 2. Add PageHeroDark Banner to `/pay-bill` and `/offers`
+**Integration**: Add `<BottomNav />` to `src/components/Layout.tsx`
 
-Both pages currently lack a proper hero banner like other pages have.
+### 2. Floating "Get Connection" CTA Button
+Create a new `FloatingCTA.tsx` component — a floating action button on the right side that links to `/new-connection`.
 
-**`src/pages/Payment.tsx`**: Add `<PageHeroDark>` with title "Pay Bill" / "বিল পরিশোধ" and a suitable bg image
-**`src/pages/Offers.tsx`**: Add `<PageHeroDark>` with title "Offers" / "অফার সমূহ" and a suitable bg image
+**Design**: Positioned on the right side (opposite to the WhatsApp button on the left). Accent-colored with a pulse animation. Text: "আজকেই কানেকশন নাও" / "Get Connected Today".
 
-### 3. Replace `/order` with `/new-connection` (Merge Pages)
+**File**: `src/components/FloatingCTA.tsx`
+- Fixed position: `bottom-20 right-4 md:bottom-6 md:right-6`
+- Accent gradient background with pulse animation (similar style to WhatsApp button)
+- Links to `/new-connection`
+- Bilingual text support
 
-**Goal**: Remove the separate Order page. The `/new-connection` page (currently a standalone landing page outside Layout) becomes the only connection form, but placed inside the Layout (with Navbar/Footer) at the route `/new-connection`.
+**Integration**: Add `<FloatingCTA />` to `src/components/Layout.tsx`
 
-**Changes**:
-- **`src/App.tsx`**:
-  - Remove `Order` import and `/order` route
-  - Move `/new-connection` route inside `<Route element={<Layout />}>` so it gets Navbar/Footer
-  - Add redirect: `/order` → `/new-connection` using `<Navigate>`
-- **`src/pages/NewConnection.tsx`**:
-  - Remove the standalone header (logo + home link) since Layout provides Navbar
-  - Add `PageHeroDark` banner at the top
-  - Keep the dark-themed form card but adapt it to work within Layout (remove `min-h-screen` and the gradient background wrapper, use a section with the dark gradient instead)
-  - Keep all form functionality (hierarchical area selection, package tabs, dedicated Mbps)
-- **`src/pages/Order.tsx`**: Delete this file (no longer needed)
-- **`src/components/Footer.tsx`**: Update link from `/order` to `/new-connection`
-- **Admin sidebar/routes**: Keep `/admin/orders` as-is (it manages submitted orders, unaffected)
+### 3. Adjust WhatsApp Button Position
+Move the WhatsApp floating button up slightly on mobile to avoid overlapping with the new bottom nav bar.
+
+### Files to Create
+- `src/components/BottomNav.tsx`
+- `src/components/FloatingCTA.tsx`
 
 ### Files to Modify
-- `src/pages/Payment.tsx` — mobile fix, add hero banner, highlight bKash
-- `src/pages/Offers.tsx` — add hero banner
-- `src/pages/NewConnection.tsx` — adapt to work inside Layout
-- `src/App.tsx` — remove Order route, move NewConnection inside Layout, add redirect
-- `src/components/Footer.tsx` — update link
-
-### File to Delete
-- `src/pages/Order.tsx`
+- `src/components/Layout.tsx` — add both new components
+- `src/components/FloatingWhatsApp.tsx` — adjust mobile position to avoid bottom nav overlap
 
