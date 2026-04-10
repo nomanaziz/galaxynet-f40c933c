@@ -14,13 +14,12 @@ import {
   CoverageArea,
   buildLocationMap,
   buildDisabledLocationIds,
-  getLocationBreadcrumb,
   getDescendantIds,
   getAncestorOfType,
   buildAreaSortKey,
 } from "@/lib/coverageHierarchy";
 
-// Division accent border colors (HSL-based semantic approach)
+// Division accent border colors
 const DIVISION_COLORS: Record<string, string> = {
   "Dhaka": "border-l-blue-500",
   "Chattogram": "border-l-emerald-500",
@@ -57,6 +56,17 @@ const DISTRICT_ICONS: Record<string, string> = {
   "Netrokona": "🎣",
 };
 
+interface DistrictGroup {
+  district: CoverageLocation | null;
+  areas: CoverageArea[];
+}
+
+interface DivisionGroup {
+  division: CoverageLocation | null;
+  districts: DistrictGroup[];
+  totalAreas: number;
+}
+
 const Coverage = () => {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
@@ -88,7 +98,7 @@ const Coverage = () => {
   const enabledLocations = useMemo(() => locations.filter(l => !disabledLocationIds.has(l.id)), [locations, disabledLocationIds]);
 
   const divisions = useMemo(() => enabledLocations.filter(l => l.type === "division"), [enabledLocations]);
-  const districts = useMemo(() => {
+  const districtOptions = useMemo(() => {
     if (!filterDivision) return [];
     return enabledLocations.filter(l => l.type === "district" && l.parent_id === filterDivision);
   }, [enabledLocations, filterDivision]);
@@ -139,21 +149,37 @@ const Coverage = () => {
     });
   }, [filtered, locationMap]);
 
-  // Group sorted areas by division for headers
-  const groupedByDivision = useMemo(() => {
-    const groups: { division: CoverageLocation | null; areas: CoverageArea[] }[] = [];
-    let currentDivId: string | null = null;
+  // Group by Division > District
+  const groupedByDivisionAndDistrict = useMemo((): DivisionGroup[] => {
+    const divMap = new Map<string, { division: CoverageLocation | null; distMap: Map<string, { district: CoverageLocation | null; areas: CoverageArea[] }> }>();
+
     for (const area of sortedFiltered) {
       const div = getAncestorOfType(area.location_id, "division", locationMap);
-      const divId = div?.id ?? null;
-      if (divId !== currentDivId) {
-        groups.push({ division: div, areas: [area] });
-        currentDivId = divId;
-      } else {
-        groups[groups.length - 1].areas.push(area);
+      const dist = getAncestorOfType(area.location_id, "district", locationMap);
+      const divKey = div?.id ?? "__none__";
+      const distKey = dist?.id ?? "__none__";
+
+      if (!divMap.has(divKey)) {
+        divMap.set(divKey, { division: div, distMap: new Map() });
       }
+      const divEntry = divMap.get(divKey)!;
+      if (!divEntry.distMap.has(distKey)) {
+        divEntry.distMap.set(distKey, { district: dist, areas: [] });
+      }
+      divEntry.distMap.get(distKey)!.areas.push(area);
     }
-    return groups;
+
+    const result: DivisionGroup[] = [];
+    for (const [, entry] of divMap) {
+      const distGroups: DistrictGroup[] = [];
+      let total = 0;
+      for (const [, dg] of entry.distMap) {
+        distGroups.push(dg);
+        total += dg.areas.length;
+      }
+      result.push({ division: entry.division, districts: distGroups, totalAreas: total });
+    }
+    return result;
   }, [sortedFiltered, locationMap]);
 
   const handleCheck = () => {
@@ -177,15 +203,8 @@ const Coverage = () => {
     return "border-l-accent";
   };
 
-  const getDistrictName = (area: CoverageArea) => {
-    const dist = getAncestorOfType(area.location_id, "district", locationMap);
-    if (!dist) return null;
-    return t(dist.name, dist.name_bn || dist.name);
-  };
-
   return (
     <>
-
       <PageHeroDark
         title="Coverage Area"
         titleBn="কভারেজ এলাকা"
@@ -223,7 +242,7 @@ const Coverage = () => {
                         </Button>
                       </Link>
                     </div>
-                  </div>
+                  </>
                 ) : (
                   <>
                     <XCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
@@ -235,7 +254,7 @@ const Coverage = () => {
                         </Button>
                       </Link>
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
             )}
@@ -272,7 +291,7 @@ const Coverage = () => {
                     <SelectTrigger className="w-full sm:w-40"><SelectValue placeholder={t("All Districts", "সকল জেলা")} /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">{t("All Districts", "সকল জেলা")}</SelectItem>
-                      {districts.map(d => <SelectItem key={d.id} value={d.id}>{t(d.name, d.name_bn || d.name)}</SelectItem>)}
+                      {districtOptions.map(d => <SelectItem key={d.id} value={d.id}>{t(d.name, d.name_bn || d.name)}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -305,39 +324,52 @@ const Coverage = () => {
                 </div>
               </div>
 
-              {/* Grouped area cards */}
-              {groupedByDivision.map((group, gi) => (
-                <div key={gi} className="mb-8">
-                  {group.division && !filterDivision && (
-                    <div className="flex items-center gap-3 mb-4">
+              {/* Grouped area cards: Division > District > Areas */}
+              {groupedByDivisionAndDistrict.map((divGroup, gi) => (
+                <div key={gi} className="mb-10">
+                  {/* Division header - shown when no specific division is filtered */}
+                  {divGroup.division && !filterDivision && (
+                    <div className="flex items-center gap-3 mb-5">
                       <div className="h-px flex-1 bg-border" />
                       <h3 className="text-base font-bold text-foreground whitespace-nowrap">
-                        {t(group.division.name + " Division", (group.division.name_bn || group.division.name) + " বিভাগ")}
+                        {t(divGroup.division.name + " Division", (divGroup.division.name_bn || divGroup.division.name) + " বিভাগ")}
                       </h3>
-                      <Badge variant="secondary" className="text-xs">{group.areas.length}</Badge>
+                      <Badge variant="secondary" className="text-xs">{divGroup.totalAreas}</Badge>
                       <div className="h-px flex-1 bg-border" />
                     </div>
                   )}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                    {group.areas.map((area) => (
-                      <div
-                        key={area.id}
-                        className={`relative overflow-hidden flex flex-col items-center text-center p-5 rounded-xl bg-background border border-l-4 ${getDivisionColor(area)} hover:shadow-md transition-all group`}
-                      >
-                        {/* Decorative watermark emoji */}
-                        <span className="absolute bottom-1 right-1 text-4xl opacity-[0.08] pointer-events-none select-none group-hover:opacity-[0.15] transition-opacity">
-                          {getDistrictIcon(area)}
-                        </span>
-                        <MapPin className="h-4 w-4 text-accent mb-1.5" />
-                        <p className="font-semibold text-foreground text-sm leading-tight">{t(area.name, area.name_bn || area.name)}</p>
-                        {getDistrictName(area) && (
-                          <span className="mt-1.5 text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                            {getDistrictName(area)}
-                          </span>
-                        )}
+
+                  {/* District sub-groups */}
+                  {divGroup.districts.map((distGroup, di) => (
+                    <div key={di} className="mb-6">
+                      {/* District sub-header */}
+                      {distGroup.district && (
+                        <div className="flex items-center gap-2 mb-3 ml-1">
+                          <span className="text-lg">{DISTRICT_ICONS[distGroup.district.name] || "📍"}</span>
+                          <h4 className="text-sm font-bold text-foreground">
+                            {t(distGroup.district.name, distGroup.district.name_bn || distGroup.district.name)}
+                          </h4>
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">{distGroup.areas.length}</Badge>
+                        </div>
+                      )}
+
+                      {/* Area cards grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                        {distGroup.areas.map((area) => (
+                          <div
+                            key={area.id}
+                            className={`relative overflow-hidden flex flex-col items-center text-center p-5 rounded-xl bg-background border border-l-4 ${getDivisionColor(area)} hover:shadow-md transition-all group`}
+                          >
+                            <span className="absolute bottom-1 right-1 text-4xl opacity-[0.08] pointer-events-none select-none group-hover:opacity-[0.15] transition-opacity">
+                              {getDistrictIcon(area)}
+                            </span>
+                            <MapPin className="h-4 w-4 text-accent mb-1.5" />
+                            <p className="font-semibold text-foreground text-sm leading-tight">{t(area.name, area.name_bn || area.name)}</p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               ))}
 
@@ -347,7 +379,7 @@ const Coverage = () => {
                   <p className="text-muted-foreground">{t("No areas found", "কোনো এলাকা পাওয়া যায়নি")}</p>
                 </div>
               )}
-            </div>
+            </>
           )}
 
           <div className="text-center mt-8">
@@ -360,8 +392,7 @@ const Coverage = () => {
           </div>
         </div>
       </section>
-
-    </div>
+    </>
   );
 };
 

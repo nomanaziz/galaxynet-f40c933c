@@ -70,7 +70,7 @@ const Notices = () => {
         </div>
       </section>
 
-    </div>
+    </>
   );
 };
 
