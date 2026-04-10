@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, Zap, Server, Globe, MonitorPlay, Loader2, Wifi } from "lucide-react";
+import { CheckCircle, Zap, Server, Globe, MonitorPlay, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,10 +24,6 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
       )}
       <CardContent className="p-3 sm:p-6">
         <h3 className="text-base sm:text-xl font-bold text-foreground">{t(plan.name, plan.name_bn || plan.name)}</h3>
-        <div className="flex items-center gap-1.5 mt-1.5 text-xs font-semibold text-accent">
-          <Wifi className="h-3.5 w-3.5" />
-          <span>{t("Free Router", "ফ্রি রাউটার")}</span>
-        </div>
         {plan.category !== "dedicated" && (
           <div className="flex items-end gap-1 my-2 sm:my-3">
             <span className="text-xl sm:text-3xl font-bold text-foreground">{plan.speed >= 1000 ? `${plan.speed / 1000} Gbps` : `${plan.speed} Mbps`}</span>
