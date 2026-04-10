@@ -19,7 +19,7 @@ import Payment from "./pages/Payment";
 import Selfcare from "./pages/Selfcare";
 
 import NotFound from "./pages/NotFound";
-import FloatingWhatsApp from "./components/FloatingWhatsApp";
+
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import Login from "./pages/Login";
@@ -108,7 +108,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <FloatingWhatsApp />
+          
           <ScrollToTopButton />
         </BrowserRouter>
       </LanguageProvider>

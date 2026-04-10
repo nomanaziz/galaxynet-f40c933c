@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BottomNav from "@/components/BottomNav";
 import FloatingCTA from "@/components/FloatingCTA";
-import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 const Layout = () => (
@@ -15,7 +15,7 @@ const Layout = () => (
     <Footer />
     <BottomNav />
     <FloatingCTA />
-    <FloatingWhatsApp />
+    
     <ScrollToTopButton />
   </div>
 );
