@@ -24,7 +24,7 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
       )}
       <CardContent className="p-3 sm:p-6">
         <h3 className="text-base sm:text-xl font-bold text-foreground">{t(plan.name, plan.name_bn || plan.name)}</h3>
-        <div className="flex items-center gap-1.5 mt-1.5 text-xs font-semibold text-green-600 dark:text-green-400">
+        <div className="flex items-center gap-1.5 mt-1.5 text-xs font-semibold text-accent">
           <Wifi className="h-3.5 w-3.5" />
           <span>{t("Free Router", "ফ্রি রাউটার")}</span>
         </div>
