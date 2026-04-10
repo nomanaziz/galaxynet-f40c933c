@@ -235,7 +235,7 @@ const About = () => {
       {/* Partners */}
       <PartnersSection partners={partners} />
 
-    </div>
+    </>
   );
 };
 

@@ -406,7 +406,7 @@ const Payment = () => {
         </DialogContent>
       </Dialog>
 
-    </div>
+    </>
   );
 };
 

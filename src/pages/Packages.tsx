@@ -131,7 +131,7 @@ const Packages = () => {
         </div>
       </section>
 
-    </div>
+    </>
   );
 };
 

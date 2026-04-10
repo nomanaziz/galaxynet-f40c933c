@@ -78,7 +78,7 @@ const Order = () => {
             </CardContent>
           </Card>
         </section>
-      </div>
+      </>
     );
   }
 
@@ -191,7 +191,7 @@ const Order = () => {
         </div>
       </section>
 
-    </div>
+    </>
   );
 };
 

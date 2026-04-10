@@ -54,7 +54,7 @@ const Selfcare = () => {
         </div>
       </section>
 
-    </div>
+    </>
   );
 };
 

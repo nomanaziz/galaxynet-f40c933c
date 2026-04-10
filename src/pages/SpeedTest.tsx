@@ -95,7 +95,7 @@ const SpeedTest = () => {
         </div>
       </section>
 
-    </div>
+    </>
   );
 };
 

@@ -101,7 +101,7 @@ const Offers = () => {
         </div>
       </section>
 
-    </div>
+    </>
   );
 };
 
