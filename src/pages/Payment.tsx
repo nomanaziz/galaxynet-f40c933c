@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import PageHeroDark from "@/components/PageHeroDark";
 
 const getYouTubeId = (url: string) => {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\s]+)/);
@@ -58,9 +59,11 @@ const Payment = () => {
       const map: Record<string, string> = {};
       (settingsRes.data ?? []).forEach((s: any) => { map[s.key] = s.value ?? ""; });
       setSettings(map);
-      // Set first mobile banking tab
+      // Auto-select bKash if available, otherwise first mobile banking
       const mobileMethods = data.filter((m: any) => m.category === "mobile_banking");
-      if (mobileMethods.length > 0) setActiveTab(mobileMethods[0].id);
+      const bkash = mobileMethods.find((m: any) => m.name.toLowerCase().includes("bkash") || m.name.toLowerCase().includes("বিকাশ"));
+      if (bkash) setActiveTab(bkash.id);
+      else if (mobileMethods.length > 0) setActiveTab(mobileMethods[0].id);
       setLoading(false);
     });
   }, []);
@@ -68,7 +71,7 @@ const Payment = () => {
   const portalUrl = settings.payment_portal_url || "https://portal.galaxynetbd.com/BillPayment/Index";
   const heroTitle = t(settings.payment_hero_title || "Quick Pay", settings.payment_hero_title_bn || "কুইক পে");
   const heroSubtitle = t(
-    settings.payment_hero_subtitle || "Make your payment instantly using bKash, Nagad, Master Card, Visa card and other methods. Pay your renewal fee and new connection fees instantly.",
+    settings.payment_hero_subtitle || "Make your payment instantly using bKash, Nagad, Master Card, Visa card and other methods.",
     settings.payment_hero_subtitle_bn || "বিকাশ, নগদ, মাস্টার কার্ড, ভিসা কার্ড এবং অন্যান্য পদ্ধতিতে তাৎক্ষণিক পেমেন্ট করুন।"
   );
   const phone = settings.phone || "+880 1700-000000";
@@ -80,35 +83,38 @@ const Payment = () => {
   const ussdMethods = methods.filter(m => m.category === "ussd");
   const activeMethod = mobileBanking.find(m => m.id === activeTab);
 
-  // Which categories exist
   const hasCategories = Object.keys(categoryIcons).filter(cat => methods.some(m => m.category === cat));
 
   if (loading) {
     return (
-      <>
-        <div className="flex-1 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
-      </>
+      <div className="flex-1 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
     );
   }
 
   return (
     <>
-      
+      <PageHeroDark
+        title="Pay Bill"
+        titleBn="বিল পরিশোধ"
+        subtitle="Pay your internet bill easily using mobile banking, online payment or bank transfer"
+        subtitleBn="মোবাইল ব্যাংকিং, অনলাইন পেমেন্ট বা ব্যাংক ট্রান্সফারের মাধ্যমে সহজে বিল পরিশোধ করুন"
+        bgImage="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80"
+      />
 
       {/* Quick Pay Banner */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5" />
-        <div className="container mx-auto px-4 py-10 md:py-14 relative">
+        <div className="container mx-auto px-4 py-6 md:py-14 relative">
           <Card className="border-0 shadow-lg bg-card/80 backdrop-blur-sm overflow-hidden">
-            <CardContent className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-6">
-              <div className="flex-1">
-                <h1 className="text-2xl md:text-3xl font-bold text-accent mb-3">{heroTitle}</h1>
+            <CardContent className="p-5 md:p-10 flex flex-col md:flex-row items-center gap-4 md:gap-6">
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-xl md:text-3xl font-bold text-accent mb-2 md:mb-3">{heroTitle}</h2>
                 <p className="text-muted-foreground text-sm md:text-base leading-relaxed">{heroSubtitle}</p>
               </div>
               <Button
                 size="lg"
                 onClick={() => window.open(portalUrl, "_blank")}
-                className="shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-6 text-base font-bold rounded-lg"
+                className="w-full md:w-auto shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-6 text-base font-bold rounded-lg"
               >
                 <CreditCard className="mr-2 h-5 w-5" />
                 {t("PAY NOW", "পে করুন")}
@@ -119,28 +125,28 @@ const Payment = () => {
       </section>
 
       {/* How to Pay? */}
-      <section className="py-12 md:py-16 bg-background">
+      <section className="py-8 md:py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-10 bg-accent rounded-full" />
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            <h2 className="text-2xl md:text-4xl font-bold text-foreground">
               {t("How to", "কিভাবে")} <span className="text-accent">{t("pay?", "পে করবেন?")}</span>
             </h2>
           </div>
-          <p className="text-muted-foreground mb-8 ml-4">
+          <p className="text-muted-foreground mb-6 md:mb-8 ml-4 text-sm md:text-base">
             {t("Step-by-step guide to making an online payment", "অনলাইন পেমেন্ট করার ধাপে ধাপে গাইড")}
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {hasCategories.map((cat) => {
               const cfg = categoryIcons[cat];
               const Icon = cfg.icon;
               return (
-                <div key={cat} className="flex items-center gap-3 p-4 rounded-xl border border-accent/20 bg-accent/5 hover:border-accent/40 transition-colors">
-                  <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                    <Icon className="h-6 w-6 text-accent" />
+                <div key={cat} className="flex items-center gap-2 md:gap-3 p-3 md:p-4 rounded-xl border border-accent/20 bg-accent/5 hover:border-accent/40 transition-colors">
+                  <div className="h-10 w-10 md:h-12 md:w-12 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                    <Icon className="h-5 w-5 md:h-6 md:w-6 text-accent" />
                   </div>
-                  <span className="font-semibold text-foreground text-sm">
+                  <span className="font-semibold text-foreground text-xs md:text-sm">
                     {t(cfg.label, cfg.labelBn)}
                   </span>
                 </div>
@@ -152,53 +158,56 @@ const Payment = () => {
 
       {/* Pay bill with mobile banking */}
       {mobileBanking.length > 0 && (
-        <section className="py-12 md:py-16 bg-secondary/30">
+        <section className="py-8 md:py-16 bg-secondary/30">
           <div className="container mx-auto px-4">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-1 h-10 bg-accent rounded-full" />
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+              <h2 className="text-xl md:text-3xl font-bold text-foreground">
                 {t("Pay bill with", "বিল পরিশোধ করুন")} <span className="text-accent">{t("mobile banking", "মোবাইল ব্যাংকিং দিয়ে")}</span>
               </h2>
             </div>
-            <p className="text-muted-foreground mb-8 ml-4">
+            <p className="text-muted-foreground mb-6 md:mb-8 ml-4 text-sm">
               {t("You can pay with Mobile banking by following these instructions", "এই নির্দেশনা অনুসরণ করে মোবাইল ব্যাংকিং দিয়ে পেমেন্ট করতে পারবেন")}
             </p>
 
-            {/* Tabs */}
-            <div className="flex gap-3 mb-8">
-              {mobileBanking.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => setActiveTab(m.id)}
-                  className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${
-                    activeTab === m.id
-                      ? "text-accent-foreground shadow-md"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                  style={activeTab === m.id ? { backgroundColor: m.bg_color || "hsl(var(--accent))" } : undefined}
-                >
-                  {language === "bn" && m.name_bn ? m.name_bn : m.name}
-                </button>
-              ))}
+            {/* Tabs - scrollable on mobile */}
+            <div className="flex gap-2 md:gap-3 mb-6 md:mb-8 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+              {mobileBanking.map((m) => {
+                const isBkash = m.name.toLowerCase().includes("bkash") || m.name.toLowerCase().includes("বিকাশ");
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => setActiveTab(m.id)}
+                    className={`px-4 md:px-6 py-2.5 md:py-3 rounded-full font-semibold text-xs md:text-sm transition-all whitespace-nowrap shrink-0 ${
+                      activeTab === m.id
+                        ? "text-accent-foreground shadow-md ring-2 ring-accent/30"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    } ${isBkash && activeTab !== m.id ? "ring-1 ring-accent/40" : ""}`}
+                    style={activeTab === m.id ? { backgroundColor: m.bg_color || "hsl(var(--accent))" } : undefined}
+                  >
+                    {language === "bn" && m.name_bn ? m.name_bn : m.name}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Tab Content */}
             {activeMethod && (
-              <div className="bg-card rounded-xl border p-6 md:p-8">
-                <div className="flex flex-col md:flex-row gap-8">
+              <div className="bg-card rounded-xl border p-4 md:p-8">
+                <div className="flex flex-col md:flex-row gap-6 md:gap-8">
                   <div className="flex-1">
                     {activeMethod.instructions && (
-                      <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-line">
+                      <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-line text-sm">
                         {language === "bn" && activeMethod.instructions_bn ? activeMethod.instructions_bn : activeMethod.instructions}
                       </div>
                     )}
                     {activeMethod.account_number && (
-                      <div className="mt-4 bg-muted rounded-lg p-4">
-                        <p className="text-sm text-muted-foreground mb-1">{t("Account/Merchant Number", "অ্যাকাউন্ট/মার্চেন্ট নম্বর")}</p>
-                        <p className="text-lg font-mono font-bold text-foreground">{activeMethod.account_number}</p>
+                      <div className="mt-4 bg-muted rounded-lg p-3 md:p-4">
+                        <p className="text-xs md:text-sm text-muted-foreground mb-1">{t("Account/Merchant Number", "অ্যাকাউন্ট/মার্চেন্ট নম্বর")}</p>
+                        <p className="text-base md:text-lg font-mono font-bold text-foreground">{activeMethod.account_number}</p>
                       </div>
                     )}
-              </div>
+                  </div>
                   {activeMethod.screenshot_url && (
                     <div className="md:w-80 shrink-0">
                       <img src={activeMethod.screenshot_url} alt="" className="w-full rounded-lg border" />
@@ -214,29 +223,29 @@ const Payment = () => {
 
       {/* Portal Payment / Online Payment */}
       {onlinePayment.length > 0 && (
-        <section className="py-12 md:py-16 bg-background">
+        <section className="py-8 md:py-16 bg-background">
           <div className="container mx-auto px-4">
-            <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-3 mb-6 md:mb-8">
               <div className="w-1 h-10 bg-accent rounded-full" />
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+              <h2 className="text-xl md:text-3xl font-bold text-foreground">
                 {t("Portal payment", "পোর্টাল পেমেন্ট")} <span className="text-accent">{t("options", "অপশন")}</span>
               </h2>
             </div>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground mb-6 text-sm">
               {t("You can pay online with other suitable payment methods", "অন্যান্য উপযুক্ত পদ্ধতিতে অনলাইনে পেমেন্ট করতে পারবেন")}
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {onlinePayment.map((m) => (
                 <Card key={m.id} className="overflow-hidden border hover:shadow-lg transition-all cursor-pointer" onClick={() => setSelectedMethod(m)}>
-                  <div className="h-32 flex items-center justify-center p-4" style={{ backgroundColor: m.bg_color || "hsl(var(--accent))" }}>
+                  <div className="h-24 md:h-32 flex items-center justify-center p-3 md:p-4" style={{ backgroundColor: m.bg_color || "hsl(var(--accent))" }}>
                     {m.logo_url ? (
-                      <img src={m.logo_url} alt={m.name} className="max-h-16 max-w-full object-contain" />
+                      <img src={m.logo_url} alt={m.name} className="max-h-12 md:max-h-16 max-w-full object-contain" />
                     ) : (
-                      <Globe className="h-12 w-12 text-white" />
+                      <Globe className="h-10 w-10 md:h-12 md:w-12 text-white" />
                     )}
                   </div>
-                  <CardContent className="p-4 text-center">
-                    <h3 className="font-bold text-foreground">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
+                  <CardContent className="p-3 md:p-4 text-center">
+                    <h3 className="font-bold text-foreground text-sm md:text-base">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
                   </CardContent>
                 </Card>
               ))}
@@ -247,18 +256,18 @@ const Payment = () => {
 
       {/* Direct Bank Transfer */}
       {bankTransfer.length > 0 && (
-        <section className="py-12 md:py-16 bg-secondary/30">
+        <section className="py-8 md:py-16 bg-secondary/30">
           <div className="container mx-auto px-4">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-1 h-10 bg-accent rounded-full" />
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+              <h2 className="text-xl md:text-3xl font-bold text-foreground">
                 {t("Direct bank", "সরাসরি ব্যাংক")} <span className="text-accent">{t("transfer", "ট্রান্সফার")}</span>
               </h2>
             </div>
-            <p className="text-muted-foreground mb-8 ml-4">
+            <p className="text-muted-foreground mb-6 md:mb-8 ml-4 text-sm">
               {t("You can pay us with direct bank transfer", "সরাসরি ব্যাংক ট্রান্সফারের মাধ্যমে পেমেন্ট করতে পারবেন")}
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {bankTransfer.map((m) => (
                 <Card key={m.id} className="overflow-hidden border">
                   <div className="h-20 flex items-center justify-center p-4" style={{ backgroundColor: m.bg_color || "hsl(var(--primary))" }}>
@@ -268,16 +277,16 @@ const Payment = () => {
                       <Building2 className="h-8 w-8 text-white" />
                     )}
                   </div>
-                  <CardContent className="p-5 space-y-3">
-                    <h3 className="font-bold text-foreground text-lg">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
+                  <CardContent className="p-4 md:p-5 space-y-3">
+                    <h3 className="font-bold text-foreground text-base md:text-lg">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
                     {m.account_number && (
                       <div className="flex justify-between items-center border-b border-border pb-2">
-                        <span className="text-sm text-muted-foreground">{t("Account No:", "অ্যাকাউন্ট নং:")}</span>
-                        <span className="font-mono font-bold text-foreground">{m.account_number}</span>
+                        <span className="text-xs md:text-sm text-muted-foreground">{t("Account No:", "অ্যাকাউন্ট নং:")}</span>
+                        <span className="font-mono font-bold text-foreground text-sm">{m.account_number}</span>
                       </div>
                     )}
                     {m.instructions && (
-                      <p className="text-sm text-muted-foreground whitespace-pre-line">
+                      <p className="text-xs md:text-sm text-muted-foreground whitespace-pre-line">
                         {language === "bn" && m.instructions_bn ? m.instructions_bn : m.instructions}
                       </p>
                     )}
@@ -292,18 +301,18 @@ const Payment = () => {
 
       {/* USSD Code */}
       {ussdMethods.length > 0 && (
-        <section className="py-12 md:py-16 bg-background">
+        <section className="py-8 md:py-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-1 h-10 bg-accent rounded-full" />
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+              <h2 className="text-xl md:text-3xl font-bold text-foreground">
                 {t("USSD Code", "ইউএসএসডি কোড")} <span className="text-accent">{t("payment", "পেমেন্ট")}</span>
               </h2>
             </div>
-            <p className="text-muted-foreground mb-8 ml-4">
+            <p className="text-muted-foreground mb-6 md:mb-8 ml-4 text-sm">
               {t("Pay your bill using USSD codes from your phone", "আপনার ফোন থেকে USSD কোড ব্যবহার করে বিল পরিশোধ করুন")}
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {ussdMethods.map((m) => (
                 <Card key={m.id} className="overflow-hidden border">
                   <div className="h-20 flex items-center justify-center p-4" style={{ backgroundColor: m.bg_color || "hsl(var(--primary))" }}>
@@ -313,16 +322,16 @@ const Payment = () => {
                       <Hash className="h-8 w-8 text-white" />
                     )}
                   </div>
-                  <CardContent className="p-5 space-y-3">
-                    <h3 className="font-bold text-foreground text-lg">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
+                  <CardContent className="p-4 md:p-5 space-y-3">
+                    <h3 className="font-bold text-foreground text-base md:text-lg">{language === "bn" && m.name_bn ? m.name_bn : m.name}</h3>
                     {m.account_number && (
                       <div className="flex justify-between items-center border-b border-border pb-2">
-                        <span className="text-sm text-muted-foreground">{t("Code:", "কোড:")}</span>
-                        <span className="font-mono font-bold text-foreground">{m.account_number}</span>
+                        <span className="text-xs md:text-sm text-muted-foreground">{t("Code:", "কোড:")}</span>
+                        <span className="font-mono font-bold text-foreground text-sm">{m.account_number}</span>
                       </div>
                     )}
                     {m.instructions && (
-                      <p className="text-sm text-muted-foreground whitespace-pre-line">
+                      <p className="text-xs md:text-sm text-muted-foreground whitespace-pre-line">
                         {language === "bn" && m.instructions_bn ? m.instructions_bn : m.instructions}
                       </p>
                     )}
@@ -342,25 +351,25 @@ const Payment = () => {
       )}
 
       {/* Disclaimer */}
-      <section className="py-10 bg-background">
+      <section className="py-8 md:py-10 bg-background">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center gap-6 bg-accent/10 rounded-xl p-6 md:p-8">
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 bg-accent/10 rounded-xl p-5 md:p-8">
             <div className="shrink-0">
-              <div className="h-20 w-20 md:h-24 md:w-24 rounded-xl bg-accent/20 flex items-center justify-center">
-                <AlertTriangle className="h-10 w-10 md:h-12 md:w-12 text-accent" />
+              <div className="h-16 w-16 md:h-24 md:w-24 rounded-xl bg-accent/20 flex items-center justify-center">
+                <AlertTriangle className="h-8 w-8 md:h-12 md:w-12 text-accent" />
               </div>
             </div>
             <div>
-              <p className="text-foreground font-semibold text-base md:text-lg mb-2">
+              <p className="text-foreground font-semibold text-sm md:text-lg mb-2">
                 {t(
                   settings.payment_helpline_text || "For any payment related issues, please contact our helpline.",
                   settings.payment_helpline_text_bn || "যেকোনো পেমেন্ট সংক্রান্ত সমস্যায় আমাদের হেল্পলাইনে যোগাযোগ করুন।"
                 )}
               </p>
-              <p className="text-foreground font-bold">
+              <p className="text-foreground font-bold text-sm md:text-base">
                 {t("Helpline number:", "হেল্পলাইন নম্বর:")} {phone}
               </p>
-              <p className="text-foreground font-bold">
+              <p className="text-foreground font-bold text-sm md:text-base">
                 {t("E-Mail:", "ই-মেইল:")} {email}
               </p>
             </div>
@@ -404,7 +413,6 @@ const Payment = () => {
           </div>
         </DialogContent>
       </Dialog>
-
     </>
   );
 };

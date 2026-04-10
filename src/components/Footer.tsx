@@ -45,7 +45,7 @@ const Footer = () => {
   const btrcUrl = settings.btrc_tariff_url || "";
 
   const resourceLinks = [
-    { href: "/order", label: t("New Connection", "নতুন সংযোগ") },
+    { href: "/new-connection", label: t("New Connection", "নতুন সংযোগ") },
     { href: "/speed-test", label: t("Speed Test", "স্পিড টেস্ট") },
     { href: "/notices", label: t("Notices", "নোটিশ") },
     { href: "/pay-bill", label: t("Pay Bill", "বিল পরিশোধ") },

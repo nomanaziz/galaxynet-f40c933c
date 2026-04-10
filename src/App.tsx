@@ -11,7 +11,7 @@ import Coverage from "./pages/Coverage";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Services from "./pages/Services";
-import Order from "./pages/Order";
+import NewConnection from "./pages/NewConnection";
 import SpeedTest from "./pages/SpeedTest";
 import Notices from "./pages/Notices";
 import Offers from "./pages/Offers";
@@ -24,7 +24,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import NewConnection from "./pages/NewConnection";
 // Admin
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -69,7 +68,8 @@ const App = () => (
               <Route path="/coverage" element={<Coverage />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/order" element={<Order />} />
+              <Route path="/new-connection" element={<NewConnection />} />
+              <Route path="/order" element={<Navigate to="/new-connection" replace />} />
               <Route path="/speed-test" element={<SpeedTest />} />
               <Route path="/notices" element={<Notices />} />
               <Route path="/offers" element={<Offers />} />
@@ -79,7 +79,6 @@ const App = () => (
               <Route path="/register" element={<Register />} />
               <Route path="*" element={<NotFound />} />
             </Route>
-            <Route path="/new-connection" element={<NewConnection />} />
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminLayout />}>
