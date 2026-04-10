@@ -36,7 +36,7 @@ const PlanCard = ({ plan, t }: { plan: any; t: (en: string, bn: string) => strin
             <>
               <span className="text-lg sm:text-2xl font-bold text-accent">৳{plan.price}</span>
               <span className="text-muted-foreground text-xs sm:text-sm">/{t("month", "মাস")}</span>
-            </div>
+            </>
           )}
         </div>
         <div className="flex flex-wrap gap-1 mb-4">
@@ -104,7 +104,7 @@ const Packages = () => {
                   <TabsTrigger value="corporate" className="px-5 text-sm font-medium">{t("Corporate Plans", "কর্পোরেট প্ল্যান")}</TabsTrigger>
                   <TabsTrigger value="dedicated" className="px-5 text-sm font-medium">{t("Dedicated", "ডেডিকেটেড")}</TabsTrigger>
                 </TabsList>
-            </>
+              </div>
 
               {["home", "corporate", "dedicated"].map(cat => (
                 <TabsContent key={cat} value={cat}>

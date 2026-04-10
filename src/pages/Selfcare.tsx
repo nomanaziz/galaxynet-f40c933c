@@ -47,7 +47,7 @@ const Selfcare = () => {
                   {t("Open Portal", "পোর্টাল খুলুন")} <ExternalLink className="ml-2 h-4 w-4" />
                 </Button>
               </a>
-            </div>
+            </>
           ) : (
             <p className="text-muted-foreground">{t("Selfcare portal is currently unavailable.", "সেলফকেয়ার পোর্টাল বর্তমানে উপলব্ধ নেই।")}</p>
           )}

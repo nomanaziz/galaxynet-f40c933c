@@ -86,9 +86,8 @@ const Payment = () => {
   if (loading) {
     return (
       <>
-        
         <div className="flex-1 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>
-      </div>
+      </>
     );
   }
 
@@ -181,7 +180,7 @@ const Payment = () => {
                   {language === "bn" && m.name_bn ? m.name_bn : m.name}
                 </button>
               ))}
-      </>
+            </div>
 
             {/* Tab Content */}
             {activeMethod && (
