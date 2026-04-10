@@ -181,7 +181,7 @@ const Payment = () => {
                   {language === "bn" && m.name_bn ? m.name_bn : m.name}
                 </button>
               ))}
-            </div>
+      </>
 
             {/* Tab Content */}
             {activeMethod && (

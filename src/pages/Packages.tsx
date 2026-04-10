@@ -104,7 +104,7 @@ const Packages = () => {
                   <TabsTrigger value="corporate" className="px-5 text-sm font-medium">{t("Corporate Plans", "কর্পোরেট প্ল্যান")}</TabsTrigger>
                   <TabsTrigger value="dedicated" className="px-5 text-sm font-medium">{t("Dedicated", "ডেডিকেটেড")}</TabsTrigger>
                 </TabsList>
-              </div>
+            </>
 
               {["home", "corporate", "dedicated"].map(cat => (
                 <TabsContent key={cat} value={cat}>
