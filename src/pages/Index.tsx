@@ -142,6 +142,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Cache Server Marquee */}
+      <CacheMarquee />
+
       {/* Fiber Banner Strip */}
       <section className="relative h-24 md:h-32 overflow-hidden">
         <img src={bannerFiber} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" width={1920} height={512} />
@@ -225,9 +228,6 @@ const Index = () => {
           </p>
         </div>
       </section>
-
-      {/* Cache Server Marquee */}
-      <CacheMarquee />
 
       {/* Popular Packages — from DB */}
       <section className="py-10 md:py-20 bg-background">
