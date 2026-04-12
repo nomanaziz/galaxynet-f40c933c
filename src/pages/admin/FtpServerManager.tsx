@@ -36,7 +36,28 @@ export default function FtpServerManager() {
   const [editing, setEditing] = useState<Partial<FtpServer> & typeof defaultServer>(defaultServer);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const path = `ftp-logos/${Date.now()}_${file.name}`;
+      const { error } = await supabase.storage.from("media").upload(path, file);
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(path);
+      setEditing(p => ({ ...p, logo_url: publicUrl }));
+      toast({ title: "Logo uploaded" });
+    } catch (err: any) {
+      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const fetchAll = async () => {
     const [{ data: srv }, { data: stg }] = await Promise.all([
