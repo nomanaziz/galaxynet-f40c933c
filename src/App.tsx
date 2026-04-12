@@ -49,6 +49,8 @@ import EmployeeManager from "./pages/admin/EmployeeManager";
 import ServicesManager from "./pages/admin/ServicesManager";
 import FestivalManager from "./pages/admin/FestivalManager";
 import AboutManager from "./pages/admin/AboutManager";
+import FtpServerManager from "./pages/admin/FtpServerManager";
+import FtpServers from "./pages/FtpServers";
 
 const queryClient = new QueryClient();
 
