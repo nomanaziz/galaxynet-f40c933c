@@ -18,6 +18,7 @@ export const ALL_PERMISSIONS = [
   { key: "departments", label: "Departments" },
   { key: "designations", label: "Designations" },
   { key: "employees", label: "Employees" },
+  { key: "ftp_servers", label: "FTP/OTT Servers" },
 ] as const;
 
 // Map route segments to permission keys
@@ -41,4 +42,5 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   departments: "departments",
   designations: "designations",
   employees: "employees",
+  "ftp-servers": "ftp_servers",
 };
