@@ -49,6 +49,8 @@ import EmployeeManager from "./pages/admin/EmployeeManager";
 import ServicesManager from "./pages/admin/ServicesManager";
 import FestivalManager from "./pages/admin/FestivalManager";
 import AboutManager from "./pages/admin/AboutManager";
+import FtpServerManager from "./pages/admin/FtpServerManager";
+import FtpServers from "./pages/FtpServers";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +81,8 @@ const App = () => (
               <Route path="/register" element={<Register />} />
               <Route path="*" element={<NotFound />} />
             </Route>
+            {/* Standalone Pages */}
+            <Route path="/ftp" element={<FtpServers />} />
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminLayout />}>
@@ -104,6 +108,7 @@ const App = () => (
               <Route path="services" element={<ServicesManager />} />
               <Route path="festivals" element={<FestivalManager />} />
               <Route path="about" element={<AboutManager />} />
+              <Route path="ftp-servers" element={<FtpServerManager />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

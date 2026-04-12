@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Package, MapPin, ShoppingCart, FileText,
   Bell, Settings, Users, LogOut, Menu, CreditCard, Home, Image, ExternalLink,
-  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog, Globe, Info
+  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog, Globe, Info, Server
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import logo from "@/assets/logo.png";
@@ -31,6 +31,7 @@ const mainItems = [
   { title: "Services", url: "/admin/services", icon: Globe, permission: "services" },
   { title: "Festivals", url: "/admin/festivals", icon: Sparkles, permission: "festivals" },
   { title: "About Page", url: "/admin/about", icon: Info, permission: "about" },
+  { title: "FTP/OTT Servers", url: "/admin/ftp-servers", icon: Server, permission: "ftp_servers" },
 ];
 
 const aboutItems = [
