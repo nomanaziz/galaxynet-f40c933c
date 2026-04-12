@@ -1,45 +1,65 @@
 
 
-## Floating Buttons Rearrangement + Rocket Scroll-to-Top + Close Option
+## FTP/OTT/Live TV Server Links Page (Smart TV Compatible)
 
-### Changes Summary
+### Overview
+Create a standalone `/ftp` page that displays categorized server links (FTP/OTT/Movie Servers, Live TV Servers) with admin-managed content. The page will be **outside the main Layout** (no navbar, footer, floating buttons) and use **minimal inline CSS with no JavaScript** for Smart TV browser compatibility.
 
-1. **FloatingCTA → Move to LEFT side** (currently right, move to left — same level as WhatsApp but stacked above it)
-2. **ScrollToTopButton → Add rocket SVG** (copy uploaded `top.svg` to `public/images/rocket.svg`, use as image instead of ChevronUp icon)
-3. **Align left/right floating buttons symmetrically** — WhatsApp on bottom-left, Get Connection above it on left; ScrollToTop on bottom-right
-4. **Add close/dismiss button on mobile** for both WhatsApp and FloatingCTA — small X button that hides them for the session (using useState)
+### Database
 
-### Layout (Mobile)
+**New table: `ftp_servers`**
 
-```text
-                              ┌──────────┐
-                              │ 🚀 Top   │  ← right side
-                              └──────────┘
-┌──────────┐ ✕
-│ CTA      │                  
-└──────────┘
-┌──────────┐ ✕
-│ WhatsApp │
-└──────────┘
-╔══════════════════════════════╗
-║  Home  Svc  About  Pkg  Call║  ← Bottom Nav
-╚══════════════════════════════╝
-```
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| name | text | Server name (e.g., "NaturalBD") |
+| category | text | "ftp" / "ott" / "livetv" |
+| logo_url | text | URL to logo image |
+| link | text | Server URL |
+| sort_order | int | Display order |
+| visible | boolean | Show/hide toggle |
+| created_at | timestamp | Auto |
 
-### Files
+**New table: `ftp_page_settings`**
 
-| File | Action |
-|---|---|
-| `public/images/rocket.svg` | Copy uploaded `top.svg` here |
-| `src/components/ScrollToTopButton.tsx` | Replace ChevronUp with rocket SVG image |
-| `src/components/FloatingCTA.tsx` | Move to left side (`left-4`), add mobile close button with session state |
-| `src/components/FloatingWhatsApp.tsx` | Add mobile close button with session state, adjust position (bottom-28 on mobile to stack below CTA) |
-| `src/components/Layout.tsx` | Add `FloatingWhatsApp` and `ScrollToTopButton` imports if not already present |
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| notice_text | text | Top notice banner text |
+| helpline | text | Bottom helpline number |
 
-### Technical Details
+### Frontend Page: `src/pages/FtpServers.tsx`
 
-- **Close buttons**: Small absolute-positioned X icon (top-right of each floating button), only visible on mobile (`md:hidden`). Uses `useState` — dismissed for the current page session, reappears on page reload.
-- **Rocket image**: `<img src="/images/rocket.svg" className="h-7 w-7" />` replacing `<ChevronUp />`
-- **Position alignment**: WhatsApp at `bottom-20 left-4`, CTA at `bottom-36 left-4` on mobile; both at same horizontal position on desktop (`left-6`)
-- **ScrollToTop**: Stays on right side at `bottom-20 right-4` on mobile, `bottom-8 right-6` on desktop
+- Renders a **standalone page** (not wrapped in Layout)
+- Fetches data from Supabase, then renders pure HTML structure with **inline styles only**
+- No Tailwind classes, no JS interactivity on the rendered content
+- Categories displayed as sections with icon grid cards
+- Notice banner at top, helpline at bottom
+- Responsive grid using CSS Grid (no flexbox hacks)
+- Design matches the reference image: light background, rounded cards, category headers with icons
+
+### Route
+- Add `/ftp` route **outside** the `<Route element={<Layout />}>` wrapper in App.tsx (same level as admin routes)
+
+### Admin Page: `src/pages/admin/FtpServerManager.tsx`
+
+- CRUD for ftp_servers (add/edit/delete servers with name, category, logo URL, link, sort order)
+- Edit notice text and helpline number
+- Logo upload via URL input
+- Add to admin sidebar and routes
+
+### Files to Create
+- `src/pages/FtpServers.tsx` — standalone public page
+- `src/pages/admin/FtpServerManager.tsx` — admin manager
+
+### Files to Modify
+- `src/App.tsx` — add `/ftp` route outside Layout
+- `src/components/admin/AdminSidebar.tsx` — add FTP manager link
+- Migration — create `ftp_servers` and `ftp_page_settings` tables with RLS
+
+### Smart TV Compatibility Strategy
+- Page uses React only for data fetching, then renders with **inline CSS styles** (no external stylesheets dependency)
+- No JavaScript-dependent interactions (no hover effects via JS, no animations)
+- Simple CSS Grid layout, large touch-friendly cards
+- All images via `<img>` tags with alt text fallbacks
 
