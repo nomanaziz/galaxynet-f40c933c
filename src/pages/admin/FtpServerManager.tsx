@@ -173,7 +173,22 @@ export default function FtpServerManager() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Logo URL</Label>
+                  <Label>Logo</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    {editing.logo_url && (
+                      <img src={editing.logo_url} alt="Preview" className="h-10 w-10 rounded object-contain border" />
+                    )}
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                    <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
+                      {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Upload className="h-4 w-4 mr-1" />}
+                      Upload
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2 my-2">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="text-xs text-muted-foreground">or paste URL</span>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
                   <Input value={editing.logo_url ?? ""} onChange={e => setEditing(p => ({ ...p, logo_url: e.target.value }))} placeholder="https://..." />
                 </div>
                 <div>
