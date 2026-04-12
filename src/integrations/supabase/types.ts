@@ -329,6 +329,60 @@ export type Database = {
         }
         Relationships: []
       }
+      ftp_page_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
+      ftp_servers: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          link: string
+          logo_url: string | null
+          name: string
+          sort_order: number
+          visible: boolean
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          link: string
+          logo_url?: string | null
+          name: string
+          sort_order?: number
+          visible?: boolean
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          link?: string
+          logo_url?: string | null
+          name?: string
+          sort_order?: number
+          visible?: boolean
+        }
+        Relationships: []
+      }
       homepage_features: {
         Row: {
           created_at: string
