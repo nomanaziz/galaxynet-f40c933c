@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, ExternalLink, Eye, EyeOff, Upload, Loader2 } from "lucide-react";
 
 interface FtpServer {
   id: string;
@@ -36,7 +36,28 @@ export default function FtpServerManager() {
   const [editing, setEditing] = useState<Partial<FtpServer> & typeof defaultServer>(defaultServer);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const path = `ftp-logos/${Date.now()}_${file.name}`;
+      const { error } = await supabase.storage.from("media").upload(path, file);
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from("media").getPublicUrl(path);
+      setEditing(p => ({ ...p, logo_url: publicUrl }));
+      toast({ title: "Logo uploaded" });
+    } catch (err: any) {
+      toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const fetchAll = async () => {
     const [{ data: srv }, { data: stg }] = await Promise.all([
@@ -152,7 +173,22 @@ export default function FtpServerManager() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Logo URL</Label>
+                  <Label>Logo</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    {editing.logo_url && (
+                      <img src={editing.logo_url} alt="Preview" className="h-10 w-10 rounded object-contain border" />
+                    )}
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                    <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
+                      {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Upload className="h-4 w-4 mr-1" />}
+                      Upload
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2 my-2">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="text-xs text-muted-foreground">or paste URL</span>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
                   <Input value={editing.logo_url ?? ""} onChange={e => setEditing(p => ({ ...p, logo_url: e.target.value }))} placeholder="https://..." />
                 </div>
                 <div>
