@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, ExternalLink, Eye, EyeOff, Upload, Loader2 } from "lucide-react";
 
 interface FtpServer {
   id: string;
