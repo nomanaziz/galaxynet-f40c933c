@@ -1,65 +1,25 @@
 
 
-## FTP/OTT/Live TV Server Links Page (Smart TV Compatible)
+## Add Logo Upload Option to FTP Server Manager
 
-### Overview
-Create a standalone `/ftp` page that displays categorized server links (FTP/OTT/Movie Servers, Live TV Servers) with admin-managed content. The page will be **outside the main Layout** (no navbar, footer, floating buttons) and use **minimal inline CSS with no JavaScript** for Smart TV browser compatibility.
-
-### Database
-
-**New table: `ftp_servers`**
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| name | text | Server name (e.g., "NaturalBD") |
-| category | text | "ftp" / "ott" / "livetv" |
-| logo_url | text | URL to logo image |
-| link | text | Server URL |
-| sort_order | int | Display order |
-| visible | boolean | Show/hide toggle |
-| created_at | timestamp | Auto |
-
-**New table: `ftp_page_settings`**
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| notice_text | text | Top notice banner text |
-| helpline | text | Bottom helpline number |
-
-### Frontend Page: `src/pages/FtpServers.tsx`
-
-- Renders a **standalone page** (not wrapped in Layout)
-- Fetches data from Supabase, then renders pure HTML structure with **inline styles only**
-- No Tailwind classes, no JS interactivity on the rendered content
-- Categories displayed as sections with icon grid cards
-- Notice banner at top, helpline at bottom
-- Responsive grid using CSS Grid (no flexbox hacks)
-- Design matches the reference image: light background, rounded cards, category headers with icons
-
-### Route
-- Add `/ftp` route **outside** the `<Route element={<Layout />}>` wrapper in App.tsx (same level as admin routes)
-
-### Admin Page: `src/pages/admin/FtpServerManager.tsx`
-
-- CRUD for ftp_servers (add/edit/delete servers with name, category, logo URL, link, sort order)
-- Edit notice text and helpline number
-- Logo upload via URL input
-- Add to admin sidebar and routes
-
-### Files to Create
-- `src/pages/FtpServers.tsx` — standalone public page
-- `src/pages/admin/FtpServerManager.tsx` — admin manager
+### What Changes
+In the Add/Edit Server dialog, replace the single "Logo URL" input with a dual option: a file upload button (uploads to Supabase `media` bucket with `ftp-logos/` prefix) AND a URL text input. The uploaded file's public URL auto-fills the logo_url field. Both methods set the same `logo_url` value.
 
 ### Files to Modify
-- `src/App.tsx` — add `/ftp` route outside Layout
-- `src/components/admin/AdminSidebar.tsx` — add FTP manager link
-- Migration — create `ftp_servers` and `ftp_page_settings` tables with RLS
+- **`src/pages/admin/FtpServerManager.tsx`**
+  - Add `Upload` icon import from lucide-react
+  - Add `uploading` state for loading indicator
+  - Add `handleLogoUpload` function that uploads to `media` bucket under `ftp-logos/` prefix, gets public URL, sets `editing.logo_url`
+  - Replace the Logo URL input section with:
+    - A file input button (hidden input + styled Button trigger) labeled "Upload Logo"
+    - An "or" separator
+    - The existing URL text input
+    - A small preview thumbnail if logo_url is set
+  - No database changes needed (uses existing `media` bucket which is already public)
 
-### Smart TV Compatibility Strategy
-- Page uses React only for data fetching, then renders with **inline CSS styles** (no external stylesheets dependency)
-- No JavaScript-dependent interactions (no hover effects via JS, no animations)
-- Simple CSS Grid layout, large touch-friendly cards
-- All images via `<img>` tags with alt text fallbacks
+### Technical Details
+- Upload path: `media` bucket → `ftp-logos/{timestamp}_{filename}`
+- Uses `supabase.storage.from('media').upload(...)` then `getPublicUrl(...)`
+- Shows upload progress via disabled state on button
+- Preview: small 40x40 rounded image when logo_url is populated
 
