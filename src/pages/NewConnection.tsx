@@ -98,6 +98,11 @@ const NewConnection = () => {
       toast({ title: t("Enter a valid phone number (11 digits)", "সঠিক ফোন নাম্বার দিন (১১ ডিজিট)"), variant: "destructive" });
       return;
     }
+    if (parseInt(captchaAnswer, 10) !== captchaA + captchaB) {
+      toast({ title: t("Captcha answer is wrong", "ক্যাপচার উত্তর সঠিক নয়"), variant: "destructive" });
+      refreshCaptcha();
+      return;
+    }
 
     setSubmitting(true);
     const notesData: any = { source: "new_connection_page" };
@@ -114,25 +119,10 @@ const NewConnection = () => {
     setSubmitting(false);
     if (error) {
       toast({ title: t("Something went wrong, please try again", "সমস্যা হয়েছে, আবার চেষ্টা করুন"), variant: "destructive" });
+      refreshCaptcha();
     } else {
-      // Fire-and-forget Telegram notification
-      const selectedPkg = packages.find((p) => p.id === packageId);
-      const packageLabel = selectedPkg
-        ? `${selectedPkg.speed >= 1000 ? `${selectedPkg.speed / 1000}Gbps` : `${selectedPkg.speed}Mbps`} @ ৳${selectedPkg.price}`
-        : "";
-      supabase.functions
-        .invoke("notify-order-telegram", {
-          body: {
-            name: name.trim(),
-            phone: phone.trim(),
-            address: address.trim() || "N/A",
-            area: areaName,
-            category: activeCategory,
-            packageLabel,
-            dedicatedMbps: activeCategory === "dedicated" ? dedicatedMbps : "",
-          },
-        })
-        .catch((e) => console.error("Telegram notify failed", e));
+      // Telegram notification is dispatched server-side via DB trigger (notify_telegram_on_new_order).
+      refreshCaptcha();
       setSuccess(true);
     }
   };
