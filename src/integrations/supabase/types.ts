@@ -849,7 +849,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_employees: {
+        Row: {
+          department_id: string | null
+          designation_id: string | null
+          id: string | null
+          name: string | null
+          name_bn: string | null
+          photo_url: string | null
+          show_on_about: boolean | null
+          sort_order: number | null
+          visible: boolean | null
+        }
+        Insert: {
+          department_id?: string | null
+          designation_id?: string | null
+          id?: string | null
+          name?: string | null
+          name_bn?: string | null
+          photo_url?: string | null
+          show_on_about?: boolean | null
+          sort_order?: number | null
+          visible?: boolean | null
+        }
+        Update: {
+          department_id?: string | null
+          designation_id?: string | null
+          id?: string | null
+          name?: string | null
+          name_bn?: string | null
+          photo_url?: string | null
+          show_on_about?: boolean | null
+          sort_order?: number | null
+          visible?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_designation_id_fkey"
+            columns: ["designation_id"]
+            isOneToOne: false
+            referencedRelation: "designations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {
