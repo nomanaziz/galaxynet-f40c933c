@@ -179,6 +179,8 @@ const TelegramSettings = () => {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader><CardTitle>Master Switch</CardTitle></CardHeader>
         <CardContent className="flex items-center justify-between">
           <div>
             <p className="font-medium">Telegram notifications</p>
