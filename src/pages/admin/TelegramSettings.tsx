@@ -130,8 +130,55 @@ const TelegramSettings = () => {
         </p>
       </div>
 
+      {!savedToken && (
+        <div className="flex items-start gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
+          <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-destructive">Bot Token দেওয়া হয়নি</p>
+            <p className="text-muted-foreground">আগে নিচের Bot Token field-এ token বসিয়ে Save করুন, না হলে কোনো message যাবে না।</p>
+          </div>
+        </div>
+      )}
+
       <Card>
-        <CardHeader><CardTitle>Master Switch</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Bot Token</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="space-y-1">
+            <Label>Telegram Bot Token</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  type={showToken ? "text" : "password"}
+                  placeholder="123456789:ABCdefGhIJKlmNoPQRstuVWxyZ"
+                  value={botToken}
+                  onChange={e => setBotToken(e.target.value)}
+                  className="pr-10 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowToken(s => !s)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <Button onClick={saveBotToken} disabled={savingToken || botToken.trim() === savedToken}>
+                {savingToken ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                <span className="ml-1">Save</span>
+              </Button>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Telegram-এ <code>@BotFather</code>-এ গিয়ে <code>/newbot</code> দিয়ে bot তৈরি করুন এবং token কপি করুন। Token-এর format: <code>123456789:ABCdef...</code>
+          </p>
+          {savedToken && (
+            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+              ✓ Token configured (<code>{savedToken.slice(0, 8)}...{savedToken.slice(-4)}</code>)
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
         <CardContent className="flex items-center justify-between">
           <div>
             <p className="font-medium">Telegram notifications</p>
