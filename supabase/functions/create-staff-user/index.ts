@@ -43,6 +43,8 @@ Deno.serve(async (req) => {
       .from("user_roles")
       .select("role")
       .eq("user_id", callerUid)
+      .in("role", ["super_admin", "admin"])
+      .limit(1)
       .maybeSingle();
 
     if (!callerRole || !["super_admin", "admin"].includes(callerRole.role)) {
@@ -53,8 +55,9 @@ Deno.serve(async (req) => {
 
     // Parse and validate input
     const { email, password, name, role, permissions } = await req.json();
+    const normalizedEmail = String(email || "").trim().toLowerCase();
 
-    if (!email || !password || !role) {
+    if (!normalizedEmail || !password || !role) {
       return new Response(JSON.stringify({ error: "email, password, and role are required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -72,10 +75,10 @@ Deno.serve(async (req) => {
     let reused = false;
 
     const { data: newUser, error: createError } = await serviceClient.auth.admin.createUser({
-      email,
+      email: normalizedEmail,
       password,
       email_confirm: true,
-      user_metadata: { full_name: name || email },
+      user_metadata: { full_name: name || normalizedEmail },
     });
 
     if (createError) {
@@ -92,7 +95,7 @@ Deno.serve(async (req) => {
       while (page <= 20 && !userId) {
         const { data: list, error: listErr } = await serviceClient.auth.admin.listUsers({ page, perPage: 200 });
         if (listErr) break;
-        const found = list.users.find((u: any) => (u.email || "").toLowerCase() === email.toLowerCase());
+        const found = list.users.find((u: any) => (u.email || "").toLowerCase() === normalizedEmail);
         if (found) { userId = found.id; break; }
         if (list.users.length < 200) break;
         page++;
@@ -135,7 +138,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ user_id: userId, email, reused }), {
+    return new Response(JSON.stringify({ user_id: userId, email: normalizedEmail, reused }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
