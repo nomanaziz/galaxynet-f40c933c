@@ -41,10 +41,10 @@ const CacheMarquee = () => {
     <section className="py-10 bg-[hsl(40,40%,96%)] dark:bg-card overflow-hidden">
       <div className="container mx-auto px-4 mb-5">
         <div className="flex flex-col items-center gap-2">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-600 text-white text-xs font-bold uppercase tracking-wider">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-600 dark:bg-purple-500 text-white dark:text-white text-xs font-bold uppercase tracking-wider shadow-md dark:shadow-purple-500/30">
             ⚡ {t("Most Cache Servers in the Country", "দেশের সবচেয়ে বেশি ক্যাশ সার্ভার")}
           </span>
-          <p className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-widest">
+          <p className="text-center text-sm font-semibold text-muted-foreground dark:text-slate-200 uppercase tracking-widest">
             {t("Connected to Premium Cache Servers", "প্রিমিয়াম ক্যাশ সার্ভারে সংযুক্ত")}
           </p>
         </div>
