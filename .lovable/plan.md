@@ -1,37 +1,45 @@
-## সমস্যা
+# New Connection → Telegram Notification + Captcha
 
-এখনকার setup Lovable-র Telegram **connector gateway** ব্যবহার করছে — তাই আপনি UI-তে bot token দেওয়ার জায়গা পাচ্ছেন না। আপনি চান আগের মতো সরাসরি **Bot Token + Chat ID** দিলেই কাজ করবে (যেমন স্ক্রিনশটে দেখানো)।
+বর্তমানে form submit হলে browser থেকে fire-and-forget call drop হয়ে যাচ্ছে, তাই Telegram-এ message যাচ্ছে না। সমাধান: DB trigger যাতে server-side থেকেই notification trigger হয় (browser বন্ধ হলেও কাজ করবে), এবং একটা simple math captcha যাতে bot-spam না হয়।
 
-## সমাধান
+## ১. Database Trigger (asynchronous, reliable)
 
-Connector gateway বাদ দিয়ে সরাসরি Telegram Bot API call করব (`https://api.telegram.org/bot<TOKEN>/sendMessage`)। তখন UI-তে যা দিব সেটাই ব্যবহার হবে।
+Migration যা করবে:
 
-### 1. `TelegramSettings.tsx`-এ নতুন "Bot Token" card
+- `pg_net` extension enable করা (extensions schema-তে)
+- `public.notify_telegram_on_new_order()` function — `connection_orders` row insert হলে edge function `notify-order-telegram`-কে `{ orderId }` payload সহ async POST করবে। কোনো error হলেও insert block হবে না।
+- `connection_orders` AFTER INSERT trigger — প্রতি new row-তে উপরের function ডাকবে।
 
-- উপরে নতুন card: **Bot Token** input (password type, eye toggle) + **Save Token** button
-- Helper text: "Telegram-এ `@BotFather`-এ গিয়ে bot create করে token নিন (format: `123456:ABC-DEF...`)"
-- Save → `site_settings.telegram_bot_token` key-তে store
-- যদি token না থাকে — recipient list-এর উপরে warning banner: "আগে Bot Token দিন, তারপর message যাবে"
+Function URL এবং anon key trigger-এর ভেতরে hardcoded থাকবে (anon key already public)।
 
-### 2. Edge function `notify-order-telegram` rewrite
+## ২. Edge Function Update (`notify-order-telegram`)
 
-- DB থেকে পড়বে: `telegram_enabled`, `telegram_bot_token`, `telegram_chat_ids`
-- Direct fetch: `https://api.telegram.org/bot${token}/sendMessage` with `{chat_id, text, parse_mode: "HTML"}`
-- Connector gateway / `LOVABLE_API_KEY` / `TELEGRAM_API_KEY` reference সব বাদ
-- Test mode আগের মতই — per-chat error message return (যেমন "chat not found", "bot was blocked", "Forbidden: bot is not a member")
-- Token না থাকলে clear error: `bot_token_not_configured`
+`orderId` mode যোগ হবে:
 
-### 3. কোনো DB migration লাগবে না
+- যদি body-তে `orderId` থাকে কিন্তু `name`/`phone` না থাকে, function নিজে DB থেকে order + linked package fetch করে message বানাবে।
+- পুরনো client payload mode (NewConnection page থেকে সরাসরি call) এখনও কাজ করবে — backward compatible।
+- Notes column থেকে `dedicated_mbps`, `source` parse করে message-এ দেখাবে।
+- Telegram message-এ থাকবে: Name, Phone, Area, Address, Category, Package, Dedicated Mbps (যদি থাকে), Notes, Order timestamp।
 
-`site_settings` table-এ শুধু নতুন key `telegram_bot_token` upsert হবে। RLS already admin-only write allow করে। Token row হিসেবে DB-তে থাকবে (frontend admin-only fetch); যদি আপনি বলেন বরং Supabase **secret** হিসেবে রাখব, সেটাও করা যায় — কিন্তু তখন UI থেকে edit করা যাবে না, প্রতিবার আমাকে বলতে হবে। তাই DB-তে রাখছি যাতে আপনি নিজেই UI থেকে যেকোনো সময় change করতে পারেন।
+## ৩. Frontend (`src/pages/NewConnection.tsx`)
 
-## ফাইল
+- বর্তমান fire-and-forget invoke সরিয়ে দেওয়া হবে — এখন trigger সব করবে, ফলে duplicate message হবে না।
+- নতুন **simple math captcha** যোগ:
+  - Submit button-এর উপরে দুটি random single-digit সংখ্যার যোগফল চাইবে (যেমন: "৩ + ৭ = ?")
+  - Bangla এবং English উভয়ে label
+  - প্রতিবার page load বা ভুল answer-এ refresh
+  - একটা ছোট 🔄 refresh icon দিয়ে user নতুন প্রশ্ন আনতে পারবে
+  - Captcha না মিললে DB-তেই insert হবে না, error toast দেখাবে
+  - Submit success হলে captcha reset হবে
 
-- edit: `src/pages/admin/TelegramSettings.tsx` (Bot Token card + warning banner)
-- edit: `supabase/functions/notify-order-telegram/index.ts` (direct API, no gateway)
+## ৪. Files
 
-## Out of scope
+- **New migration** — `pg_net` + trigger function + trigger
+- `supabase/functions/notify-order-telegram/index.ts` — `orderId` lookup mode
+- `src/pages/NewConnection.tsx` — fire-and-forget call সরানো + math captcha state ও UI
 
-- Webhook/incoming messages
-- Per-event routing
-- Multiple bot tokens
+## প্রভাব
+
+- Form submit → DB insert → Trigger → Edge function → Telegram (browser-independent, 100% reliable)
+- Bot/spam submission কমবে captcha-র কারণে
+- Admin panel-এর "Telegram Settings" page এবং Test button আগের মতই কাজ করবে।
