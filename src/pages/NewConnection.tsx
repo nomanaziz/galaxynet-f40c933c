@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, Wifi, Zap, Shield, BadgeCheck, Search } from "lucide-react";
+import { CheckCircle, Wifi, Zap, Shield, BadgeCheck, Search, RefreshCw } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -31,6 +31,16 @@ const NewConnection = () => {
   const [selectedThana, setSelectedThana] = useState("");
   const [districtSearch, setDistrictSearch] = useState("");
   const [thanaSearch, setThanaSearch] = useState("");
+
+  // Simple math captcha
+  const [captchaA, setCaptchaA] = useState(() => Math.floor(Math.random() * 9) + 1);
+  const [captchaB, setCaptchaB] = useState(() => Math.floor(Math.random() * 9) + 1);
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const refreshCaptcha = () => {
+    setCaptchaA(Math.floor(Math.random() * 9) + 1);
+    setCaptchaB(Math.floor(Math.random() * 9) + 1);
+    setCaptchaAnswer("");
+  };
 
   useEffect(() => {
     supabase.from("coverage_locations").select("*").order("sort_order").order("name").then(({ data }) => {
@@ -88,6 +98,11 @@ const NewConnection = () => {
       toast({ title: t("Enter a valid phone number (11 digits)", "সঠিক ফোন নাম্বার দিন (১১ ডিজিট)"), variant: "destructive" });
       return;
     }
+    if (parseInt(captchaAnswer, 10) !== captchaA + captchaB) {
+      toast({ title: t("Captcha answer is wrong", "ক্যাপচার উত্তর সঠিক নয়"), variant: "destructive" });
+      refreshCaptcha();
+      return;
+    }
 
     setSubmitting(true);
     const notesData: any = { source: "new_connection_page" };
@@ -104,25 +119,10 @@ const NewConnection = () => {
     setSubmitting(false);
     if (error) {
       toast({ title: t("Something went wrong, please try again", "সমস্যা হয়েছে, আবার চেষ্টা করুন"), variant: "destructive" });
+      refreshCaptcha();
     } else {
-      // Fire-and-forget Telegram notification
-      const selectedPkg = packages.find((p) => p.id === packageId);
-      const packageLabel = selectedPkg
-        ? `${selectedPkg.speed >= 1000 ? `${selectedPkg.speed / 1000}Gbps` : `${selectedPkg.speed}Mbps`} @ ৳${selectedPkg.price}`
-        : "";
-      supabase.functions
-        .invoke("notify-order-telegram", {
-          body: {
-            name: name.trim(),
-            phone: phone.trim(),
-            address: address.trim() || "N/A",
-            area: areaName,
-            category: activeCategory,
-            packageLabel,
-            dedicatedMbps: activeCategory === "dedicated" ? dedicatedMbps : "",
-          },
-        })
-        .catch((e) => console.error("Telegram notify failed", e));
+      // Telegram notification is dispatched server-side via DB trigger (notify_telegram_on_new_order).
+      refreshCaptcha();
       setSuccess(true);
     }
   };
@@ -317,6 +317,34 @@ const NewConnection = () => {
                       />
                     </TabsContent>
                   </Tabs>
+                </div>
+
+
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-semibold">
+                    {t("Security Check", "নিরাপত্তা যাচাই")} <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted border font-mono text-base font-bold select-none">
+                      <span>{captchaA}</span>
+                      <span>+</span>
+                      <span>{captchaB}</span>
+                      <span>=</span>
+                      <span>?</span>
+                    </div>
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      placeholder={t("Answer", "উত্তর")}
+                      value={captchaAnswer}
+                      onChange={(e) => setCaptchaAnswer(e.target.value)}
+                      className="flex-1"
+                      required
+                    />
+                    <Button type="button" variant="outline" size="icon" onClick={refreshCaptcha} title={t("Refresh", "রিফ্রেশ")}>
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 <Button type="submit" disabled={submitting} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-base py-6">

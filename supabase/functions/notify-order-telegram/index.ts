@@ -100,7 +100,34 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { name, phone, address, area, packageLabel, category, dedicatedMbps, notes } = body ?? {};
+    let { name, phone, address, area, packageLabel, category, dedicatedMbps, notes } = body ?? {};
+
+    // orderId mode: DB trigger sends just the order id; fetch the rest server-side
+    if (body?.orderId && (!name || !phone)) {
+      const { data: order } = await supabase
+        .from("connection_orders")
+        .select("name, phone, address, area, notes, packages(name, speed, price)")
+        .eq("id", body.orderId)
+        .maybeSingle();
+      if (order) {
+        name = order.name;
+        phone = order.phone;
+        address = order.address;
+        area = order.area;
+        const pkg: any = (order as any).packages;
+        if (pkg) {
+          const speedStr = pkg.speed >= 1000 ? `${pkg.speed / 1000}Gbps` : `${pkg.speed}Mbps`;
+          packageLabel = `${pkg.name} — ${speedStr} @ ৳${pkg.price}`;
+        }
+        try {
+          const parsed = JSON.parse(order.notes || "{}");
+          if (parsed?.dedicated_mbps) dedicatedMbps = parsed.dedicated_mbps;
+          if (parsed?.source) category = parsed.source;
+          if (parsed?.note) notes = parsed.note;
+        } catch { notes = order.notes; }
+      }
+    }
+
     if (!name || !phone) {
       return new Response(JSON.stringify({ ok: false, error: "invalid_body" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
