@@ -319,6 +319,34 @@ const NewConnection = () => {
                   </Tabs>
                 </div>
 
+
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-semibold">
+                    {t("Security Check", "নিরাপত্তা যাচাই")} <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted border font-mono text-base font-bold select-none">
+                      <span>{captchaA}</span>
+                      <span>+</span>
+                      <span>{captchaB}</span>
+                      <span>=</span>
+                      <span>?</span>
+                    </div>
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      placeholder={t("Answer", "উত্তর")}
+                      value={captchaAnswer}
+                      onChange={(e) => setCaptchaAnswer(e.target.value)}
+                      className="flex-1"
+                      required
+                    />
+                    <Button type="button" variant="outline" size="icon" onClick={refreshCaptcha} title={t("Refresh", "রিফ্রেশ")}>
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
                 <Button type="submit" disabled={submitting} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold text-base py-6">
                   {submitting ? t("Submitting...", "জমা হচ্ছে...") : t("Submit Application", "ফর্ম সাবমিট করুন")}
                 </Button>
