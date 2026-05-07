@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Phone, Facebook, Youtube, MessageCircle, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const TopBar = () => {
   const { t } = useLanguage();
@@ -47,6 +48,7 @@ const TopBar = () => {
               </a>
             ))}
           </div>
+          <ThemeToggle className="text-primary-foreground/90 hover:text-accent" />
         </div>
       </div>
     </div>
