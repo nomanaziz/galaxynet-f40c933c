@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Package, MapPin, ShoppingCart, FileText,
   Bell, Settings, Users, LogOut, Menu, CreditCard, Home, Image, ExternalLink,
-  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog, Globe, Info, Server
+  Gift, Star, Handshake, Sparkles, Building2, BadgeCheck, UserCog, Globe, Info, Server, Send
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import logo from "@/assets/logo.png";
