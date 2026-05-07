@@ -6,3 +6,6 @@ verify_jwt = false
 [functions.list-staff-users]
 verify_jwt = false
 
+[functions.create-staff-user]
+verify_jwt = false
+
