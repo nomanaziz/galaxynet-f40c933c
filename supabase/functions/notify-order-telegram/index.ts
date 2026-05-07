@@ -26,6 +26,29 @@ async function sendTelegram(token: string, chat_id: string, text: string) {
   };
 }
 
+function supergroupFallbackId(chatId: string): string | null {
+  const normalized = chatId.trim();
+  if (!normalized.startsWith("-") || normalized.startsWith("-100")) return null;
+  const digits = normalized.slice(1);
+  return /^\d{10,}$/.test(digits) ? `-100${digits}` : null;
+}
+
+async function sendTelegramWithFallback(token: string, chat_id: string, text: string) {
+  const first = await sendTelegram(token, chat_id, text);
+  const fallbackId = supergroupFallbackId(chat_id);
+  if (first.ok || !fallbackId || !String(first.error || "").toLowerCase().includes("chat not found")) {
+    return { chat_id, ...first };
+  }
+
+  const retry = await sendTelegram(token, fallbackId, text);
+  return {
+    chat_id,
+    attempted_chat_id: fallbackId,
+    ...retry,
+    error: retry.ok ? undefined : `${retry.error} (also tried ${fallbackId})`,
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -52,8 +75,8 @@ Deno.serve(async (req) => {
     // Test mode
     if (body?.test === true && body?.chatId) {
       const text = `🧪 <b>Test message</b>\nLabel: ${escape(body.label || "(unnamed)")}\nGalaxy Net Telegram সঠিকভাবে কনফিগার হয়েছে।\n🕒 ${new Date().toLocaleString("en-GB", { timeZone: "Asia/Dhaka" })} (BD)`;
-      const r = await sendTelegram(token, String(body.chatId), text);
-      return new Response(JSON.stringify({ ok: r.ok, results: [{ chat_id: body.chatId, ...r }] }), {
+      const r = await sendTelegramWithFallback(token, String(body.chatId), text);
+      return new Response(JSON.stringify({ ok: r.ok, results: [r] }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -99,9 +122,9 @@ Deno.serve(async (req) => {
 
     const results = [];
     for (const chat_id of chatIds) {
-      const r = await sendTelegram(token, chat_id, text);
+      const r = await sendTelegramWithFallback(token, chat_id, text);
       if (!r.ok) console.error(`Telegram send failed for ${chat_id}:`, r.error);
-      results.push({ chat_id, ...r });
+      results.push(r);
     }
 
     return new Response(JSON.stringify({ ok: true, results }), {

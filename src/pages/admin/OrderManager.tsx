@@ -195,7 +195,9 @@ const OrderManager = () => {
                   <TableCell className="font-medium">{order.name}</TableCell>
                   <TableCell>{order.phone}</TableCell>
                   <TableCell>{order.area || "—"}</TableCell>
-                  <TableCell className="max-w-[180px] truncate">{order.address}</TableCell>
+                  <TableCell className="min-w-[260px] max-w-[420px] whitespace-normal break-words leading-relaxed">
+                    {order.address || "—"}
+                  </TableCell>
                   <TableCell>{order.packages?.name ?? "—"}</TableCell>
                   <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                     {format(new Date(order.created_at), "dd MMM yyyy")}
