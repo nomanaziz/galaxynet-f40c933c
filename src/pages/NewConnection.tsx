@@ -195,7 +195,17 @@ const NewConnection = () => {
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold">{t("Select Area", "এলাকা নির্বাচন করুন")} <span className="text-red-500">*</span></Label>
 
-                  <Select value={selectedDivision} onValueChange={(v) => { setSelectedDivision(v); setSelectedDistrict(""); setSelectedThana(""); setDistrictSearch(""); setThanaSearch(""); }}>
+                  <Select
+                    key={`div-${locations.length}`}
+                    value={selectedDivision || undefined}
+                    onValueChange={(v) => {
+                      setSelectedDivision(v);
+                      setSelectedDistrict("");
+                      setSelectedThana("");
+                      setDistrictSearch("");
+                      setThanaSearch("");
+                    }}
+                  >
                     <SelectTrigger><SelectValue placeholder={t("Select Division", "বিভাগ বাছাই করুন")} /></SelectTrigger>
                     <SelectContent>
                       {divisions.map((d) => (
@@ -210,14 +220,23 @@ const NewConnection = () => {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input placeholder={t("Search district...", "জেলা খুঁজুন...")} value={districtSearch} onChange={(e) => setDistrictSearch(e.target.value)} className="pl-9 h-9 text-sm" />
                       </div>
-                      <Select value={selectedDistrict} onValueChange={(v) => { setSelectedDistrict(v); setSelectedThana(""); setThanaSearch(""); }}>
+                      <Select
+                        key={`dist-${selectedDivision}`}
+                        value={selectedDistrict || undefined}
+                        onValueChange={(v) => {
+                          setSelectedDistrict(v);
+                          setSelectedThana("");
+                          setThanaSearch("");
+                        }}
+                      >
                         <SelectTrigger><SelectValue placeholder={t("Select District", "জেলা বাছাই করুন")} /></SelectTrigger>
                         <SelectContent>
-                          {districts.map((d) => (
-                            <SelectItem key={d.id} value={d.id}>{d.name_bn || d.name}</SelectItem>
-                          ))}
-                          {districts.length === 0 && (
-                            <div className="py-2 px-3 text-sm text-muted-foreground text-center">{t("No districts found", "কোনো জেলা পাওয়া যায়নি")}</div>
+                          {districts.length === 0 ? (
+                            <SelectItem value="__none__" disabled>{t("No districts found", "কোনো জেলা পাওয়া যায়নি")}</SelectItem>
+                          ) : (
+                            districts.map((d) => (
+                              <SelectItem key={d.id} value={d.id}>{d.name_bn || d.name}</SelectItem>
+                            ))
                           )}
                         </SelectContent>
                       </Select>
@@ -230,7 +249,11 @@ const NewConnection = () => {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input placeholder={t("Search thana...", "থানা/উপজেলা খুঁজুন...")} value={thanaSearch} onChange={(e) => setThanaSearch(e.target.value)} className="pl-9 h-9 text-sm" />
                       </div>
-                      <Select value={selectedThana} onValueChange={setSelectedThana}>
+                      <Select
+                        key={`thana-${selectedDistrict}`}
+                        value={selectedThana || undefined}
+                        onValueChange={setSelectedThana}
+                      >
                         <SelectTrigger><SelectValue placeholder={t("Select Thana", "থানা/উপজেলা বাছাই করুন")} /></SelectTrigger>
                         <SelectContent>
                           {thanas.map((th) => (
