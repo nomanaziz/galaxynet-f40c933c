@@ -15,6 +15,10 @@ type Recipient = { label: string; chat_id: string; type: "personal" | "group" };
 const TelegramSettings = () => {
   const [enabled, setEnabled] = useState(false);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [botToken, setBotToken] = useState("");
+  const [savedToken, setSavedToken] = useState("");
+  const [showToken, setShowToken] = useState(false);
+  const [savingToken, setSavingToken] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testingId, setTestingId] = useState<string | null>(null);
@@ -26,10 +30,12 @@ const TelegramSettings = () => {
       const { data } = await supabase
         .from("site_settings")
         .select("key,value")
-        .in("key", ["telegram_enabled", "telegram_chat_ids"]);
+        .in("key", ["telegram_enabled", "telegram_chat_ids", "telegram_bot_token"]);
       const map: Record<string, string> = {};
       (data ?? []).forEach((r: any) => { map[r.key] = r.value ?? ""; });
       setEnabled(map.telegram_enabled === "true");
+      setBotToken(map.telegram_bot_token || "");
+      setSavedToken(map.telegram_bot_token || "");
       try {
         const arr = JSON.parse(map.telegram_chat_ids || "[]");
         if (Array.isArray(arr)) setRecipients(arr);
@@ -37,6 +43,18 @@ const TelegramSettings = () => {
       setLoading(false);
     })();
   }, []);
+
+  const saveBotToken = async () => {
+    setSavingToken(true);
+    await supabase.from("site_settings").upsert(
+      { key: "telegram_bot_token", value: botToken.trim() },
+      { onConflict: "key" }
+    );
+    setSavedToken(botToken.trim());
+    setSavingToken(false);
+    toast({ title: "Bot Token সংরক্ষণ হয়েছে" });
+  };
+
 
   const persist = async (next: { enabled?: boolean; recipients?: Recipient[] }) => {
     setSaving(true);
