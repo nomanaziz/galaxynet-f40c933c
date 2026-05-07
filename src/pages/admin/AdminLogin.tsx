@@ -51,7 +51,7 @@ const AdminLogin = () => {
       .eq("user_id", currentUser.id)
       .maybeSingle();
 
-    if (!roleData || !["super_admin", "admin", "staff"].includes(roleData.role)) {
+    if (!roleData || !["super_admin", "admin", "staff", "supervisor"].includes(roleData.role)) {
       await supabase.auth.signOut();
       toast({ title: "Access Denied", description: "You do not have admin privileges.", variant: "destructive" });
       setLoginLoading(false);

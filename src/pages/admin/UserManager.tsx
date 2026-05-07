@@ -46,25 +46,20 @@ const UserManager = () => {
 
   const fetchStaffUsers = async () => {
     setLoading(true);
-    const { data: roles } = await supabase.from("user_roles").select("*");
-    if (!roles) { setLoading(false); return; }
-
-    // Get permission counts
-    const { data: perms } = await supabase.from("staff_permissions").select("user_id, permission");
-
-    const permMap: Record<string, number> = {};
-    perms?.forEach(p => {
-      permMap[p.user_id] = (permMap[p.user_id] || 0) + 1;
-    });
-
-    const users: StaffUser[] = roles.map(r => ({
-      id: r.id,
-      user_id: r.user_id,
-      role: r.role,
-      permissionCount: permMap[r.user_id] || 0,
-    }));
-
-    setStaffUsers(users);
+    const { data, error } = await supabase.functions.invoke("list-staff-users");
+    if (error || !data?.users) {
+      // Fallback: roles only (no email)
+      const { data: roles } = await supabase.from("user_roles").select("*");
+      const { data: perms } = await supabase.from("staff_permissions").select("user_id, permission");
+      const permMap: Record<string, number> = {};
+      perms?.forEach(p => { permMap[p.user_id] = (permMap[p.user_id] || 0) + 1; });
+      setStaffUsers((roles ?? []).map((r: any) => ({
+        id: r.id, user_id: r.user_id, role: r.role,
+        permissionCount: permMap[r.user_id] || 0,
+      })));
+    } else {
+      setStaffUsers(data.users);
+    }
     setLoading(false);
   };
 
