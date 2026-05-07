@@ -1,31 +1,37 @@
 ## সমস্যা
 
-আগের loop-এ TelegramSettings page তৈরি হয়েছিল বলে summary-তে আছে, কিন্তু আসলে file save হয়নি — `src/pages/admin/TelegramSettings.tsx` নেই, `AdminSidebar.tsx`-এ Telegram menu entry নেই, `App.tsx`-এ route নেই, এবং `notify-order-telegram` edge function এখনো শুধু secret থেকে chat ID পড়ছে। তাই Admin panel-এ Telegram option দেখা যাচ্ছে না।
+এখনকার setup Lovable-র Telegram **connector gateway** ব্যবহার করছে — তাই আপনি UI-তে bot token দেওয়ার জায়গা পাচ্ছেন না। আপনি চান আগের মতো সরাসরি **Bot Token + Chat ID** দিলেই কাজ করবে (যেমন স্ক্রিনশটে দেখানো)।
 
-## যা করব
+## সমাধান
 
-1. **নতুন page**: `src/pages/admin/TelegramSettings.tsx`
-   - Master switch (Enable/Disable) — `site_settings.telegram_enabled`
-   - "Add Recipient" form: Label + Chat ID + Type (Personal/Group)
-   - Recipients list (table) — প্রতি row-এ Test ও Delete button
-   - Bangla helper: personal-এ `@userinfobot`, group-এ bot member হিসেবে add করতে হবে এবং `@RawDataBot` দিয়ে chat ID নিতে হবে
-   - Data store: `site_settings` table-এ `telegram_chat_ids` key, value = JSON array `[{label, chat_id, type}]`
+Connector gateway বাদ দিয়ে সরাসরি Telegram Bot API call করব (`https://api.telegram.org/bot<TOKEN>/sendMessage`)। তখন UI-তে যা দিব সেটাই ব্যবহার হবে।
 
-2. **Sidebar**: `AdminSidebar.tsx`-এর System group-এ "Telegram" entry (super-admin only, icon: Send)
+### 1. `TelegramSettings.tsx`-এ নতুন "Bot Token" card
 
-3. **Route**: `App.tsx`-এ `/admin/telegram` → `<TelegramSettings />`
+- উপরে নতুন card: **Bot Token** input (password type, eye toggle) + **Save Token** button
+- Helper text: "Telegram-এ `@BotFather`-এ গিয়ে bot create করে token নিন (format: `123456:ABC-DEF...`)"
+- Save → `site_settings.telegram_bot_token` key-তে store
+- যদি token না থাকে — recipient list-এর উপরে warning banner: "আগে Bot Token দিন, তারপর message যাবে"
 
-4. **Edge function**: `supabase/functions/notify-order-telegram/index.ts` rewrite করব — service-role Supabase client দিয়ে DB থেকে `telegram_enabled` ও `telegram_chat_ids` পড়বে, না থাকলে পুরনো `TELEGRAM_ADMIN_CHAT_ID` secret-এ fallback. নতুন `{ test: true, chatId, label }` mode যোগ — Test button থেকে call হবে এবং প্রতি chat-এর জন্য send result + error detail return করবে।
+### 2. Edge function `notify-order-telegram` rewrite
 
-5. **DB**: কোনো migration লাগবে না — existing `site_settings` table ব্যবহার, RLS already admin upsert allow করে।
+- DB থেকে পড়বে: `telegram_enabled`, `telegram_bot_token`, `telegram_chat_ids`
+- Direct fetch: `https://api.telegram.org/bot${token}/sendMessage` with `{chat_id, text, parse_mode: "HTML"}`
+- Connector gateway / `LOVABLE_API_KEY` / `TELEGRAM_API_KEY` reference সব বাদ
+- Test mode আগের মতই — per-chat error message return (যেমন "chat not found", "bot was blocked", "Forbidden: bot is not a member")
+- Token না থাকলে clear error: `bot_token_not_configured`
 
-## যা করব না
+### 3. কোনো DB migration লাগবে না
 
-- Two-way bot / incoming messages
-- Per-event routing (যেকোনো order event সব configured chat-এ যাবে)
-- API key UI input — `TELEGRAM_API_KEY` Lovable connector secret হিসেবে already managed
+`site_settings` table-এ শুধু নতুন key `telegram_bot_token` upsert হবে। RLS already admin-only write allow করে। Token row হিসেবে DB-তে থাকবে (frontend admin-only fetch); যদি আপনি বলেন বরং Supabase **secret** হিসেবে রাখব, সেটাও করা যায় — কিন্তু তখন UI থেকে edit করা যাবে না, প্রতিবার আমাকে বলতে হবে। তাই DB-তে রাখছি যাতে আপনি নিজেই UI থেকে যেকোনো সময় change করতে পারেন।
 
 ## ফাইল
 
-- নতুন: `src/pages/admin/TelegramSettings.tsx`
-- edit: `src/components/admin/AdminSidebar.tsx`, `src/App.tsx`, `supabase/functions/notify-order-telegram/index.ts`
+- edit: `src/pages/admin/TelegramSettings.tsx` (Bot Token card + warning banner)
+- edit: `supabase/functions/notify-order-telegram/index.ts` (direct API, no gateway)
+
+## Out of scope
+
+- Webhook/incoming messages
+- Per-event routing
+- Multiple bot tokens

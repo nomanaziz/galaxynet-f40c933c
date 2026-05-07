@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Plus, Trash2, Send, Users, User } from "lucide-react";
+import { Loader2, Plus, Trash2, Send, Users, User, Save, Eye, EyeOff, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Recipient = { label: string; chat_id: string; type: "personal" | "group" };
@@ -15,6 +15,10 @@ type Recipient = { label: string; chat_id: string; type: "personal" | "group" };
 const TelegramSettings = () => {
   const [enabled, setEnabled] = useState(false);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [botToken, setBotToken] = useState("");
+  const [savedToken, setSavedToken] = useState("");
+  const [showToken, setShowToken] = useState(false);
+  const [savingToken, setSavingToken] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testingId, setTestingId] = useState<string | null>(null);
@@ -26,10 +30,12 @@ const TelegramSettings = () => {
       const { data } = await supabase
         .from("site_settings")
         .select("key,value")
-        .in("key", ["telegram_enabled", "telegram_chat_ids"]);
+        .in("key", ["telegram_enabled", "telegram_chat_ids", "telegram_bot_token"]);
       const map: Record<string, string> = {};
       (data ?? []).forEach((r: any) => { map[r.key] = r.value ?? ""; });
       setEnabled(map.telegram_enabled === "true");
+      setBotToken(map.telegram_bot_token || "");
+      setSavedToken(map.telegram_bot_token || "");
       try {
         const arr = JSON.parse(map.telegram_chat_ids || "[]");
         if (Array.isArray(arr)) setRecipients(arr);
@@ -37,6 +43,18 @@ const TelegramSettings = () => {
       setLoading(false);
     })();
   }, []);
+
+  const saveBotToken = async () => {
+    setSavingToken(true);
+    await supabase.from("site_settings").upsert(
+      { key: "telegram_bot_token", value: botToken.trim() },
+      { onConflict: "key" }
+    );
+    setSavedToken(botToken.trim());
+    setSavingToken(false);
+    toast({ title: "Bot Token সংরক্ষণ হয়েছে" });
+  };
+
 
   const persist = async (next: { enabled?: boolean; recipients?: Recipient[] }) => {
     setSaving(true);
@@ -111,6 +129,55 @@ const TelegramSettings = () => {
           নতুন connection order এলে এখানে যোগ করা সব Telegram chat-এ notification যাবে।
         </p>
       </div>
+
+      {!savedToken && (
+        <div className="flex items-start gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
+          <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-destructive">Bot Token দেওয়া হয়নি</p>
+            <p className="text-muted-foreground">আগে নিচের Bot Token field-এ token বসিয়ে Save করুন, না হলে কোনো message যাবে না।</p>
+          </div>
+        </div>
+      )}
+
+      <Card>
+        <CardHeader><CardTitle>Bot Token</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="space-y-1">
+            <Label>Telegram Bot Token</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  type={showToken ? "text" : "password"}
+                  placeholder="123456789:ABCdefGhIJKlmNoPQRstuVWxyZ"
+                  value={botToken}
+                  onChange={e => setBotToken(e.target.value)}
+                  className="pr-10 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowToken(s => !s)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <Button onClick={saveBotToken} disabled={savingToken || botToken.trim() === savedToken}>
+                {savingToken ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                <span className="ml-1">Save</span>
+              </Button>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Telegram-এ <code>@BotFather</code>-এ গিয়ে <code>/newbot</code> দিয়ে bot তৈরি করুন এবং token কপি করুন। Token-এর format: <code>123456789:ABCdef...</code>
+          </p>
+          {savedToken && (
+            <p className="text-xs text-emerald-600 dark:text-emerald-400">
+              ✓ Token configured (<code>{savedToken.slice(0, 8)}...{savedToken.slice(-4)}</code>)
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader><CardTitle>Master Switch</CardTitle></CardHeader>
