@@ -72,11 +72,10 @@ const About = () => {
       setJourneySub({ en: map.about_journey_sub_en || "From a small local ISP to serving 10,000+ customers across Bangladesh.", bn: map.about_journey_sub_bn || "একটি ছোট স্থানীয় ISP থেকে বাংলাদেশজুড়ে ১০,০০০+ গ্রাহকে সেবা প্রদান।" });
     });
     // Fetch team from employees table
-    supabase.from("employees")
+    (supabase.from("public_employees" as any)
       .select("id, name, name_bn, photo_url, department_id, departments(name, name_bn), designations(name, name_bn)")
       .eq("show_on_about", true)
-      .eq("visible", true)
-      .order("sort_order")
+      .order("sort_order") as any)
       .then(({ data }) => { setTeam((data as TeamMember[]) ?? []); });
     // Fetch departments
     supabase.from("departments").select("id, name, name_bn, sort_order").eq("visible", true).order("sort_order")
