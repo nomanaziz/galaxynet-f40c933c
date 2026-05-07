@@ -54,7 +54,7 @@ const Footer = () => {
 
   return (
     <>
-      <footer className="footer-galaxy text-primary-foreground">
+      <footer className="footer-galaxy text-white">
         <div className="container mx-auto px-4 py-12 relative z-10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10">
             {/* Brand */}
@@ -62,15 +62,15 @@ const Footer = () => {
               <div className="flex items-center gap-2.5 mb-4">
                 <img src={logo} alt={siteName} className="h-10 w-auto brightness-0 invert" />
               </div>
-              <p className="text-primary-foreground/90 text-sm leading-relaxed mb-4">
+              <p className="text-white/90 text-sm leading-relaxed mb-4">
                 {tagline}
               </p>
               <div className="flex gap-2">
-                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-foreground/10 hover:bg-accent transition-colors">
+                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 hover:bg-accent transition-colors">
                   <Facebook className="h-4 w-4" />
                 </a>
                 {[Youtube, MessageCircle].map((Icon, i) => (
-                  <a key={i} href="#" className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-foreground/10 hover:bg-accent transition-colors">
+                  <a key={i} href="#" className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 hover:bg-accent transition-colors">
                     <Icon className="h-4 w-4" />
                   </a>
                 ))}
@@ -85,7 +85,7 @@ const Footer = () => {
               <ul className="space-y-2.5">
                 {quickLinks.map((link) => (
                   <li key={link.href}>
-                    <Link to={link.href} className="text-sm text-primary-foreground/90 hover:text-accent transition-colors">
+                    <Link to={link.href} className="text-sm text-white/90 hover:text-accent transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -101,14 +101,14 @@ const Footer = () => {
               <ul className="space-y-2.5">
                 {resourceLinks.map((link) => (
                   <li key={link.href}>
-                    <Link to={link.href} className="text-sm text-primary-foreground/90 hover:text-accent transition-colors">
+                    <Link to={link.href} className="text-sm text-white/90 hover:text-accent transition-colors">
                       {link.label}
                     </Link>
                   </li>
                 ))}
                 {btrcUrl && (
                   <li>
-                    <a href={btrcUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary-foreground/90 hover:text-accent transition-colors">
+                    <a href={btrcUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-white/90 hover:text-accent transition-colors">
                       {t("BTRC Approved Tariff", "বিটিআরসি অনুমোদিত ট্যারিফ")}
                     </a>
                   </li>
@@ -121,7 +121,7 @@ const Footer = () => {
               <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-accent">
                 {t("Contact", "যোগাযোগ")}
               </h4>
-              <ul className="space-y-3 text-sm text-primary-foreground/90">
+              <ul className="space-y-3 text-sm text-white/90">
                 <li className="flex items-start gap-2.5">
                   <Phone className="h-4 w-4 mt-0.5 text-accent shrink-0" />
                   <a href={`tel:${phone}`} className="hover:text-accent transition-colors">{phone}</a>
@@ -145,8 +145,8 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-primary-foreground/10">
-          <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-primary-foreground/80 text-xs relative z-10">
+        <div className="border-t border-white/10">
+          <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-white/80 text-xs relative z-10">
             <span>© {new Date().getFullYear()} {siteName}. {t("All rights reserved.", "সর্বস্বত্ব সংরক্ষিত।")}</span>
             <span>Developed by: <a href="https://finehost.net" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">FineHost.net</a></span>
           </div>
