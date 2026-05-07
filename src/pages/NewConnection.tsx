@@ -32,6 +32,16 @@ const NewConnection = () => {
   const [districtSearch, setDistrictSearch] = useState("");
   const [thanaSearch, setThanaSearch] = useState("");
 
+  // Simple math captcha
+  const [captchaA, setCaptchaA] = useState(() => Math.floor(Math.random() * 9) + 1);
+  const [captchaB, setCaptchaB] = useState(() => Math.floor(Math.random() * 9) + 1);
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const refreshCaptcha = () => {
+    setCaptchaA(Math.floor(Math.random() * 9) + 1);
+    setCaptchaB(Math.floor(Math.random() * 9) + 1);
+    setCaptchaAnswer("");
+  };
+
   useEffect(() => {
     supabase.from("coverage_locations").select("*").order("sort_order").order("name").then(({ data }) => {
       setLocations((data as CoverageLocation[]) ?? []);
