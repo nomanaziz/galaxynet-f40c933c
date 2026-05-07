@@ -51,6 +51,7 @@ import ServicesManager from "./pages/admin/ServicesManager";
 import FestivalManager from "./pages/admin/FestivalManager";
 import AboutManager from "./pages/admin/AboutManager";
 import FtpServerManager from "./pages/admin/FtpServerManager";
+import TelegramSettings from "./pages/admin/TelegramSettings";
 import FtpServers from "./pages/FtpServers";
 
 const queryClient = new QueryClient();
@@ -111,6 +112,7 @@ const App = () => (
               <Route path="festivals" element={<FestivalManager />} />
               <Route path="about" element={<AboutManager />} />
               <Route path="ftp-servers" element={<FtpServerManager />} />
+              <Route path="telegram" element={<TelegramSettings />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
