@@ -105,6 +105,24 @@ const NewConnection = () => {
     if (error) {
       toast({ title: t("Something went wrong, please try again", "সমস্যা হয়েছে, আবার চেষ্টা করুন"), variant: "destructive" });
     } else {
+      // Fire-and-forget Telegram notification
+      const selectedPkg = packages.find((p) => p.id === packageId);
+      const packageLabel = selectedPkg
+        ? `${selectedPkg.speed >= 1000 ? `${selectedPkg.speed / 1000}Gbps` : `${selectedPkg.speed}Mbps`} @ ৳${selectedPkg.price}`
+        : "";
+      supabase.functions
+        .invoke("notify-order-telegram", {
+          body: {
+            name: name.trim(),
+            phone: phone.trim(),
+            address: address.trim() || "N/A",
+            area: areaName,
+            category: activeCategory,
+            packageLabel,
+            dedicatedMbps: activeCategory === "dedicated" ? dedicatedMbps : "",
+          },
+        })
+        .catch((e) => console.error("Telegram notify failed", e));
       setSuccess(true);
     }
   };
