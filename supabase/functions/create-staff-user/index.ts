@@ -67,7 +67,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create the user
+    // Create the user (or reuse existing)
+    let userId: string | null = null;
+    let reused = false;
+
     const { data: newUser, error: createError } = await serviceClient.auth.admin.createUser({
       email,
       password,
@@ -76,27 +79,63 @@ Deno.serve(async (req) => {
     });
 
     if (createError) {
-      return new Response(JSON.stringify({ error: createError.message }), {
+      const msg = (createError.message || "").toLowerCase();
+      const alreadyExists = msg.includes("already been registered") || msg.includes("already registered") || msg.includes("already exists");
+      if (!alreadyExists) {
+        return new Response(JSON.stringify({ error: createError.message }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Find existing user by paginating through admin.listUsers
+      let page = 1;
+      while (page <= 20 && !userId) {
+        const { data: list, error: listErr } = await serviceClient.auth.admin.listUsers({ page, perPage: 200 });
+        if (listErr) break;
+        const found = list.users.find((u: any) => (u.email || "").toLowerCase() === email.toLowerCase());
+        if (found) { userId = found.id; break; }
+        if (list.users.length < 200) break;
+        page++;
+      }
+
+      if (!userId) {
+        return new Response(JSON.stringify({ error: "User exists but could not be located. Please try again." }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      reused = true;
+    } else {
+      userId = newUser.user.id;
+    }
+
+    // Upsert role (delete any existing role first to avoid duplicates, then insert new role)
+    await serviceClient.from("user_roles").delete().eq("user_id", userId);
+    const { error: roleErr } = await serviceClient.from("user_roles").insert({
+      user_id: userId,
+      role,
+    });
+    if (roleErr) {
+      return new Response(JSON.stringify({ error: `Failed to assign role: ${roleErr.message}` }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Assign role
-    await serviceClient.from("user_roles").insert({
-      user_id: newUser.user.id,
-      role,
-    });
-
-    // Assign permissions if provided
+    // Replace permissions
+    await serviceClient.from("staff_permissions").delete().eq("user_id", userId);
     if (permissions && Array.isArray(permissions) && permissions.length > 0) {
       const permRows = permissions.map((p: string) => ({
-        user_id: newUser.user.id,
+        user_id: userId,
         permission: p,
       }));
-      await serviceClient.from("staff_permissions").insert(permRows);
+      const { error: permErr } = await serviceClient.from("staff_permissions").insert(permRows);
+      if (permErr) {
+        return new Response(JSON.stringify({ error: `Failed to assign permissions: ${permErr.message}` }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
-    return new Response(JSON.stringify({ user_id: newUser.user.id, email }), {
+    return new Response(JSON.stringify({ user_id: userId, email, reused }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
