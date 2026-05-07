@@ -17,7 +17,7 @@ const cacheLogos = [
 
 const LogoItem = ({ logo }: { logo: typeof cacheLogos[0] }) => {
   return (
-    <div className="inline-flex items-center justify-center mx-3 md:mx-5 px-5 py-3 rounded-xl bg-white border border-border shadow-sm min-w-[120px] h-[56px] hover:shadow-md transition-shadow">
+    <div className="inline-flex items-center justify-center mx-3 md:mx-5 px-5 py-3 rounded-xl bg-white dark:bg-white/95 border border-border shadow-sm min-w-[120px] h-[56px] hover:shadow-md transition-shadow">
       <img
         src={logo.logo}
         alt={logo.name}
@@ -38,7 +38,7 @@ const CacheMarquee = () => {
   const { t } = useLanguage();
 
   return (
-    <section className="py-10 bg-[hsl(40,40%,96%)] overflow-hidden">
+    <section className="py-10 bg-[hsl(40,40%,96%)] dark:bg-card overflow-hidden">
       <div className="container mx-auto px-4 mb-5">
         <div className="flex flex-col items-center gap-2">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-600 text-white text-xs font-bold uppercase tracking-wider">
