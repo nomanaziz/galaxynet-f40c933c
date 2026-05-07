@@ -46,25 +46,20 @@ const UserManager = () => {
 
   const fetchStaffUsers = async () => {
     setLoading(true);
-    const { data: roles } = await supabase.from("user_roles").select("*");
-    if (!roles) { setLoading(false); return; }
-
-    // Get permission counts
-    const { data: perms } = await supabase.from("staff_permissions").select("user_id, permission");
-
-    const permMap: Record<string, number> = {};
-    perms?.forEach(p => {
-      permMap[p.user_id] = (permMap[p.user_id] || 0) + 1;
-    });
-
-    const users: StaffUser[] = roles.map(r => ({
-      id: r.id,
-      user_id: r.user_id,
-      role: r.role,
-      permissionCount: permMap[r.user_id] || 0,
-    }));
-
-    setStaffUsers(users);
+    const { data, error } = await supabase.functions.invoke("list-staff-users");
+    if (error || !data?.users) {
+      // Fallback: roles only (no email)
+      const { data: roles } = await supabase.from("user_roles").select("*");
+      const { data: perms } = await supabase.from("staff_permissions").select("user_id, permission");
+      const permMap: Record<string, number> = {};
+      perms?.forEach(p => { permMap[p.user_id] = (permMap[p.user_id] || 0) + 1; });
+      setStaffUsers((roles ?? []).map((r: any) => ({
+        id: r.id, user_id: r.user_id, role: r.role,
+        permissionCount: permMap[r.user_id] || 0,
+      })));
+    } else {
+      setStaffUsers(data.users);
+    }
     setLoading(false);
   };
 
@@ -155,7 +150,7 @@ const UserManager = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>User ID</TableHead>
+            <TableHead>User</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Permissions</TableHead>
             <TableHead>Actions</TableHead>
@@ -164,7 +159,13 @@ const UserManager = () => {
         <TableBody>
           {staffUsers.map(u => (
             <TableRow key={u.id}>
-              <TableCell className="font-mono text-xs">{u.user_id}</TableCell>
+              <TableCell>
+                <div className="flex flex-col">
+                  <span className="font-medium text-sm">{u.email || <span className="text-muted-foreground italic">no email</span>}</span>
+                  {u.name && <span className="text-xs text-muted-foreground">{u.name}</span>}
+                  <span className="text-[10px] text-muted-foreground/60 font-mono">{u.user_id}</span>
+                </div>
+              </TableCell>
               <TableCell>
                 <Badge variant="secondary" className={roleColor(u.role)}>{u.role}</Badge>
               </TableCell>
