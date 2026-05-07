@@ -41,6 +41,7 @@ const aboutItems = [
 ];
 
 const systemItems = [
+  { title: "Telegram", url: "/admin/telegram", icon: Send, permission: null },
   { title: "Settings", url: "/admin/settings", icon: Settings, permission: null },
   { title: "Users", url: "/admin/users", icon: Users, permission: null },
 ];
