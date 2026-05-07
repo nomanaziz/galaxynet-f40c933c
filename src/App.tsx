@@ -112,6 +112,7 @@ const App = () => (
               <Route path="festivals" element={<FestivalManager />} />
               <Route path="about" element={<AboutManager />} />
               <Route path="ftp-servers" element={<FtpServerManager />} />
+              <Route path="telegram" element={<TelegramSettings />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
