@@ -65,9 +65,15 @@ const aboutJsonKeys = [
   { key: "about_timeline", label: "Timeline (JSON)", help: '[{"year":"2015","title":"Founded","title_bn":"প্রতিষ্ঠিত","desc":"Started...","desc_bn":"শুরু..."}]' },
 ];
 
+const seoKeys = [
+  { key: "ga_measurement_id", label: "Google Analytics 4 ID (e.g. G-XXXXXXXXXX)" },
+  { key: "google_site_verification", label: "Google Search Console verification (meta content value)" },
+  { key: "bing_site_verification", label: "Bing Webmaster verification (meta content value)" },
+];
+
 const allKeys = [
   ...settingsKeys, ...topbarKeys, ...heroKeys, ...selfcareKeys,
-  ...contactKeys, ...aboutTextKeys, ...aboutJsonKeys,
+  ...contactKeys, ...aboutTextKeys, ...aboutJsonKeys, ...seoKeys,
 ];
 
 const SettingsPage = () => {
@@ -183,6 +189,7 @@ const SettingsPage = () => {
       {renderSection("Selfcare Portal", selfcareKeys)}
       {renderSection("Contact Page", contactKeys)}
       {renderJsonSection("About Page", aboutTextKeys, aboutJsonKeys)}
+      {renderSection("SEO & Analytics", seoKeys)}
 
       <Card>
         <CardHeader><CardTitle>BTRC Approved Tariff (PDF)</CardTitle></CardHeader>

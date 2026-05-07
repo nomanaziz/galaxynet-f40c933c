@@ -21,6 +21,7 @@ import Selfcare from "./pages/Selfcare";
 import NotFound from "./pages/NotFound";
 
 import ScrollToTop from "./components/ScrollToTop";
+import SeoHead from "./components/SeoHead";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -62,6 +63,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <SeoHead />
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
