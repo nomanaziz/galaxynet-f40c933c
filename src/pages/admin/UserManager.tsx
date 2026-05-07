@@ -150,7 +150,7 @@ const UserManager = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>User ID</TableHead>
+            <TableHead>User</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Permissions</TableHead>
             <TableHead>Actions</TableHead>
@@ -159,7 +159,13 @@ const UserManager = () => {
         <TableBody>
           {staffUsers.map(u => (
             <TableRow key={u.id}>
-              <TableCell className="font-mono text-xs">{u.user_id}</TableCell>
+              <TableCell>
+                <div className="flex flex-col">
+                  <span className="font-medium text-sm">{u.email || <span className="text-muted-foreground italic">no email</span>}</span>
+                  {u.name && <span className="text-xs text-muted-foreground">{u.name}</span>}
+                  <span className="text-[10px] text-muted-foreground/60 font-mono">{u.user_id}</span>
+                </div>
+              </TableCell>
               <TableCell>
                 <Badge variant="secondary" className={roleColor(u.role)}>{u.role}</Badge>
               </TableCell>

@@ -2,3 +2,7 @@ project_id = "txbmzkpmjjanejnkqksd"
 
 [functions.notify-order-telegram]
 verify_jwt = false
+
+[functions.list-staff-users]
+verify_jwt = false
+
