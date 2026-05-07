@@ -34,7 +34,12 @@ Deno.serve(async (req) => {
     );
 
     const { data: callerRole } = await serviceClient
-      .from("user_roles").select("role").eq("user_id", callerUser.id).maybeSingle();
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", callerUser.id)
+      .in("role", ["super_admin", "admin"])
+      .limit(1)
+      .maybeSingle();
     if (!callerRole || !["super_admin", "admin"].includes(callerRole.role)) {
       return new Response(JSON.stringify({ error: "Forbidden: admin only" }), {
         status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -42,22 +47,28 @@ Deno.serve(async (req) => {
     }
 
     // Fetch all roles
-    const { data: roles } = await serviceClient
+    const { data: roles, error: rolesError } = await serviceClient
       .from("user_roles")
-      .select("id, user_id, role, created_at");
+      .select("id, user_id, role");
+
+    if (rolesError) {
+      return new Response(JSON.stringify({ error: `Failed to load staff roles: ${rolesError.message}` }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Fetch all auth users (paginated)
     const emailMap: Record<string, string> = {};
     const nameMap: Record<string, string> = {};
     let page = 1;
     while (true) {
-      const { data, error } = await serviceClient.auth.admin.listUsers({ page, perPage: 1000 });
+      const { data, error } = await serviceClient.auth.admin.listUsers({ page, perPage: 200 });
       if (error) break;
       data.users.forEach((u: any) => {
         emailMap[u.id] = u.email ?? "";
         nameMap[u.id] = u.user_metadata?.full_name ?? "";
       });
-      if (!data.users.length || data.users.length < 1000) break;
+      if (!data.users.length || data.users.length < 200) break;
       page++;
     }
 
