@@ -29,7 +29,7 @@ const LogoItem = ({ logo }: { logo: typeof cacheLogos[0] }) => {
           if (fallback) fallback.style.display = "block";
         }}
       />
-      <span className="font-bold text-sm text-foreground tracking-tight hidden">{logo.name}</span>
+      <span className="font-bold text-sm text-slate-900 tracking-tight hidden">{logo.name}</span>
     </div>
   );
 };
